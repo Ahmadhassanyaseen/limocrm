@@ -1,6 +1,12 @@
 
 <?php include_once "components/layout/header.php"; ?>
 <?php include_once "components/layout/sidebar.php"; ?>
+<?php include_once "config/api.php"; ?>
+<?php
+$data['id'] = "b1165351-1891-38b6-b49e-695b9b0f3a27";
+$leads = fetchAllUserLeads($data);
+// print_r($leads);
+?>
     
       <!-- Start::app-content -->
       <div class="main-content app-content">
@@ -257,7 +263,7 @@
           <!-- End::row-1 -->
           <!-- Start::row-2 -->
           <div class="grid grid-cols-12 gap-x-6">
-            <div class="md:col-span-12 xxl:col-span-3 col-span-12">
+            <!-- <div class="md:col-span-12 xxl:col-span-3 col-span-12">
               <div
                 class="box overflow-hidden earnings-card box-bg-primary shadow-sm"
               >
@@ -335,7 +341,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
             <div class="md:col-span-12 xxl:col-span-6 col-span-12">
               <div class="box">
                 <div class="box-header justify-between">
@@ -363,7 +369,235 @@
                 </div>
               </div>
             </div>
-            <div class="md:col-span-12 xxl:col-span-3 col-span-12">
+            <div class="md:col-span-12 xxl:col-span-6 col-span-12">
+              <div class="box overflow-hidden">
+                <div class="box-header justify-between">
+                  <div class="box-title">Sales Performance</div>
+                  <div class="ti-dropdown hs-dropdown">
+                    <button
+                      class="ti-btn ti-btn-light border btn-full ti-btn-sm"
+                      data-bs-toggle="dropdown"
+                    >
+                      Today<i class="ri-arrow-down-s-line"></i>
+                    </button>
+                    <ul
+                      class="ti-dropdown-menu hs-dropdown-menu hidden"
+                      role="menu"
+                    >
+                      <li>
+                        <a class="ti-dropdown-item" href="javascript:void(0);"
+                          >Today</a
+                        >
+                      </li>
+                      <li>
+                        <a class="ti-dropdown-item" href="javascript:void(0);"
+                          >Weekly</a
+                        >
+                      </li>
+                      <li>
+                        <a class="ti-dropdown-item" href="javascript:void(0);"
+                          >Monthly</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="box-body p-0">
+                  <div class="table-responsive">
+                    <table class="ti-custom-table ti-custom-table-head">
+                      <thead>
+                        <tr
+                          class="border-b border-defaultborder dark:border-defaultborder/10"
+                        >
+                          <th scope="col">S.No.</th>
+                          <th scope="col">Representative</th>
+                          <th scope="col">Deals Closed</th>
+                          <th scope="col">Leads</th>
+                          <th scope="col">Rate (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
+                        >
+                          <td>1</td>
+                          <td>
+                            <div class="flex items-center">
+                              <div class="me-2 leading-none">
+                                <span class="avatar avatar-xs">
+                                  <img
+                                    src="assets/images/faces/11.jpg"
+                                    alt=""
+                                  />
+                                </span>
+                              </div>
+                              <div>
+                                <a href="javascript:void(0)" class="font-medium"
+                                  >John Joe</a
+                                >
+                              </div>
+                            </div>
+                          </td>
+                          <td>15</td>
+                          <td>100</td>
+                          <td>
+                            15.0<i
+                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
+                            ></i>
+                          </td>
+                        </tr>
+                        <tr
+                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
+                        >
+                          <td>2</td>
+                          <td>
+                            <div class="flex items-center">
+                              <div class="me-2 leading-none">
+                                <span class="avatar avatar-xs">
+                                  <img
+                                    src="assets/images/faces/12.jpg"
+                                    alt=""
+                                  />
+                                </span>
+                              </div>
+                              <div>
+                                <a href="javascript:void(0)" class="font-medium"
+                                  >Jane Smith</a
+                                >
+                              </div>
+                            </div>
+                          </td>
+                          <td>20</td>
+                          <td>120</td>
+                          <td>
+                            16.7<i
+                              class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg"
+                            ></i>
+                          </td>
+                        </tr>
+                        <tr
+                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
+                        >
+                          <td>3</td>
+                          <td>
+                            <div class="flex items-center">
+                              <div class="me-2 leading-none">
+                                <span class="avatar avatar-xs">
+                                  <img
+                                    src="assets/images/faces/15.jpg"
+                                    alt=""
+                                  />
+                                </span>
+                              </div>
+                              <div>
+                                <a href="javascript:void(0)" class="font-medium"
+                                  >Michael Johnson</a
+                                >
+                              </div>
+                            </div>
+                          </td>
+                          <td>18</td>
+                          <td>110</td>
+                          <td>
+                            16.4<i
+                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
+                            ></i>
+                          </td>
+                        </tr>
+                        <tr
+                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
+                        >
+                          <td>4</td>
+                          <td>
+                            <div class="flex items-center">
+                              <div class="me-2 leading-none">
+                                <span class="avatar avatar-xs">
+                                  <img
+                                    src="assets/images/faces/11.jpg"
+                                    alt=""
+                                  />
+                                </span>
+                              </div>
+                              <div>
+                                <a href="javascript:void(0)" class="font-medium"
+                                  >Emily Davis</a
+                                >
+                              </div>
+                            </div>
+                          </td>
+                          <td>22</td>
+                          <td>130</td>
+                          <td>
+                            16.9<i
+                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
+                            ></i>
+                          </td>
+                        </tr>
+                        <tr
+                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
+                        >
+                          <td>5</td>
+                          <td>
+                            <div class="flex items-center">
+                              <div class="me-2 leading-none">
+                                <span class="avatar avatar-xs">
+                                  <img
+                                    src="assets/images/faces/1.jpg"
+                                    alt=""
+                                  />
+                                </span>
+                              </div>
+                              <div>
+                                <a href="javascript:void(0)" class="font-medium"
+                                  >Anna Garcia</a
+                                >
+                              </div>
+                            </div>
+                          </td>
+                          <td>17</td>
+                          <td>105</td>
+                          <td>
+                            16.2<i
+                              class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg"
+                            ></i>
+                          </td>
+                        </tr>
+                        <tr
+                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
+                        >
+                          <th scope="row">6</th>
+                          <td>
+                            <div class="flex items-center">
+                              <div class="me-2 leading-none">
+                                <span class="avatar avatar-xs">
+                                  <img
+                                    src="assets/images/faces/4.jpg"
+                                    alt=""
+                                  />
+                                </span>
+                              </div>
+                              <div>
+                                <a href="javascript:void(0)" class="font-medium"
+                                  >Kiara Nousin</a
+                                >
+                              </div>
+                            </div>
+                          </td>
+                          <td>20</td>
+                          <td>35</td>
+                          <td>
+                            57%<i
+                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
+                            ></i>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="md:col-span-12 xxl:col-span-3 col-span-12">
               <div class="box">
                 <div class="box-header justify-between">
                   <div class="box-title">Profit By Sale</div>
@@ -406,8 +640,7 @@
                         <div class="flex">
                           <span
                             class="avatar avatar-rounded avatar-md bg-primary/10 !text-primary"
-                            ><i class="bx bx-wallet-alt text-lg"></i
-                          ></span>
+                            ><i class="ri-wallet-line text-lg"></i></span>
                           <div class="flex flex-col ms-2">
                             <p class="font-medium mb-0">Total Sales</p>
                             <p
@@ -532,11 +765,11 @@
                   </ul>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
           <!-- End::row-2 -->
           <!-- Start::row-3 -->
-          <div class="grid grid-cols-12 gap-x-6">
+          <!-- <div class="grid grid-cols-12 gap-x-6">
             <div class="xxl:col-span-4 col-span-12">
               <div class="box">
                 <div class="box-header justify-between">
@@ -1732,7 +1965,7 @@
                       class="ti-btn ti-btn-light border ti-btn-full ti-btn-sm"
                       data-bs-toggle="dropdown"
                     >
-                      Yearly<i class="ti ti-chevron-down"></i>
+                      Yearly<i class="ri-arrow-down-s-line"></i>
                     </button>
                     <ul
                       class="ti-dropdown-menu hs-dropdown-menu hidden"
@@ -1772,7 +2005,7 @@
                       class="ti-btn ti-btn-light border btn-full ti-btn-sm"
                       data-bs-toggle="dropdown"
                     >
-                      Today<i class="ti ti-chevron-down"></i>
+                      Today<i class="ri-arrow-down-s-line"></i>
                     </button>
                     <ul
                       class="ti-dropdown-menu hs-dropdown-menu hidden"
@@ -1991,7 +2224,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <!-- End::row-3 -->
           <!-- Start::row-4 -->
           <div class="grid grid-cols-12 gap-x-6">
@@ -2004,7 +2237,7 @@
                       class="ti-btn ti-btn-light border btn-full ti-btn-sm"
                       data-bs-toggle="dropdown"
                     >
-                      View All<i class="ti ti-chevron-down ms-1"></i>
+                      View All<i class="ri-arrow-down-s-line ms-1"></i>
                     </div>
                     <ul
                       class="ti-dropdown-menu hs-dropdown-menu hidden"
@@ -2031,48 +2264,7 @@
                 <div class="box-body active-tab">
                <?php include_once "components/tables/leads.php" ?>
                 </div>
-                <div class="box-footer">
-                  <div class="flex items-center flex-wrap">
-                    <div>
-                      Showing 5 Entries
-                      <i class="bi bi-arrow-right ms-2 font-semibold"></i>
-                    </div>
-                    <div class="ms-auto">
-                      <nav
-                        aria-label="Page navigation"
-                        class="pagination-style-4"
-                      >
-                        <ul class="ti-pagination mb-0 flex-wrap">
-                          <li class="page-item disabled">
-                            <a class="page-link" href="javascript:void(0);">
-                              Prev
-                            </a>
-                          </li>
-                          <li class="page-item">
-                            <a
-                              class="page-link active"
-                              href="javascript:void(0);"
-                              >1</a
-                            >
-                          </li>
-                          <li class="page-item">
-                            <a class="page-link" href="javascript:void(0);"
-                              >2</a
-                            >
-                          </li>
-                          <li class="page-item">
-                            <a
-                              class="page-link !text-primary"
-                              href="javascript:void(0);"
-                            >
-                              next
-                            </a>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
-                  </div>
-                </div>
+                
               </div>
             </div>
           </div>

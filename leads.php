@@ -1,6 +1,12 @@
 
 <?php include_once "components/layout/header.php"; ?>
 <?php include_once "components/layout/sidebar.php"; ?>
+<?php include_once "config/api.php"; ?>
+<?php
+$data['id'] = "b1165351-1891-38b6-b49e-695b9b0f3a27";
+$leads = fetchAllUserLeads($data);
+// print_r($leads);
+?>
     
      <div class="main-content app-content"> 
         <div class="container-fluid">
@@ -10,9 +16,9 @@
                    
                     <h1 class="page-title font-medium text-lg mb-0">Leads</h1>
                 </div> 
-                <div class="btn-list">
+                <!-- <div class="btn-list">
                     <button type="button" class="ti-btn bg-white dark:bg-bodybg border border-defaultborder dark:border-defaultborder/10 btn-wave !my-0 waves-effect waves-light"> <i class="ri-filter-3-line align-middle me-1 leading-none"></i> Filter </button> <button type="button" class="ti-btn ti-btn-primary !border-0 btn-wave me-0 waves-effect waves-light"> <i class="ri-share-forward-line me-1"></i> Share </button>
-                </div> 
+                </div>  -->
             </div>  
             <div class="grid grid-cols-12 gap-6"> 
                 <div class="xl:col-span-12 col-span-12"> 
