@@ -1,11 +1,12 @@
 
+
 <?php include_once "components/layout/header.php"; ?>
 <?php include_once "components/layout/sidebar.php"; ?>
 <?php include_once "config/api.php"; ?>
 <?php
-$data['id'] = "b1165351-1891-38b6-b49e-695b9b0f3a27";
+$data['id'] = $_SESSION['user']['id'];
 $leads = fetchAllUserLeads($data);
-// print_r($leads);
+// print_r($_SESSION);
 ?>
     
       <!-- Start::app-content -->
@@ -14,7 +15,7 @@ $leads = fetchAllUserLeads($data);
           <!-- Start::page-header -->
           <div
             class="flex items-center justify-between page-header-breadcrumb flex-wrap gap-2"
-          >
+            >
             <div>
               <nav>
                 <ol class="breadcrumb mb-0">
@@ -48,7 +49,7 @@ $leads = fetchAllUserLeads($data);
           <!-- Start::row-1 -->
           <div
             class="grid xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-x-6"
-          >
+            >
             <div class="">
               <div class="box crm-card">
                 <div class="box-body">

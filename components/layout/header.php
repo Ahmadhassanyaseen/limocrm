@@ -1,3 +1,11 @@
+ <?php session_start(); 
+print_r($_SESSION['user']);
+ if(!isset($_SESSION['user'])){
+
+    header("Location: login.php");
+ }
+ 
+ ?>
  <html
   lang="en"
   dir="ltr"
@@ -15,15 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>LimoGen</title>
-    <meta
-      name="Description"
-      content="Tailwind Responsive Admin Web Dashboard HTML5 Template"
-    />
-    <meta name="Author" content="Spruko Technologies Private Limited" />
-    <meta
-      name="keywords"
-      content="tailwind template,tailwind dashboard,tailwind,tailwind admin template,dashboard,tailwind css templates,html dashboard template,tailwind dashboard template,dashboard tailwind,admin,html css templates,html dashboard,html css javascript templates,dashboard tailwind template,tailwind css dashboard"
-    />
+    
     <!-- Favicon -->
     <link
       rel="icon"
@@ -67,7 +67,7 @@
       rel="stylesheet"
       href="assets/libs/@tarekraafat/autocomplete.js/css/autoComplete.css"
     />
-
+<script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
     <meta http-equiv="imagetoolbar" content="no" />
 
     <style id="apexcharts-css">
@@ -2506,7 +2506,7 @@
                 class="main-header-dropdown hs-dropdown-menu ti-dropdown-menu hidden"
                 data-popper-placement="none"
                 role="menu"
-              >
+                >
                 <div class="p-4">
                   <div class="flex items-center justify-between">
                     <p class="mb-0 text-[15px] font-medium">Notifications</p>
@@ -2884,10 +2884,10 @@
                   <div
                     class="ti-dropdown-item text-center border-b border-defaultborder dark:border-defaultborder/10 block"
                   >
-                    <span> Mr.Henry </span>
+                    <span> <?php echo $_SESSION['user']['user_name']; ?> </span>
                     <span
                       class="block text-xs text-textmuted dark:text-textmuted/50"
-                      >UI/UX Designer</span
+                      ><?php echo $_SESSION['user']['email']; ?></span
                     >
                   </div>
                 </li>
@@ -2931,13 +2931,13 @@
                   >
                 </li>
                 <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="sign-in-cover.html"
+                  <span
+                    class="ti-dropdown-item flex items-center cursor-pointer"
+                    id="logout-btn"
                     ><i
                       class="ri-logout-box-line p-1 rounded-full bg-primary/10 text-primary ut me-2 text-[1rem]"
                     ></i
-                    >Log Out</a
+                    >Log Out</span
                   >
                 </li>
               </ul>
@@ -2981,3 +2981,27 @@
         <!-- End::main-header-container -->
       </header>
       <!-- /app-header -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out of your session.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log out!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'config/logout.php';
+                    }
+                });
+            });
+        }
+    });
+</script>

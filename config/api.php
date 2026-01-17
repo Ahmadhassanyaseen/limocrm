@@ -1,11 +1,11 @@
-<?php include_once "logs/logger.php"; ?>
+
 <?php
 
 function curlRequest($data) {
     $api_url = 'https://zabrin.xyz/limogen/index.php?entryPoint=CustomEntryPoint';
     
     // Log the request data
-    log_message("Sending to API: " . print_r($data, true));
+    // log_message("Sending to API: " . print_r($data, true));
     
     $curl = curl_init($api_url);
     curl_setopt($curl, CURLOPT_POST, true);
@@ -20,11 +20,11 @@ function curlRequest($data) {
     // Log any cURL errors
     if (curl_errno($curl)) {
         $curlError = curl_error($curl);
-        log_message("cURL Error: " . $curlError, 'ERROR');
+        // log_message("cURL Error: " . $curlError, 'ERROR');
     }
     
     // Log the raw response
-    log_message("API Response: " . $response);
+    // log_message("API Response: " . $response);
     
     curl_close($curl);
     
@@ -33,7 +33,7 @@ function curlRequest($data) {
     // Log if JSON decode failed
     if (json_last_error() !== JSON_ERROR_NONE) {
         $jsonError = json_last_error_msg();
-        log_message("JSON Decode Error: " . $jsonError, 'ERROR');
+        // log_message("JSON Decode Error: " . $jsonError, 'ERROR');
     }
     
     return $decoded;
@@ -41,5 +41,25 @@ function curlRequest($data) {
 
 function fetchAllUserLeads($data){
     $data["action"] = "fetchAllUserLeads";
+    return curlRequest($data);
+}
+function fetchAllTeamMembers($data){
+    $data["action"] = "fetchAllTeamMembers";
+    return curlRequest($data);
+}
+function fetchSingleLead($data){
+    $data["action"] = "fetchSingleLead";
+    return curlRequest($data);
+}
+function updateLead($data){
+    $data["action"] = "update_lead";
+    return curlRequest($data);
+}
+function userLogin($data){
+    $data["action"] = "user_login";
+    return curlRequest($data);
+}
+function fetchRoles(){
+    $data["action"] = "fetch_roles";
     return curlRequest($data);
 }

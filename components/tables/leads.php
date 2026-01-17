@@ -75,7 +75,7 @@ table.dataTable thead th{
                               >
                                 <a
                                   aria-label="anchor"
-                                  href="javascript:void(0);"
+                                  href="lead.php?id=<?php echo $leads[$i]['id']; ?>"
                                   class="hs-tooltip-toggle ti-btn ti-btn-icon !rounded-full me-2 ti-btn-soft-primary"
                                 >
                                   <i class="ri-eye-line"></i>
