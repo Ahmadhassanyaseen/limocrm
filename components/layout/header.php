@@ -2913,7 +2913,7 @@
                 <li>
                   <a
                     class="ti-dropdown-item flex items-center"
-                    href="mail-settings.php"
+                    href="settings.php"
                     ><i
                       class="ri-settings-line p-1 rounded-full bg-primary/10 text-primary ings me-2 text-[1rem]"
                     ></i
