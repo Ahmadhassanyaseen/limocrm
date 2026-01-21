@@ -1724,7 +1724,7 @@
             <!-- Start::header-element -->
             <div class="header-element">
               <div class="horizontal-logo">
-                <a href="index.html" class="header-logo">
+                <a href="index.php" class="header-logo">
                   <img
                     src="assets/images/brand-logos/desktop-logo.png"
                     alt="logo"
@@ -2168,7 +2168,7 @@
                                     class="flex items-center justify-between mb-0"
                                   >
                                     <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.html"
+                                      <a href="cart.php"
                                         >Wireless Headphones</a
                                       >
                                       <div class="truncate">
@@ -2221,7 +2221,7 @@
                                     class="flex items-center justify-between mb-0"
                                   >
                                     <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.html">Ladies Hand Bag</a>
+                                      <a href="cart.php">Ladies Hand Bag</a>
                                       <div class="truncate">
                                         <p
                                           class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
@@ -2271,7 +2271,7 @@
                                     class="flex items-center justify-between mb-0"
                                   >
                                     <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.html">Alarm Clock</a>
+                                      <a href="cart.php">Alarm Clock</a>
                                       <div class="truncate">
                                         <p
                                           class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
@@ -2321,7 +2321,7 @@
                                     class="flex items-center justify-between mb-0"
                                   >
                                     <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.html"
+                                      <a href="cart.php"
                                         >Kids' Party Wear Frock</a
                                       >
                                       <div class="truncate">
@@ -2374,7 +2374,7 @@
                                     class="flex items-center justify-between mb-0"
                                   >
                                     <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.html"
+                                      <a href="cart.php"
                                         >Advanced Smart Watch</a
                                       >
                                       <div class="truncate">
@@ -2440,7 +2440,7 @@
                 </ul>
                 <div class="p-4 empty-header-item border-t grid items-center">
                   <a
-                    href="checkout.html"
+                    href="checkout.php"
                     class="ti-btn ti-btn-primary btn-wave text-center waves-effect waves-light"
                     >Proceed to checkout</a
                   >
@@ -2457,7 +2457,7 @@
                       >Add some items to make me happy :)</span
                     >
                     <a
-                      href="products.html"
+                      href="products.php"
                       class="ti-btn bg-primarytint1color text-white btn-wave ti-btn-sm m-1 waves-effect waves-light"
                       data-abc="true"
                       >continue shopping <i class="bi bi-arrow-right ms-1"></i
@@ -2557,7 +2557,7 @@
                                 >
                                   <div>
                                     <p class="mb-0 font-medium">
-                                      <a href="chat.html">New Messages</a>
+                                      <a href="chat.php">New Messages</a>
                                     </p>
                                     <div
                                       class="text-textmuted dark:text-textmuted/50 font-normal text-xs header-notification-text truncate"
@@ -2598,7 +2598,7 @@
                                 >
                                   <div>
                                     <p class="mb-0 font-medium">
-                                      <a href="chat.html">Order Updates</a>
+                                      <a href="chat.php">Order Updates</a>
                                     </p>
                                     <div
                                       class="text-textmuted dark:text-textmuted/50 font-normal text-xs header-notification-text truncate"
@@ -2644,7 +2644,7 @@
                                 >
                                   <div>
                                     <p class="mb-0 font-medium">
-                                      <a href="chat.html">Comment on Post</a>
+                                      <a href="chat.php">Comment on Post</a>
                                     </p>
                                     <div
                                       class="text-textmuted dark:text-textmuted/50 font-normal text-xs header-notification-text truncate"
@@ -2690,7 +2690,7 @@
                                 >
                                   <div>
                                     <p class="mb-0 font-medium">
-                                      <a href="chat.html">Follow Request</a>
+                                      <a href="chat.php">Follow Request</a>
                                     </p>
                                     <div
                                       class="text-textmuted dark:text-textmuted/50 font-normal text-xs header-notification-text truncate"
@@ -2732,7 +2732,7 @@
                                 >
                                   <div>
                                     <p class="mb-0 font-medium">
-                                      <a href="chat.html">Exclusive Offers</a>
+                                      <a href="chat.php">Exclusive Offers</a>
                                     </p>
                                     <div
                                       class="text-textmuted dark:text-textmuted/50 font-normal text-xs header-notification-text truncate"
@@ -2894,7 +2894,7 @@
                 <li>
                   <a
                     class="ti-dropdown-item flex items-center"
-                    href="profile.html"
+                    href="profile.php"
                     ><i
                       class="ri-user-line p-1 rounded-full bg-primary/10 text-primary me-2 text-[1rem]"
                     ></i
@@ -2902,7 +2902,7 @@
                   >
                 </li>
                 <li>
-                  <a class="ti-dropdown-item flex items-center" href="mail.html"
+                  <a class="ti-dropdown-item flex items-center" href="mail.php"
                     ><i
                       class="ri-mail-line p-1 rounded-full bg-primary/10 text-primary me-2 text-[1rem]"
                     ></i
@@ -2913,7 +2913,7 @@
                 <li>
                   <a
                     class="ti-dropdown-item flex items-center"
-                    href="mail-settings.html"
+                    href="mail-settings.php"
                     ><i
                       class="ri-settings-line p-1 rounded-full bg-primary/10 text-primary ings me-2 text-[1rem]"
                     ></i
@@ -2923,7 +2923,7 @@
                 <li
                   class="border-t border-defaultborder dark:border-defaultborder/10 bg-light"
                 >
-                  <a class="ti-dropdown-item flex items-center" href="chat.html"
+                  <a class="ti-dropdown-item flex items-center" href="chat.php"
                     ><i
                       class="ri-question-line p-1 rounded-full bg-primary/10 text-primary set me-2 text-[1rem]"
                     ></i
