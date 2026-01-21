@@ -87,7 +87,7 @@ table.dataTable thead th{
                               >
                                 <a
                                   aria-label="anchor"
-                                  href="javascript:void(0);"
+                                  href="edit_lead.php?id=<?php echo $leads[$i]['id']; ?>"
                                   class="hs-tooltip-toggle ti-btn ti-btn-icon !rounded-full me-2 ti-btn-soft-info"
                                 >
                                <i class="ri-edit-line"></i>

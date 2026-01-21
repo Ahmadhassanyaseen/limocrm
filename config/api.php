@@ -63,3 +63,51 @@ function fetchRoles(){
     $data["action"] = "fetch_roles";
     return curlRequest($data);
 }
+function fetchEmailTemplates(){
+    $data["action"] = "fetch_email_templates";
+    return curlRequest([]);
+}
+function getEmailTemplate($data){
+    $data["action"] = "get_email_template";
+    return curlRequest($data);
+}
+function saveEmailTemplate($data){
+    $data["action"] = "save_email_template";
+    return curlRequest($data);
+}
+function deleteEmailTemplate($data){
+    $data["action"] = "delete_email_template";
+    return curlRequest($data);
+}
+function fetchTasks($data){
+    $data["action"] = "fetch_tasks";
+    return curlRequest($data);
+}
+function saveTask($data){
+    $data["action"] = "save_task";
+    return curlRequest($data);
+}
+function updateTaskStatus($data){
+    $data["action"] = "update_task_status";
+    return curlRequest($data);
+}
+function deleteTask($data){
+    $data["action"] = "delete_task";
+    return curlRequest($data);
+}
+function fetchVehicles($data){
+    $data["action"] = "fetch_vehicles";
+    return curlRequest($data);
+}
+function saveVehicle($data){
+    $data["action"] = "save_vehicle";
+    return curlRequest($data);
+}
+function getVehicle($data){
+    $data["action"] = "get_vehicle";
+    return curlRequest($data);
+}
+function deleteVehicle($data){
+    $data["action"] = "delete_vehicle";
+    return curlRequest($data);
+}
