@@ -1,6 +1,7 @@
 <?php include_once "components/layout/header.php"; ?>
 <?php include_once "components/layout/sidebar.php"; ?>
 <?php include_once "config/api.php"; ?>
+
 <div class="main-content app-content">
      <div class="container-fluid"> 
         <!-- Page Header --> 
