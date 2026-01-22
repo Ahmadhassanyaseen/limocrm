@@ -9,7 +9,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Create Workflow</title>
 
- 
+  <style>
+    :root{
+      --bg:#f6f8fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+      --primary:#2563eb; --primary-2:#1d4ed8; --danger:#ef4444;
+      --shadow: 0 10px 25px rgba(0,0,0,.06);
+      --radius:14px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family:var(--font); color:var(--text); background:var(--bg); }
+    .page{ max-width:1100px; margin:24px auto; padding:0 16px 40px; }
+
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+    .title{ font-size:20px; font-weight:700; letter-spacing:.2px; }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+    .btn{
+      border:1px solid var(--line); background:#fff; padding:10px 14px; border-radius:12px; cursor:pointer;
+      font-weight:600; font-size:13px; transition:.15s; display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.07) }
+    .btn-primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
+    .btn-primary:hover{ background:var(--primary-2) }
+    .btn-danger{ background:#fff; border-color:#fecaca; color:var(--danger); }
+
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:var(--shadow); overflow:hidden; margin-bottom:14px;
+    }
+    .card-head{
+      background:linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color:#fff; padding:12px 16px; font-weight:800; font-size:12px; letter-spacing:.12em;
+      display:flex; align-items:center; justify-content:space-between; text-transform:uppercase;
+    }
+    .card-body{ padding:16px; }
+
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px 18px; }
+    @media (max-width:860px){
+      .grid{grid-template-columns:1fr}
+      .topbar{flex-direction:column; align-items:flex-start}
+      .actions{justify-content:flex-start}
+    }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    label{ font-size:12px; font-weight:800; color:var(--muted); letter-spacing:.02em; }
+
+    input[type="text"], select, textarea{
+      border:1px solid var(--line); border-radius:12px; padding:11px 12px; font-size:14px;
+      background:#fff; outline:none; transition:.15s;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus{
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    }
+    textarea{ min-height:110px; resize:vertical; }
+
+    .hint{ font-size:12px; color:var(--muted); margin-top:4px; }
+    .info{
+      padding:10px 12px; border:1px dashed rgba(37,99,235,.35); background:rgba(37,99,235,.06);
+      border-radius:12px; color:#1e40af; font-size:13px; margin-top:8px;
+    }
+    .errorbox{
+      display:none; margin-top:12px; padding:10px 12px; border:1px solid rgba(239,68,68,.25);
+      background:rgba(239,68,68,.08); border-radius:12px; color:#991b1b; font-size:13px; white-space:pre-wrap;
+    }
+    .successbox{
+      display:none; margin-top:12px; padding:10px 12px; border:1px solid rgba(16,185,129,.25);
+      background:rgba(16,185,129,.08); border-radius:12px; color:#065f46; font-size:13px; white-space:pre-wrap;
+    }
+  </style>
 </head>
 
 <body>
