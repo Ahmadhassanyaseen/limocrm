@@ -84737,3 +84737,74 @@ h6{
       background:rgba(16,185,129,.08); border-radius:12px; color:#065f46; font-size:13px; white-space:pre-wrap;
     }
   
+   
+        .crm-code-widget {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #0f172a;
+  margin-top: 15px;
+ 
+    padding: 0 24px;
+    width: fit-content;
+    display:flex;
+    justify-content:end;
+    align-items:end;
+    max-width: 1080px;
+    min-width: 1080px;
+    /* margin-left: 240px; */
+    /* margin-top: 40px; */
+}
+
+
+.crm-code-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
+    width: 100%;
+    gap: 80px;
+}
+
+.crm-code-title {
+  color: #fff;
+  font-weight: 600;
+}
+
+.crm-copy-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.crm-copy-btn:hover {
+  background: #1d4ed8;
+}
+
+.crm-code-box {
+  padding: 15px;
+  color: #22c55e;
+  overflow-x: auto;
+  font-size: 13px;
+  display: flex;
+    justify-content: center;
+
+}
+
+.crm-copy-status {
+  color: #22c55e;
+  padding: 8px 15px;
+  display: block;
+}
+.shortcodeparent{
+width: 100%;
+display:flex;
+justify-content:end;
+align-items:center;
+padding-right:10px;
+}
+      
