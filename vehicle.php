@@ -84,6 +84,37 @@ $isEdit = !empty($vehicleId);
                         <div class="box-header bg-gray-50/50 dark:bg-black/10 px-6 py-4 border-b border-gray-200 dark:border-white/10">
                             <h5 class="box-title font-bold text-gray-700 dark:text-gray-300">Details & Features</h5>
                         </div>
+
+<!-- <div class="testing">
+<div class="module-build">
+    <option></option>
+    <option></option>
+    <option></option>
+    <option></option>
+    <option></option>
+    <option></option>
+    <option></option>
+    <option></option>
+    <option></option>
+    </div>
+<div class="check">
+
+<div class="subject">
+    <div class="yui">
+        <ul>
+            <li>hamza</li>
+            <li>hamza</li>
+            <li>hamza</li>
+            <li>hamza</li>
+            <li>hamza</li>
+            <li>hamza</li>
+            <li>hamza</li>
+        </ul>
+    </div>
+</div>
+</div>
+</div> -->
+
                         <div class="box-body p-6 space-y-6">
                             <div>
                                 <label class="text-xs font-bold text-gray-500 mb-2 block uppercase tracking-wider">Facilities / Features (Comma separated)</label>
