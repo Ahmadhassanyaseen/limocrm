@@ -5,7 +5,7 @@
 <div id="limogen-widget"
      data-user-id="109a9a69-0209-5bfa-4079-696ba7b1cc44"
      data-width="100%"
-     data-height="820"
+     data-height="620"
      
      >
 </div>
@@ -74,3 +74,4 @@ document.addEventListener("click", function (e) {
 </script>
 
 
+<?php include_once "components/layout/footer.php"; ?>

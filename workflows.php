@@ -273,7 +273,7 @@ try{
     });
   }
 
-  loadWorkflows();
+  loadWorkflows()
 </script>
 
 <style>

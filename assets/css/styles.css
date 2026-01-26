@@ -84800,11 +84800,10 @@ h6{
   padding: 8px 15px;
   display: block;
 }
-.shortcodeparent{
-width: 100%;
-display:flex;
-justify-content:end;
-align-items:center;
-padding-right:10px;
+.shortcodeparent {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
       
