@@ -111,3 +111,7 @@ function deleteVehicle($data){
     $data["action"] = "delete_vehicle";
     return curlRequest($data);
 }
+function deleteworkflow($data){
+    $data["action"] = "delete_workflow";
+    return curlRequest($data);
+}

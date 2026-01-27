@@ -129,7 +129,7 @@
 <script src="assets/libs/preline/preline.js"></script>
 
 <script>
-    const modules = ['Leads', 'Users']; 
+    const modules = ['Workflows', 'Email Templates', 'Leads', 'Check', 'Team', 'Task']; 
     let allRoles = []; // Store roles locally for sorting/searching
 
     $(document).ready(function() {

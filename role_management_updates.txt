@@ -1,0 +1,45 @@
+// Updated JavaScript sections for role_management.php
+
+// 1. UPDATE LINE 238-242: Add visibility checkbox to permission rows
+// Replace the existing row generation with:
+/*
+                    <td class="px-3 py-2 font-medium text-gray-700 dark:text-gray-300">${module}</td>
+                    <td class="text-center align-middle"><input type="checkbox" class="form-checkbox w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" data-module="${module}" data-perm="is_visible"></td>
+                    <td class="text-center align-middle"><input type="checkbox" class="form-checkbox w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" data-module="${module}" data-perm="can_create"></td>
+                    <td class="text-center align-middle"><input type="checkbox" class="form-checkbox w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" data-module="${module}" data-perm="can_read"></td>
+                    <td class="text-center align-middle"><input type="checkbox" class="form-checkbox w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" data-module="${module}" data-perm="can_update"></td>
+                    <td class="text-center align-middle"><input type="checkbox" class="form-checkbox w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" data-module="${module}" data-perm="can_delete"></td>
+*/
+
+// 2. UPDATE LINE 269-272: Add visibility to editRole function
+// Replace lines 269-272 with:
+/*
+                    $(`input[data-module="${perm.module}"][data-perm="is_visible"]`).prop('checked', perm.is_visible == 1);
+                    $(`input[data-module="${perm.module}"][data-perm="can_create"]`).prop('checked', perm.can_create == 1);
+                    $(`input[data-module="${perm.module}"][data-perm="can_read"]`).prop('checked', perm.can_read == 1);
+                    $(`input[data-module="${perm.module}"][data-perm="can_update"]`).prop('checked', perm.can_update == 1);
+                    $(`input[data-module="${perm.module}"][data-perm="can_delete"]`).prop('checked', perm.can_delete == 1);
+*/
+
+// 3. UPDATE LINE 304-310: Add visibility to saveRole function
+// Replace lines 304-310 with:
+/*
+            let perm = {
+                module: module,
+                is_visible: row.find(`input[data-perm="is_visible"]`).is(':checked'),
+                can_create: row.find(`input[data-perm="can_create"]`).is(':checked'),
+                can_read: row.find(`input[data-perm="can_read"]`).is(':checked'),
+                can_update: row.find(`input[data-perm="can_update"]`).is(':checked'),
+                can_delete: row.find(`input[data-perm="can_delete"]`).is(':checked')
+            };
+*/
+
+// 4. UPDATE LINE 101-104: Add Visibility column header
+// Replace lines 101-104 with:
+/*
+                                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Visibility</th>
+                                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Create</th>
+                                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Read</th>
+                                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Update</th>
+                                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Delete</th>
+*/
