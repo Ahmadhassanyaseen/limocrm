@@ -114,7 +114,7 @@
             <select id="module">
               <option value="">Select Module</option>
               <option value="Leads">Leads</option>
-              <option value="">Quotes</option>
+              <option value="AOS_Quotes">Quotes</option>
             </select>
             <div class="hint">Workflow kis module ke sath link hoga.</div>
           </div>

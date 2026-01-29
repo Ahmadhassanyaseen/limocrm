@@ -13,7 +13,7 @@
       type="image/x-icon"
     />
     <!-- Main Theme Js -->
-    <script src="assets/js/authentication-main.js"></script>
+    <!-- <script src="assets/js/authentication-main.js"></script> -->
     <!-- Style Css -->
     <link href="assets/css/styles.css" rel="stylesheet" />
 

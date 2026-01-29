@@ -83,6 +83,10 @@ function fetchTasks($data){
     $data["action"] = "fetch_tasks";
     return curlRequest($data);
 }
+function fetch_workflows($data){
+    $data["action"] = "fetch_workflows";
+    return curlRequest($data);
+}
 function saveTask($data){
     $data["action"] = "save_task";
     return curlRequest($data);
