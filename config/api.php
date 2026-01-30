@@ -119,3 +119,20 @@ function deleteworkflow($data){
     $data["action"] = "delete_workflow";
     return curlRequest($data);
 }
+
+function create_role($data){
+    $data["action"] = "create_role";
+    return curlRequest($data);
+}
+function fetch_roles($data){
+    $data["action"] = "fetch_roles";
+    return curlRequest($data);
+}
+function delete_role($data){
+    $data["action"] = "delete_role";
+    return curlRequest($data);
+}
+function update_role($data){
+    $data["action"] = "update_role";
+    return curlRequest($data);
+}
