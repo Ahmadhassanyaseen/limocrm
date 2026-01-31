@@ -132,6 +132,9 @@
       .apexcharts-series-collapsed {
         opacity: 0;
       }
+      #save-Notes-btn{
+background:red
+      }
 
       .apexcharts-tooltip {
         border-radius: 5px;

@@ -56462,6 +56462,8 @@ ul.files-main-nav li div.filemanager-upgrade-storage img{
   border-color: rgb(var(--primary-tint2-rgb));
   opacity: 1;
 }
+   
+
 .ti-btn-facebook.border-primary2.border-opacity-10{
   border-color: rgb(var(--primary-tint2-rgb) / 0.1) !important;
 }
@@ -84807,3 +84809,9 @@ h6{
   align-items: center;
 }
       
+ #save-Notes-btn{
+background:red;
+      }
+      .toggle-logo{
+        height: 30px;
+      }

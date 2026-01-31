@@ -136,3 +136,15 @@ function update_role($data){
     $data["action"] = "update_role";
     return curlRequest($data);
 }
+function get_module_template($data){
+    $data["action"] = "get_module_template";
+    return curlRequest($data);
+}
+function getUserIdByEmail($data){
+    $data["action"] = "getUserIdByEmail";
+    return curlRequest($data);
+}
+function fetchCurrentUserPermissions($data = []) {
+    $data["action"] = "fetch_current_user_permissions";
+    return curlRequest($data);
+}
