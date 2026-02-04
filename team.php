@@ -114,7 +114,7 @@ $data['id'] = $_SESSION['user']['id'];
                         placeholder="Role"
                         name="role"
                         >
-                            <option value="">Select Role</option>
+                            <option value=""> Select Role</option>
                             <?php if(!empty($roles) && is_array($roles)): ?>
                                 <?php foreach($roles as $role): ?>
                                     <option value="<?php echo $role['id']; ?>"><?php echo htmlspecialchars($role['name']); ?></option>
@@ -521,7 +521,7 @@ $data['id'] = $_SESSION['user']['id'];
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     
                     var data = response;
                     if (typeof response === 'string') {
