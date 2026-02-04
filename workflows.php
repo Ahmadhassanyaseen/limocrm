@@ -276,10 +276,3 @@ try{
   loadWorkflows()
 </script>
 
-<style>
-  .table-responsive::-webkit-scrollbar { height: 6px; }
-  .table-responsive::-webkit-scrollbar-track { background: transparent; }
-  .table-responsive::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-  .table-responsive::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-  .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
-</style>

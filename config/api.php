@@ -43,6 +43,10 @@ function fetchAllUserLeads($data){
     $data["action"] = "fetchAllUserLeads";
     return curlRequest($data);
 }
+function createNote($data){
+    $data["action"] = "createNote";
+    return curlRequest($data);
+}
 function fetchAllTeamMembers($data){
     $data["action"] = "fetchAllTeamMembers";
     return curlRequest($data);
