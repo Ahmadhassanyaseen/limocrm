@@ -6,7 +6,7 @@
 <?php
 $data['id'] = $_SESSION['user']['id'];
 $leads = fetchAllUserLeads($data);
-print_r($_SESSION);
+// print_r($_SESSION);
 ?>
     
       <!-- Start::app-content -->
