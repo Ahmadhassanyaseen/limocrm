@@ -152,3 +152,19 @@ function fetchCurrentUserPermissions($data = []) {
     $data["action"] = "fetch_current_user_permissions";
     return curlRequest($data);
 }
+
+function create_user($data = []) {
+    $data["action"] = "create_user";
+    return curlRequest($data);
+}
+
+function delete_user($data = []) {
+    $data["action"] = "delete_user";
+    return curlRequest($data);
+}
+
+function update_user($data = []) {
+    $data["action"] = "update_user";
+    return curlRequest($data);
+}
+
