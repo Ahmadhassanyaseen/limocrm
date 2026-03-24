@@ -1,0 +1,1 @@
+[13-Mar-2026 13:04:25 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at C:\8.2\htdocs\limocrm\limocrm\components\layout\header.php:9) in C:\8.2\htdocs\limocrm\limocrm\profile.php on line 20

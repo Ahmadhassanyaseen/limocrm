@@ -394,35 +394,35 @@ function requestFullscreen() {
     elem.msRequestFullscreen();
   }
 }
-function exitFullscreen() {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if (document.webkitExitFullscreen) {
-    document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) {
-    document.msExitFullscreen();
-  }
-}
+// function exitFullscreen() {
+//   if (document.exitFullscreen) {
+//     document.exitFullscreen();
+//   } else if (document.webkitExitFullscreen) {
+//     document.webkitExitFullscreen();
+//   } else if (document.msExitFullscreen) {
+//     document.msExitFullscreen();
+//   }
+// }
 // Listen for fullscreen change event
 document.addEventListener("fullscreenchange", handleFullscreenChange);
-function handleFullscreenChange() {
+// function handleFullscreenChange() {
   
-  let open = document.querySelector(".full-screen-open");
-  let close = document.querySelector(".full-screen-close");
+//   let open = document.querySelector(".full-screen-open");
+//   let close = document.querySelector(".full-screen-close");
 
-  if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-    // Update icon for fullscreen mode
-    close.classList.add("block");
-    close.classList.remove("hidden");
-    open.classList.add("hidden");
-  } else {
-    // Update icon for non-fullscreen mode
-    close.classList.remove("block");
-    open.classList.remove("hidden");
-    close.classList.add("hidden");
-    open.classList.add("block");
-  }
-}
+//   if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+//     // Update icon for fullscreen mode
+//     close.classList.add("block");
+//     close.classList.remove("hidden");
+//     open.classList.add("hidden");
+//   } else {
+//     // Update icon for non-fullscreen mode
+//     close.classList.remove("block");
+//     open.classList.remove("hidden");
+//     close.classList.add("hidden");
+//     open.classList.add("block");
+//   }
+// }
 /* full screen */
 
 /* toggle switches */
@@ -477,4 +477,145 @@ headerbtn1.forEach((button) => {
     }
   });
 });
-/* for notifications dropdown */
+
+// Preview profile image before upload
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Remove profile picture
+function removeProfilePicture() {
+    if (confirm('Are you sure you want to remove your profile picture?')) {
+        document.getElementById('profilePreview').src = 'assets/images/faces/default-avatar.png';
+        document.getElementById('profile_picture').value = '';
+    }
+}
+
+// Toggle password visibility
+function togglePassword(fieldId) {
+    var field = document.getElementById(fieldId);
+    var type = field.type === 'password' ? 'text' : 'password';
+    field.type = type;
+}
+
+// Password strength checker
+document.getElementById('new_password')?.addEventListener('input', function() {
+    var password = this.value;
+    var strength = 0;
+    var progressBar = document.getElementById('passwordStrength');
+    var strengthText = document.getElementById('passwordStrengthText');
+    
+    if (password.length >= 8) strength += 25;
+    if (password.match(/[a-z]+/)) strength += 25;
+    if (password.match(/[A-Z]+/)) strength += 25;
+    if (password.match(/[0-9]+/)) strength += 15;
+    if (password.match(/[$@#&!]+/)) strength += 10;
+    
+    progressBar.style.width = strength + '%';
+    
+    if (strength < 30) {
+        progressBar.className = 'progress-bar bg-danger';
+        strengthText.innerHTML = 'Weak password';
+    } else if (strength < 60) {
+        progressBar.className = 'progress-bar bg-warning';
+        strengthText.innerHTML = 'Medium password';
+    } else if (strength < 80) {
+        progressBar.className = 'progress-bar bg-info';
+        strengthText.innerHTML = 'Good password';
+    } else {
+        progressBar.className = 'progress-bar bg-success';
+        strengthText.innerHTML = 'Strong password';
+    }
+});
+
+// Password match checker
+document.getElementById('confirm_password')?.addEventListener('input', function() {
+    var password = document.getElementById('new_password').value;
+    var confirm = this.value;
+    var matchDiv = document.getElementById('passwordMatch');
+    
+    if (password === confirm) {
+        matchDiv.innerHTML = '<span class="text-success"><i class="ri-check-line"></i> Passwords match</span>';
+    } else {
+        matchDiv.innerHTML = '<span class="text-danger"><i class="ri-close-line"></i> Passwords do not match</span>';
+    }
+});
+
+// Validate password form
+function validatePassword() {
+    var password = document.getElementById('new_password').value;
+    var confirm = document.getElementById('confirm_password').value;
+    
+    if (password !== confirm) {
+        alert('Passwords do not match!');
+        return false;
+    }
+    
+    if (password.length < 8) {
+        alert('Password must be at least 8 characters long!');
+        return false;
+    }
+    
+    return true;
+}
+
+// Setup 2FA
+function setup2FA() {
+    window.location.href = 'two-factor-setup.php';
+}
+
+// Logout all devices
+function logoutAllDevices() {
+    if (confirm('This will log you out from all other devices. Continue?')) {
+        window.location.href = 'logout-all-devices.php';
+    }
+}
+
+// Save active tab
+function saveActiveTab() {
+    var activeTab = document.querySelector('.tab-pane.active');
+    if (activeTab) {
+        var form = activeTab.querySelector('form');
+        if (form) {
+            form.submit();
+        }
+    }
+}
+
+// Tab persistence
+document.addEventListener('DOMContentLoaded', function() {
+    // Get tab from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    
+    if (tab) {
+        // Remove active class from all tabs and panes
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('show', 'active'));
+        
+        // Activate the selected tab
+        const activeLink = document.querySelector(`[data-tab="${tab}"]`);
+        const activePane = document.getElementById(`${tab}-pane`);
+        
+        if (activeLink && activePane) {
+            activeLink.classList.add('active');
+            activePane.classList.add('show', 'active');
+        }
+    }
+    
+    // Update URL when tab changes
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const tab = this.getAttribute('data-tab');
+            const url = new URL(window.location);
+            url.searchParams.set('tab', tab);
+            window.history.pushState({}, '', url);
+        });
+    });
+});
