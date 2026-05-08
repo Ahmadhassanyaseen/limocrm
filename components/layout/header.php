@@ -1,11 +1,29 @@
- <?php session_start(); 
-// print_r($_SESSION['user']);
- if(!isset($_SESSION['user'])){
+<?php
+// Only start a new session if one isn't already active. Pages like
+// profile.php run their own bootstrap (auth check) before including this
+// layout and start the session themselves; without this guard PHP emits
+// a "session_start(): Ignoring ... because a session is already active"
+// notice for any caller that pre-starts the session.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-    header("Location: login.php");
- }
- 
- ?>
+// Compute app base path so assets work in subfolders like /workflows/*
+$__script = $_SERVER['SCRIPT_NAME'] ?? '';
+$__parts = array_values(array_filter(explode('/', trim($__script, '/')), 'strlen'));
+$__idx = array_search('limocrm', $__parts, true);
+$APP_BASE = '/';
+if ($__idx !== false) {
+  $APP_BASE = '/' . implode('/', array_slice($__parts, 0, $__idx + 1)) . '/';
+} elseif (count($__parts) > 0) {
+  $APP_BASE = '/' . $__parts[0] . '/';
+}
+
+if (!isset($_SESSION['user'])) {
+  header("Location: " . $APP_BASE . "login.php");
+  exit;
+}
+?>
  <html
   lang="en"
   dir="ltr"
@@ -23,6 +41,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>LimoGen</title>
+
+    <!-- Ensure relative asset paths work from subfolders -->
+    <base href="<?php echo htmlspecialchars($APP_BASE, ENT_QUOTES, 'UTF-8'); ?>">
     
     <!-- Favicon -->
     <link

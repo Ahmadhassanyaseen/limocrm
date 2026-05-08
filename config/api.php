@@ -168,3 +168,18 @@ function update_user($data = []) {
     return curlRequest($data);
 }
 
+function sendLeadEmail($data) {
+    $data["action"] = "send_lead_email";
+    return curlRequest($data);
+}
+
+function sendFormalQuoteEmail($data) {
+    $data["action"] = "send_formal_quote_email";
+    return curlRequest($data);
+}
+
+function sendAgreementEmail($data) {
+    $data["action"] = "send_agreement_email";
+    return curlRequest($data);
+}
+

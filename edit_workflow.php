@@ -1,5 +1,6 @@
 <?php include_once "components/layout/header.php"; ?>
 <?php include_once "components/layout/sidebar.php"; ?>
+<?php $id = $_GET['id'] ?? ''; ?>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -41,10 +42,7 @@
   .wf2 .step-pill{ display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:6px 10px; background:rgba(37,99,235,.10); color:var(--blue); font-weight:900; font-size:12px; }
   .wf2 .mini{ width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; border-radius:14px; border:1px solid var(--border); background:transparent; color:var(--text); }
   .wf2 .timeline{ position:relative; }
-  .wf2 .timeline:before{
-    content:""; position:absolute; left: 18px; top: 0; bottom: 0;
-    width:2px; background: rgba(37,99,235,.18);
-  }
+  .wf2 .timeline:before{ content:""; position:absolute; left: 18px; top: 0; bottom: 0; width:2px; background: rgba(37,99,235,.18); }
   .wf2 .stickybar{
     position: sticky; bottom: 0; z-index: 30;
     background: rgba(255,255,255,.85);
@@ -54,14 +52,7 @@
     display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
   }
   .dark .wf2 .stickybar{ background: rgba(10,16,30,.75); }
-  .wf2 .info{
-    border:1px dashed rgba(37,99,235,.35);
-    background: rgba(37,99,235,.06);
-    border-radius: 14px;
-    padding: 10px 12px;
-    color: var(--muted);
-    font-size: 12px;
-  }
+  .wf2 .info{ border:1px dashed rgba(37,99,235,.35); background: rgba(37,99,235,.06); border-radius: 14px; padding: 10px 12px; color: var(--muted); font-size: 12px; }
   .wf2 .err{ display:none; border:1px solid rgba(239,68,68,.25); background: rgba(239,68,68,.08); color:#b91c1c; border-radius:14px; padding:10px 12px; white-space:pre-wrap; }
   .dark .wf2 .err{ color:#fecaca; }
 </style>
@@ -72,25 +63,26 @@
       <div class="topbar">
         <div>
           <div class="muted text-sm font-semibold">Workflows</div>
-          <div class="title">Create Workflow</div>
+          <div class="title">Edit Workflow</div>
           <div class="muted text-sm">Conditions first → then Actions.</div>
         </div>
         <div class="flex items-center gap-2 flex-wrap justify-end">
-          <a class="btn" href="index.php"><i class="ri-arrow-left-line me-1"></i> Back</a>
-          <button class="btn" type="button" onclick="resetAll()">Reset</button>
+          <a class="btn" href="workflows.php"><i class="ri-arrow-left-line me-1"></i> Back</a>
+          <!-- <button class="btn" type="button" onclick="loadWorkflow()">Reset</button> -->
           <button class="btn btn-blue" id="btnSave" type="button" onclick="saveWorkflow()"><i class="ri-save-3-line me-1"></i> Save</button>
         </div>
       </div>
 
+      <input type="hidden" id="workflow_id" value="<?php echo htmlspecialchars($id); ?>">
+
       <div class="grid3">
-        <!-- PANEL 1: Details -->
         <div class="panel">
           <div class="ph"><h3>Workflow Details</h3></div>
           <div class="pb">
             <div class="row row2">
               <div>
                 <label class="label">Workflow Name</label>
-                <input id="workflow_name" class="input" placeholder="Estimated Quote Follow-up" />
+                <input id="workflow_name" class="input" />
               </div>
               <div>
                 <label class="label">Module</label>
@@ -116,14 +108,13 @@
 
             <div class="row">
               <label class="label">Description</label>
-              <textarea id="description" class="textarea" placeholder="Optional…"></textarea>
+              <textarea id="description" class="textarea"></textarea>
             </div>
 
             <div class="err" id="errBox"></div>
           </div>
         </div>
 
-        <!-- PANEL 2: Condition -->
         <div class="panel">
           <div class="ph">
             <h3>Condition</h3>
@@ -136,14 +127,12 @@
                 <option value="status_equals">Status =</option>
                 <option value="event_date">Event Date</option>
               </select>
-              <div class="muted text-sm mt-2">This is the only condition (simple mode).</div>
+              <div class="muted text-sm mt-2">Simple mode: 1 condition.</div>
             </div>
-
             <div id="conditionConfig"></div>
           </div>
         </div>
 
-        <!-- PANEL 3: Email Template -->
         <div class="panel">
           <div class="ph">
             <h3>Email Template</h3>
@@ -154,7 +143,6 @@
               <select id="email_template_id" class="select">
                 <option value="">Loading templates…</option>
               </select>
-              <div class="muted text-sm mt-2">This template will be sent when the condition matches.</div>
             </div>
           </div>
         </div>
@@ -162,11 +150,11 @@
 
       <div class="stickybar">
         <div class="info">
-          This workflow is created via <span class="mono">action=save_workflow</span> (SuiteCRM CustomEntryPoint).
+          This workflow updates via <span class="mono">action=update_workflow</span> (SuiteCRM CustomEntryPoint).
         </div>
         <div class="flex items-center gap-2">
-          <a class="btn" href="index.php"><i class="ri-arrow-left-line me-1"></i> Back</a>
-          <button class="btn" type="button" onclick="resetAll()">Reset</button>
+          <a class="btn" href="workflows.php"><i class="ri-arrow-left-line me-1"></i> Back</a>
+          <!-- <button class="btn" type="button" onclick="loadWorkflow()">Reset</button> -->
           <button class="btn btn-blue" id="btnSave2" type="button" onclick="saveWorkflow()"><i class="ri-save-3-line me-1"></i> Save Changes</button>
         </div>
       </div>
@@ -197,6 +185,51 @@
     });
   }
 
+  function templateOptionsHtml(selected){
+    const opts = [`<option value="">Select template</option>`];
+    (emailTemplates || []).forEach(t => {
+      const sel = String(selected) === String(t.id) ? "selected" : "";
+      opts.push(`<option value="${t.id}" ${sel}>${t.name}</option>`);
+    });
+    return opts.join("");
+  }
+
+  async function loadEmailTemplates(selectedId){
+    const dd = document.getElementById("email_template_id");
+    dd.innerHTML = `<option value="">Loading templates…</option>`;
+    try{
+      const res = await postForm(SUITE_ENTRYPOINT, { action:"fetch_email_templates", id: SESSION_USER_ID });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch(e){ data = []; }
+      emailTemplates = Array.isArray(data) ? data : [];
+      dd.innerHTML = `<option value="">Select template</option>`;
+      emailTemplates.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        if(selectedId && String(selectedId) === String(t.id)) opt.selected = true;
+        dd.appendChild(opt);
+      });
+    }catch(e){
+      dd.innerHTML = `<option value="">Failed to load</option>`;
+    }
+  }
+
+  function ensureBaseGroup(){
+    const host = document.getElementById("conditionGroups");
+    if(host.children.length) return;
+    host.innerHTML = `
+      <div class="cond-card">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <div class="mono text-sm muted">Group 1</div>
+        </div>
+        <div data-group-rows="1"></div>
+        <button class="btn btn-outline w-full mt-2" type="button" onclick="addConditionRow(1)"><i class="ri-add-line me-1"></i> Add Condition</button>
+      </div>
+    `;
+  }
+
   function addConditionGroup(){
     condGroupCount++;
     const host = document.getElementById("conditionGroups");
@@ -222,22 +255,7 @@
     if(el) el.remove();
   }
 
-  function ensureBaseGroup(){
-    const host = document.getElementById("conditionGroups");
-    if(host.children.length) return;
-    host.innerHTML = `
-      <div class="cond-card">
-        <div class="flex items-center justify-between gap-2 mb-2">
-          <div class="mono text-sm muted">Group 1</div>
-        </div>
-        <div data-group-rows="1"></div>
-        <button class="btn btn-outline w-full mt-2" type="button" onclick="addConditionRow(1)"><i class="ri-add-line me-1"></i> Add Condition</button>
-      </div>
-    `;
-    addConditionRow(1);
-  }
-
-  function addConditionRow(group){
+  function addConditionRow(group, seed){
     ensureBaseGroup();
     const rowsHost = document.querySelector(`[data-group-rows="${group}"]`);
     const row = document.createElement("div");
@@ -245,7 +263,7 @@
     row.innerHTML = `
       <div>
         <label class="label">Field</label>
-        <select class="select" data-cond-field>${fieldOptionsHtml("")}</select>
+        <select class="select" data-cond-field>${fieldOptionsHtml(seed?.field || "")}</select>
       </div>
       <div>
         <label class="label">Operator</label>
@@ -253,48 +271,14 @@
       </div>
       <div>
         <label class="label">Value</label>
-        <input class="input mono" data-cond-val placeholder="value" />
+        <input class="input mono" data-cond-val value="${seed?.value || ""}" />
       </div>
       <div>
         <button class="mini" type="button" title="Remove" onclick="this.closest('.cond-item').remove()"><i class="ri-close-line"></i></button>
       </div>
     `;
     rowsHost.appendChild(row);
-  }
-
-  function redrawConditions(){
-    // refresh field dropdowns when module changes
-    document.querySelectorAll("[data-cond-field]").forEach(sel => {
-      const current = sel.value;
-      sel.innerHTML = fieldOptionsHtml(current);
-      if(current) sel.value = current;
-    });
-    document.querySelectorAll("#trigger_field").forEach(sel => {
-      const current = sel.value;
-      sel.innerHTML = fieldOptionsHtml(current);
-      if(current) sel.value = current;
-    });
-  }
-
-  async function loadEmailTemplates(){
-    const dd = document.getElementById("email_template_id");
-    dd.innerHTML = `<option value="">Loading templates…</option>`;
-    try{
-      const res = await postForm(SUITE_ENTRYPOINT, { action:"fetch_email_templates", id: SESSION_USER_ID });
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch(e){ data = []; }
-      emailTemplates = Array.isArray(data) ? data : [];
-      dd.innerHTML = `<option value="">Select template</option>`;
-      emailTemplates.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t.id;
-        opt.textContent = t.name;
-        dd.appendChild(opt);
-      });
-    }catch(e){
-      dd.innerHTML = `<option value="">Failed to load</option>`;
-    }
+    row.querySelector("[data-cond-op]").value = seed?.operator || "equals";
   }
 
   function onConditionTypeChange(){
@@ -314,23 +298,36 @@
         <div class="row">
           <label class="label">Event date field</label>
           <input id="event_date_field" class="input mono" value="event_date_c" />
-          <div class="muted text-sm mt-2">Execution for event_date is typically handled by cron (not immediate).</div>
         </div>
       `;
       return;
     }
-    host.innerHTML = `<div class="muted text-sm">Runs immediately when a record is created.</div>`;
+    host.innerHTML = `<div class="muted text-sm">Runs when a record is created.</div>`;
   }
 
-  function resetAll(){
+  async function loadWorkflow(){
     setErr("");
-    document.getElementById("workflow_name").value = "";
-    document.getElementById("module_name").value = "";
-    document.getElementById("status").value = "Active";
-    document.getElementById("description").value = "";
-    document.getElementById("condition_type").value = "on_create";
-    document.getElementById("email_template_id").value = "";
+    const id = document.getElementById("workflow_id").value;
+    if(!id) return setErr("Missing workflow id in URL.");
+
+    const res = await postForm(SUITE_ENTRYPOINT, { action:"fetch_single_workflow", id });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch(e){ return setErr("Invalid server response."); }
+    if(!json.success) return setErr(json.message || "Failed to load workflow.");
+
+    const w = json.workflow || {};
+    document.getElementById("workflow_name").value = w.workflow_name || "";
+    document.getElementById("module_name").value = w.module_name || "";
+    document.getElementById("status").value = w.status || "Active";
+    document.getElementById("description").value = w.description || "";
+
+    document.getElementById("condition_type").value = w.condition_type || "on_create";
     onConditionTypeChange();
+    if (document.getElementById("status_value")) document.getElementById("status_value").value = w.status_value || "";
+    if (document.getElementById("event_date_field")) document.getElementById("event_date_field").value = w.event_date_field || "event_date_c";
+
+    await loadEmailTemplates(w.email_template_id || "");
   }
 
   async function saveWorkflow(){
@@ -340,7 +337,9 @@
     btn.disabled = true; btn2.disabled = true;
 
     try{
+      const id = document.getElementById("workflow_id").value;
       const payload = {
+        id,
         name: document.getElementById("workflow_name").value.trim(),
         module: document.getElementById("module_name").value,
         status: document.getElementById("status").value,
@@ -357,12 +356,13 @@
       if(!payload.email_template_id) return setErr("Email template is required.");
       if(payload.condition_type === "status_equals" && !payload.status_value) return setErr("Status value is required.");
 
-      const res = await postForm(SUITE_ENTRYPOINT, { action:"save_workflow", ...payload });
+      const res = await postForm(SUITE_ENTRYPOINT, { action:"update_workflow", ...payload });
       const text = await res.text();
       let json;
       try { json = JSON.parse(text); } catch(e){ return setErr("Invalid server response."); }
       if(!json.success) return setErr(json.message || "Save failed.");
-      window.location.href = `edit_workflow.php?id=${encodeURIComponent(json.id)}`;
+      alert("Workflow updated successfully.");
+      await loadWorkflow();
     }catch(e){
       setErr(e?.message || String(e));
     }finally{
@@ -371,7 +371,7 @@
   }
 
   // init
-  loadEmailTemplates();
   onConditionTypeChange();
+  loadEmailTemplates().then(loadWorkflow);
 </script>
 

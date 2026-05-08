@@ -19,19 +19,52 @@ if (!empty($templateId)) {
 <script src="https://unpkg.com/grapesjs"></script>
 <script src="https://unpkg.com/grapesjs-preset-newsletter"></script>
  
+<style>
+  /* Builder page polish (scoped) */
+  .email-builder-toolbar{
+    backdrop-filter: saturate(140%) blur(6px);
+  }
+  .email-builder-toolbar .editor-toggle{
+    color: rgba(15,23,42,0.60);
+  }
+  .dark .email-builder-toolbar .editor-toggle{
+    color: rgba(255,255,255,0.60);
+  }
+  .email-builder-toolbar .editor-toggle.active{
+    color: var(--primary-color, #cf1c82);
+  }
+
+  .email-builder-side .form-control{
+    height: 42px;
+    border-radius: 12px;
+  }
+  .email-builder-side textarea.form-control{
+    height: auto;
+    min-height: 88px;
+    resize: vertical;
+  }
+
+  /* Remove GrapesJS device dropdown/feature */
+  .gjs-pn-devices,
+  .gjs-pn-panel.gjs-pn-devices-c,
+  .gjs-pn-devices-c{
+    display: none !important;
+  }
+</style>
+
 <div class="main-content app-content">
     <div class="container-fluid !p-0">
         <!-- Sticky Sub-Header / Toolbar -->
-        <div class="flex items-center justify-between px-6 py-3 bg-white dark:bg-black/20 border-b border-gray-200 dark:border-white/10 sticky top-0 z-[100]">
+        <div class="email-builder-toolbar flex items-center justify-between px-6 py-3 bg-white/90 dark:bg-black/20 border-b border-defaultborder dark:border-defaultborder/10 sticky top-0 z-[100]">
             <div class="flex items-center gap-4">
-                <a href="email_templates.php" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-all">
+                <a href="email_templates.php" class="w-10 h-10 flex items-center justify-center rounded-xl bg-black/[0.04] dark:bg-white/5 text-textmuted dark:text-textmuted/50 hover:bg-black/[0.07] dark:hover:bg-white/10 transition-all">
                     <i class="ri-arrow-left-line text-xl"></i>
                 </a>
                 <div>
-                    <h1 class="font-bold text-lg mb-0 text-gray-800 dark:text-gray-100"><?php echo $template ? 'Edit Template' : 'New Template'; ?></h1>
-                    <div class="flex items-center gap-2 text-[11px] text-gray-400 font-medium">
+                    <h1 class="font-semibold text-lg mb-0 text-defaulttextcolor dark:text-defaulttextcolor/90"><?php echo $template ? 'Edit Template' : 'New Template'; ?></h1>
+                    <div class="flex items-center gap-2 text-[11px] text-textmuted dark:text-textmuted/50 font-medium">
                         <span class="flex items-center gap-1"><i class="ri-history-line"></i> Auto-save ready</span>
-                        <span class="text-gray-200 dark:text-white/10">|</span>
+                        <span class="text-defaultborder dark:text-defaultborder/10">|</span>
                         <span>LimoCRM Builder v2.0</span>
                     </div>
                 </div>
@@ -39,16 +72,16 @@ if (!empty($templateId)) {
 
             <div class="flex items-center gap-3">
                 <!-- Mode Switcher -->
-                <div class="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl border border-gray-200 dark:border-white/5">
-                    <button type="button" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all editor-toggle active shadow-sm" data-view="builder">
+                <div class="flex bg-black/[0.04] dark:bg-white/5 p-1 rounded-xl border border-defaultborder dark:border-defaultborder/10">
+                    <button type="button" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all editor-toggle active bg-white dark:bg-black/30 shadow-sm" data-view="builder">
                         <i class="ri-layout-grid-line me-1.5 align-middle"></i>Builder
                     </button>
-                    <button type="button" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all editor-toggle text-gray-500 hover:text-primary" data-view="code">
+                    <button type="button" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all editor-toggle hover:text-primary" data-view="code">
                         <i class="ri-code-s-slash-line me-1.5 align-middle"></i>Source
                     </button>
                 </div>
                 
-                <div class="w-px h-8 bg-gray-200 dark:bg-white/10 mx-1"></div>
+                <div class="w-px h-8 bg-defaultborder dark:bg-defaultborder/10 mx-1"></div>
 
                 <button type="button" class="ti-btn ti-btn-md bg-primary text-white font-bold px-6 shadow-sm hover:shadow-primary/20 transition-all border-0 rounded-xl" id="save-template-btn">
                     <i class="ri-save-3-line me-1.5 align-middle text-lg"></i> Finish & Save
@@ -58,7 +91,7 @@ if (!empty($templateId)) {
 
         <div class="flex overflow-hidden" style="height: calc(100vh - 75px);">
             <!-- Sidebar: Attributes & Variables -->
-            <div class="w-[320px] h-full bg-white dark:bg-black/20 border-r border-gray-200 dark:border-white/10 flex flex-col">
+            <div class="email-builder-side w-[320px] h-full bg-white dark:bg-black/20 border-r border-defaultborder dark:border-defaultborder/10 flex flex-col">
                 <div class="flex-grow overflow-y-auto px-6 py-6 scrollbar-thin">
                     <form id="template-info-form">
                         <input type="hidden" id="template-id" name="id" value="<?php echo $template['id'] ?? ''; ?>">
@@ -68,13 +101,13 @@ if (!empty($templateId)) {
                             <label class="text-[10px] font-black tracking-widest text-primary uppercase mb-4 block">Basic Identity</label>
                             <div class="space-y-5">
                                 <div class="relative group">
-                                    <label for="name" class="text-xs font-bold text-gray-500 mb-1.5 block">Template Alias <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control !bg-gray-50 dark:!bg-white/5 !border-gray-200 dark:!border-white/10 focus:!border-primary rounded-xl" id="name" name="name" 
+                                    <label for="name" class="text-xs font-bold text-textmuted dark:text-textmuted/50 mb-1.5 block">Template Alias <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control !bg-black/[0.02] dark:!bg-white/5 !border-defaultborder dark:!border-defaultborder/10 focus:!border-primary rounded-xl" id="name" name="name" 
                                         placeholder="e.g. Booking Confirmation" value="<?php echo htmlspecialchars($template['name'] ?? ''); ?>" required>
                                 </div>
                                 <div class="relative">
-                                    <label for="type" class="text-xs font-bold text-gray-500 mb-1.5 block">Organization Category</label>
-                                    <select class="form-control !bg-gray-50 dark:!bg-white/5 !border-gray-200 dark:!border-white/10 focus:!border-primary rounded-xl" id="type" name="type">
+                                    <label for="type" class="text-xs font-bold text-textmuted dark:text-textmuted/50 mb-1.5 block">Organization Category</label>
+                                    <select class="form-control !bg-black/[0.02] dark:!bg-white/5 !border-defaultborder dark:!border-defaultborder/10 focus:!border-primary rounded-xl" id="type" name="type">
                                         <option value="email" <?php echo ($template['type'] ?? '') == 'email' ? 'selected' : ''; ?>>Standard Email</option>
                                         <option value="campaign" <?php echo ($template['type'] ?? '') == 'campaign' ? 'selected' : ''; ?>>Marketing Campaign</option>
                                         <option value="support" <?php echo ($template['type'] ?? '') == 'support' ? 'selected' : ''; ?>>Support Ticket</option>
@@ -93,7 +126,7 @@ if (!empty($templateId)) {
                                         placeholder="Hello, $firstName!" value="<?php echo htmlspecialchars($template['subject'] ?? ''); ?>" required>
                                 </div>
                                 <div>
-                                    <label for="description" class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 block">Internal Internal Note</label>
+                                    <label for="description" class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 block">Internal Note</label>
                                     <textarea class="form-control !bg-white dark:!bg-black/20 !border-primary/20 focus:!border-primary rounded-xl" id="description" name="description" rows="2" 
                                         placeholder="Who is this for?"><?php echo htmlspecialchars($template['description'] ?? ''); ?></textarea>
                                 </div>
@@ -101,42 +134,13 @@ if (!empty($templateId)) {
                         </div>
 
                      
-                        <!-- Group: variables (Restored) -->
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <label class="text-[10px] font-black tracking-widest text-primary uppercase block mb-0">Smart Tokens</label>
-                                <span class="px-2 py-0.5 rounded bg-success/10 text-success text-[10px] font-bold tracking-tighter cursor-help hs-tooltip inline-block">
-                                    LIVE
-                                    <span class="hs-tooltip-content ti-tooltip-content !p-2 !text-[10px]" role="tooltip">Tokens will be replaced with lead data</span>
-                                </span>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                                <select class="form-control !bg-white dark:!bg-black/20 !border-gray-200 dark:!border-white/10 rounded-xl text-xs mb-3" id="variable-selector">
-                                    <option value="">Insert variable...</option>
-                                    <optgroup label="Core Identity">
-                                        <option value="$firstName">First Name</option>
-                                        <option value="$lastName">Last Name</option>
-                                        <option value="$email">Email Address</option>
-                                        <option value="$phone">Phone Number</option>
-                                    </optgroup>
-                                    <optgroup label="Trip Logistics">
-                                        <option value="$pickupLocation">Pickup Point</option>
-                                        <option value="$dropoffLocation">Destination</option>
-                                        <option value="$pickupDate">Pickup Date</option>
-                                        <option value="$totalPrice">Grand Total</option>
-                                    </optgroup>
-                                </select>
-                                <p class="text-[10px] text-gray-400 mb-0 font-medium leading-relaxed italic pr-2">
-                                    <i class="ri-lightbulb-line text-amber-500"></i> Tip: Variables copy to clipboard in builder mode. Just paste them into text blocks!
-                                </p>
-                            </div>
-                        </div>
+                       
                     </form>
                 </div>
             </div>
 
             <!-- Main Workspace -->
-            <div class="flex-grow h-full bg-gray-50 dark:bg-black/40 relative">
+            <div class="flex-grow h-full bg-black/[0.02] dark:bg-black/40 relative">
                 <!-- Builder View -->
                 <div id="builder-container" class="h-full">
                     <div id="gjs" class="gjs-custom-editor"></div>
@@ -145,7 +149,7 @@ if (!empty($templateId)) {
                 <div id="code-container" class="h-full hidden">
                     <div class="p-6 h-full flex flex-col">
                         <div class="flex items-center justify-between mb-3 px-2">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest"><i class="ri-braces-line me-1"></i> HTML Engine</span>
+                            <span class="text-xs font-bold text-textmuted dark:text-textmuted/50 uppercase tracking-widest"><i class="ri-braces-line me-1"></i> HTML Engine</span>
                             <span class="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-bold">LIVE EDITOR</span>
                         </div>
                         <div class="flex-grow rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
@@ -171,6 +175,7 @@ if (!empty($templateId)) {
             fromElement: false,
             height: '100%',
             storageManager: false,
+            deviceManager: { devices: [] },
             plugins: ['gjs-preset-newsletter'],
             pluginsOpts: {
                 'gjs-preset-newsletter': {}
@@ -316,7 +321,8 @@ if (!empty($templateId)) {
         background-color: #5a66f1;
         color: #fff;
     }
-    .gjs-cv-canvas { top: 0 !important; height: 100% !important; }
+    /* Push canvas below GrapesJS top panels */
+    .gjs-cv-canvas { top: 48px !important; height: calc(100% - 48px) !important; }
     .gjs-one-bg { background-color: #f8fafc; }
     .scrollbar-thin::-webkit-scrollbar { width: 4px; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }

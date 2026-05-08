@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Allow direct access to index.php
+RewriteRule ^index\.php$ - [L]
+
+# Route all other /api/* requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ index.php [QSA,L]
+

@@ -56,7 +56,7 @@
                                         <th scope="col" class="px-6 py-4 text-start text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Type</th>
                                         <th scope="col" class="px-6 py-4 text-start text-xs font-bold uppercase tracking-wider text-gray-500">Subject Line</th>
                                         <th scope="col" class="px-6 py-4 text-start text-xs font-bold uppercase tracking-wider text-gray-500">Created On</th>
-                                        <th scope="col" class="px-6 py-4 text-end text-xs font-bold uppercase tracking-wider text-gray-500">Actions</th>
+                                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-500">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="template-list" class="divide-y divide-gray-100 dark:divide-white/5">
@@ -170,9 +170,9 @@
                     });
                     
                     const typeClass = {
-                        'email': 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-                        'campaign': 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
-                        'support': 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
+                        'email': 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 ',
+                        'campaign': 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 ',
+                        'support': 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 '
                     }[t.type] || 'bg-gray-100 text-gray-700';
 
                     html += `
@@ -183,13 +183,13 @@
                                         <i class="ri-article-line text-xl"></i>
                                     </div>
                                     <div>
-                                        <div class="font-bold text-gray-800 dark:text-gray-100 text-[15px] mb-0.5 line-clamp-1">${t.name}</div>
+                                        <div class="font-bold text-defaulttextcolor dark:text-defaulttextcolor/90 text-[15px] mb-0.5 line-clamp-1">${t.name}</div>
                                         <div class="text-[12px] text-gray-500 line-clamp-1 opacity-70">${t.description || 'No description provided'}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider ${typeClass}">
+                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider text-black ${typeClass}">
                                     ${t.type}
                                 </span>
                             </td>
@@ -204,10 +204,8 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-end">
-                                <div class="flex justify-end gap-2 outline-none">
-                                    <button class="w-9 h-9 rounded-xl flex items-center justify-center bg-success/10 text-success hover:bg-success hover:text-white border border-success/20 transition-all preview-template-btn" data-id="${t.id}" data-hs-overlay="#preview-modal">
-                                        <i class="ri-eye-line text-lg"></i>
-                                    </button>
+                                <div class="flex justify-center gap-2 outline-none">
+                                    
                                     <a href="email_template.php?id=${t.id}" class="w-9 h-9 rounded-xl flex items-center justify-center bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 transition-all">
                                         <i class="ri-edit-line text-lg"></i>
                                     </a>

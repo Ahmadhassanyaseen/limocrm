@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Signin </title>
+    <title>Sign in | LimoCRM</title>
    
     <link
       rel="icon"
@@ -26,18 +26,79 @@
       referrerpolicy="no-referrer"
     />
     <style>
-      .border-red-500{
-        border-color: red !important;
+      :root{
+        --crm-primary: #cf1c82;
+        --crm-primary-rgb: 207, 28, 130;
       }
+
+      /* Validation */
+      .border-red-500{
+        border-color: #ef4444 !important;
+      }
+
+      /* Page shell */
+      body.crm-login{
+        background:
+          radial-gradient(1200px 600px at 15% 10%, rgba(var(--crm-primary-rgb), .10), transparent 55%),
+          radial-gradient(900px 500px at 90% 35%, rgba(14, 165, 233, .10), transparent 55%),
+          #ffffff;
+        min-height: 100vh;
+      }
+
+      .dark body.crm-login{
+        background:
+          radial-gradient(1200px 600px at 15% 10%, rgba(var(--crm-primary-rgb), .20), transparent 55%),
+          radial-gradient(900px 500px at 90% 35%, rgba(14, 165, 233, .12), transparent 55%),
+          #0b1220;
+      }
+
+      /* Card + controls */
+      .crm-auth-card{
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+      }
+      .dark .crm-auth-card{
+        box-shadow: 0 14px 36px rgba(0, 0, 0, .35);
+      }
+
+      .crm-auth-card .form-control{
+        height: 42px;
+        border-radius: 12px;
+      }
+      .crm-auth-card .form-control:focus{
+        border-color: var(--crm-primary) !important;
+        box-shadow: 0 0 0 3px rgba(var(--crm-primary-rgb), .18) !important;
+      }
+
+      .crm-primary-btn{
+        background: var(--crm-primary) !important;
+        border-color: var(--crm-primary) !important;
+      }
+      .crm-primary-btn:hover{
+        filter: brightness(0.95);
+      }
+
+      .crm-loading-spinner{
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.45);
+        border-top-color: #fff;
+        border-radius: 9999px;
+        animation: crmSpin 0.8s linear infinite;
+        vertical-align: middle;
+      }
+      @keyframes crmSpin { to { transform: rotate(360deg); } }
     </style>
   </head>
-  <body class="bg-white" cz-shortcut-listen="true">
+  <body class="crm-login">
     
     <div
-      class="grid grid-cols-12 authentication authentication-cover-main mx-0"
+      class="grid grid-cols-12 authentication authentication-cover-main mx-0 min-h-screen"
       >
       <div class="xxl:col-span-6 xl:col-span-7 col-span-12">
-        <div class="grid grid-cols-12 justify-center items-center h-full">
+        <div class="grid grid-cols-12 justify-center items-center h-full py-10">
           <div
             class="xxl:col-span-3 xl:col-span-2 lg:col-span-3 md:col-span-3 sm:col-span-2 col-span-12"
           ></div>
@@ -45,10 +106,18 @@
             class="xxl:col-span-6 xl:col-span-8 lg:col-span-6 md:col-span-6 sm:col-span-8 col-span-12 px-3"
           >
             <div
-              class="box my-auto border border-defaultborder dark:border-defaultborder/10"
+              class="box my-auto border border-defaultborder dark:border-defaultborder/10 crm-auth-card"
             >
-              <div class="box-body p-[3rem]">
-                <p class="h5 mb-6 text-center">Sign In</p>
+              <div class="box-body p-[2.5rem]">
+                <div class="flex items-center justify-center mb-5">
+                  <img src="assets/images/brand-logos/desktop-dark.png" class="h-7 dark:hidden" alt="LimoCRM" onerror="this.classList.add('hidden')" />
+                  <img src="assets/images/brand-logos/desktop-white.png" class="h-7 hidden dark:block" alt="LimoCRM" onerror="this.classList.add('hidden')" />
+                </div>
+
+                <div class="text-center mb-6">
+                  <p class="text-lg font-semibold mb-1 text-defaulttextcolor dark:text-defaulttextcolor/90">Welcome back</p>
+                  <p class="text-xs text-textmuted dark:text-textmuted/50 mb-0">Sign in to manage leads, quotes, and fleet operations.</p>
+                </div>
                 
                 
                 <form id="signinForm">
@@ -63,7 +132,7 @@
                         class="form-control"
                         id="username"
                         name="user_name"
-                        placeholder="user name"
+                        placeholder="Enter your username"
                       />
                     </div>
                    
@@ -77,7 +146,7 @@
                           class="form-control create-password-input"
                           id="signin-password"
                           name="password1"
-                          placeholder="password"
+                          placeholder="Enter your password"
                         />
                         <a
                           aria-label="anchor"
@@ -98,9 +167,14 @@
                    
                   </div>
                   <div class="grid mt-4">
-                    <button type="submit"  class="ti-btn ti-btn-primary">Sign In</button>
+                    <button type="submit" id="signinBtn" class="ti-btn ti-btn-primary crm-primary-btn">Sign In</button>
                   </div>
                 </form>
+
+                <!-- <div class="flex items-center justify-between mt-4 text-xs">
+                  <span class="text-textmuted dark:text-textmuted/50">Need access? Contact your admin.</span>
+                  <a href="./signup.php" class="text-primary font-medium">Create account</a>
+                </div>
                 <div class="text-center">
                   <p class="text-textmuted dark:text-textmuted/50 mt-3 mb-0">
                     Don't have an account?
@@ -137,7 +211,7 @@
                       class="ri-instagram-line leading-none align-center text-[17px]"
                     ></i>
                   </button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -149,7 +223,7 @@
       <div
         class="xxl:col-span-6 xl:col-span-5 lg:col-span-12 xl:block hidden px-0"
       >
-        <div class="authentication-cover overflow-hidden">
+        <div class="authentication-cover  relative" style="background: radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.16), transparent 60%), linear-gradient(135deg, #0b1220 0%, #111827 40%, rgba(var(--crm-primary-rgb), .55) 120%);">
           <div class="authentication-cover-logo">
             <a aria-label="anchor" href="index.html">
               <img
@@ -159,18 +233,15 @@
               />
             </a>
           </div>
-          <div
-            class="aunthentication-cover-content flex items-center justify-center"
-          >
-            <div>
-              <h3 class="text-white mb-1 font-medium">Welcome!</h3>
-              <h6 class="text-white mb-3 font-medium">Sign Up to Your Account</h6>
-              <p class="text-white mb-1 op-6">
-                Welcome to the Admin Dashboard. Please log in to securely manage
-                your administrative tools and oversee platform activities. Your
-                credentials ensure system integrity and functionality.
-              </p>
-            </div>
+          <div class="aunthentication-cover-content absolute inset-0">
+            <img
+              src="assets/images/media/login-a.svg"
+              alt="Login"
+              class="w-full object-contain"
+            />
+            
+            <h3 class="text-white text-4xl font-bold text-center ">Run your limo business in one place</h3>
+            <div class="absolute inset-0 bg-gradient-to-br from-black/35 via-black/20 to-transparent"></div>
           </div>
         </div>
       </div>
@@ -187,6 +258,11 @@
 
           // Reset borders
           $('.form-control').removeClass('border-red-500');
+
+          // Button loading state
+          var btn = $('#signinBtn');
+          var originalBtnHtml = btn.html();
+          btn.prop('disabled', true).html('<span class="crm-loading-spinner me-2"></span> Signing in...');
 
           // Get values
         
@@ -211,6 +287,7 @@
            
 
           if (hasError) {
+            btn.prop('disabled', false).html(originalBtnHtml);
             Swal.fire({
               icon: 'error',
               title: 'Oops...',
@@ -255,6 +332,7 @@
                             }
                         });
                     }else{
+                         btn.prop('disabled', false).html(originalBtnHtml);
                          Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -262,6 +340,7 @@
                         });
                     }
                } catch (e) {
+                   btn.prop('disabled', false).html(originalBtnHtml);
                    // Fallback if not JSON
                    Swal.fire({
                         icon: 'error',
@@ -276,6 +355,7 @@
             },
             error: function(xhr, status, error) {
               console.error(error);
+              btn.prop('disabled', false).html(originalBtnHtml);
               Swal.fire({
                 icon: 'error',
                 title: 'Server Error',

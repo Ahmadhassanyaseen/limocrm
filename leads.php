@@ -3,6 +3,11 @@
 <?php include_once "components/layout/sidebar.php"; ?>
 <?php include_once "config/api.php"; ?>
 
+<style>
+  label{
+    font-weight: 400;
+  }
+</style>
     
      <div class="main-content app-content"> 
         <div class="container-fluid">
@@ -18,6 +23,34 @@
                 $data['id'] = $_SESSION['user']['id'];
                 $leads = fetchAllUserLeads($data);
                 // print_r($leads);
+
+                if (!is_array($leads)) {
+                  $leads = [];
+                }
+
+                $leadStats = [
+                  'total' => count($leads),
+                  'new' => 0,
+                  'converted' => 0,
+                  'dead' => 0,
+                ];
+
+                foreach ($leads as $lead) {
+                  $statusRaw = $lead['status'] ?? '';
+                  $status = strtolower(trim((string) $statusRaw));
+
+                  if ($status === 'converted' || $status === 'won' || $status === 'success') {
+                    $leadStats['converted']++;
+                  } elseif ($status === 'dead' || $status === 'lost' || $status === 'closed' || $status === 'junk') {
+                    $leadStats['dead']++;
+                  } elseif ($status === 'new' || $status === 'open' || $status === 'new lead' || $status === 'new_lead') {
+                    $leadStats['new']++;
+                  }
+                }
+
+                $conversionRate = $leadStats['total'] > 0
+                  ? round(($leadStats['converted'] / $leadStats['total']) * 100, 1)
+                  : 0;
                 ?>
                  <!-- Start::row-1 -->
 
@@ -57,12 +90,7 @@
                     </p>
                   </div>
                   <div class="flex items-center justify-between mt-1">
-                    <h4 class="mb-0 flex items-center">1,1125</h4>
-                    <span
-                      class="text-success badge bg-success/10 rounded-full flex items-center text-[11px] me-0 ms-2 mb-0"
-                      ><i class="ri-arrow-left-up-line text-[11px]"></i
-                      >+2.5%</span
-                    >
+                    <h4 class="mb-0 flex items-center"><?php echo $leadStats['total']; ?></h4>
                   </div>
                 </div>
               </div>
@@ -95,16 +123,11 @@
                     <p
                       class="flex-auto text-textmuted dark:text-textmuted/50 text-[14px] mb-0"
                     >
-                      Conversion Rate
+                      New Leads
                     </p>
                   </div>
                   <div class="flex items-center justify-between mt-1">
-                    <h4 class="mb-0 flex items-center">15.8%</h4>
-                    <span
-                      class="text-danger badge bg-danger/10 rounded-full flex items-center text-[11px] me-0 ms-2 mb-0"
-                      ><i class="ri-arrow-left-down-line text-[11px]"></i
-                      >-2.5%</span
-                    >
+                    <h4 class="mb-0 flex items-center"><?php echo $leadStats['new']; ?></h4>
                   </div>
                 </div>
               </div>
@@ -137,16 +160,11 @@
                     <p
                       class="flex-auto text-textmuted dark:text-textmuted/50 text-[14px] mb-0"
                     >
-                      Tasks Pending
+                      Converted Leads
                     </p>
                   </div>
                   <div class="flex items-center justify-between mt-1">
-                    <h4 class="mb-0 flex items-center">$3,132</h4>
-                    <span
-                      class="text-success badge bg-success/10 rounded-full flex items-center text-[11px] me-0 ms-2 mb-0"
-                      ><i class="ri-arrow-left-up-line text-[11px]"></i
-                      >+2.5%</span
-                    >
+                    <h4 class="mb-0 flex items-center"><?php echo $leadStats['converted']; ?></h4>
                   </div>
                 </div>
               </div>
@@ -179,16 +197,11 @@
                     <p
                       class="flex-auto text-textmuted dark:text-textmuted/50 text-[14px] mb-0"
                     >
-                      Sales Pipeline
+                      Dead Leads
                     </p>
                   </div>
                   <div class="flex items-center justify-between mt-1">
-                    <h4 class="mb-0 flex items-center">$3,132</h4>
-                    <span
-                      class="text-success badge bg-success/10 rounded-full flex items-center text-[11px] me-0 ms-2 mb-0"
-                      ><i class="ri-arrow-left-up-line text-[11px]"></i
-                      >+2.5%</span
-                    >
+                    <h4 class="mb-0 flex items-center"><?php echo $leadStats['dead']; ?></h4>
                   </div>
                 </div>
               </div>
@@ -221,16 +234,11 @@
                     <p
                       class="flex-auto text-textmuted dark:text-textmuted/50 text-[14px] mb-0"
                     >
-                      New Contacts
+                      Conversion Rate
                     </p>
                   </div>
                   <div class="flex items-center justify-between mt-1">
-                    <h4 class="mb-0 flex items-center">968</h4>
-                    <span
-                      class="text-danger badge bg-danger/10 rounded-full flex items-center text-[11px] me-0 ms-2 mb-0"
-                      ><i class="ri-arrow-left-down-line text-[11px]"></i
-                      >-2.5%</span
-                    >
+                    <h4 class="mb-0 flex items-center"><?php echo $conversionRate; ?>%</h4>
                   </div>
                 </div>
               </div>
@@ -239,10 +247,227 @@
           <!-- End::row-1 -->
             <div class="grid grid-cols-12 gap-6"> 
                 <div class="xl:col-span-12 col-span-12"> 
+                  <div style="margin-bottom: 1rem;">
+                    <div class="rounded-xl border border-defaultborder dark:border-defaultborder/10 bg-white dark:bg-bodybg p-3 mb-4">
+                      <div class="flex lg:items-end gap-3 lg:gap-2">
+                        <div class="flex-1" style="min-width: 300px;">
+                          <label for="leads-filter-search" class="block text-xs text-textmuted dark:text-textmuted/50 mb-1">
+                            Search
+                          </label>
+                          <input
+                            id="leads-filter-search"
+                            type="text"
+                            placeholder="Search name, phone, email..."
+                            class="w-full rounded-lg border border-defaultborder dark:border-defaultborder/10 bg-transparent px-3 py-2 text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                          />
+                        </div>
+
+                        <div class="flex  items-end gap-2 w-full lg:w-auto">
+                          <div class="w-full sm:w-[220px] lg:w-[200px]">
+                            <label for="leads-filter-status" class="block text-xs text-textmuted dark:text-textmuted/50 mb-1">
+                              Status
+                            </label>
+                            <div class="relative">
+                              <select
+                                id="leads-filter-status"
+                                class="appearance-none w-full rounded-lg border border-defaultborder dark:border-defaultborder/10 bg-transparent px-3 py-2 pr-9 text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                              >
+                                <option value="">All Statuses</option>
+                                <?php
+                                  $statusSet = [];
+                                  foreach ($leads as $lead) {
+                                    $st = trim((string)($lead['status'] ?? ''));
+                                    if ($st !== '') { $statusSet[$st] = true; }
+                                  }
+                                  $statuses = array_keys($statusSet);
+                                  sort($statuses, SORT_NATURAL | SORT_FLAG_CASE);
+                                  foreach ($statuses as $st) {
+                                    echo '<option value="'.htmlspecialchars($st, ENT_QUOTES).'">'.htmlspecialchars($st).'</option>';
+                                  }
+                                ?>
+                              </select>
+                              <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-textmuted dark:text-textmuted/50" style="right: 0.75rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+
+                          <div class="w-full sm:w-[200px] lg:w-[180px]">
+                            <label for="leads-filter-event-from" class="block text-xs text-textmuted dark:text-textmuted/50 mb-1">
+                              Event From
+                            </label>
+                            <input
+                              id="leads-filter-event-from"
+                              type="date"
+                              class="w-full rounded-lg border border-defaultborder dark:border-defaultborder/10 bg-transparent px-3 py-2 text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                              aria-label="Event from"
+                            />
+                          </div>
+
+                          <div class="w-full sm:w-[200px] lg:w-[180px]">
+                            <label for="leads-filter-event-to" class="block text-xs text-textmuted dark:text-textmuted/50 mb-1">
+                              Event To
+                            </label>
+                            <input
+                              id="leads-filter-event-to"
+                              type="date"
+                              class="w-full rounded-lg border border-defaultborder dark:border-defaultborder/10 bg-transparent px-3 py-2 text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                              aria-label="Event to"
+                            />
+                          </div>
+
+                          <div class="w-full sm:w-auto">
+                            <label class="block text-xs text-transparent mb-1 select-none">.</label>
+                            <button
+                              type="button"
+                              id="leads-filter-clear-btn"
+                              class="ti-btn ti-btn-soft-danger w-full sm:w-auto px-3 py-2 text-sm rounded-lg"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
                    <?php include_once "components/tables/leads.php" ?>
                 </div> 
             </div> 
         </div> 
     </div>
+
+    <script>
+      (function () {
+        const $ = window.jQuery;
+        if (!$) return;
+        const clearBtn = document.getElementById("leads-filter-clear-btn");
+
+        const searchInput = document.getElementById("leads-filter-search");
+        const statusSelect = document.getElementById("leads-filter-status");
+        const eventFrom = document.getElementById("leads-filter-event-from");
+        const eventTo = document.getElementById("leads-filter-event-to");
+
+        function parseDateToYmdNumber(dateStr) {
+          if (!dateStr) return null;
+          const s = String(dateStr).trim();
+
+          // yyyy-mm-dd
+          const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (iso) return Number(iso[1] + iso[2] + iso[3]);
+
+          // mm/dd/yyyy or m/d/yyyy
+          const us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+          if (us) {
+            const mm = us[1].padStart(2, "0");
+            const dd = us[2].padStart(2, "0");
+            return Number(us[3] + mm + dd);
+          }
+
+          const d = new Date(s);
+          if (!isNaN(d.getTime())) {
+            const yyyy = String(d.getFullYear());
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return Number(yyyy + mm + dd);
+          }
+
+          return null;
+        }
+
+        function getTable() {
+          if (window.leadsDataTable) return window.leadsDataTable;
+          if ($.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable("#leads-table")) {
+            return $("#leads-table").DataTable();
+          }
+          return null;
+        }
+
+        function applyStatusFilter(table) {
+          if (!table) return;
+          const val = (statusSelect?.value || "").trim();
+          // Status column index in table markup:
+          // S.NO(0) Name(1) Phone(2) Pickup(3) Dropoff(4) Event Date(5)
+          // Amount(6) Status(7) Created(8) Action(9)
+          const statusColIdx = 7;
+          if (!val) {
+            table.column(statusColIdx).search("", false, false);
+          } else {
+            const escaped = val.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            table.column(statusColIdx).search("^" + escaped + "$", true, false);
+          }
+        }
+
+        function wireDateFilters() {
+          // Register once
+          if ($.fn.dataTable.ext.search.__leadsFiltersRegistered) return;
+          $.fn.dataTable.ext.search.__leadsFiltersRegistered = true;
+
+          $.fn.dataTable.ext.search.push(function (settings, data) {
+            if (settings.nTable?.id !== "leads-table") return true;
+
+            const eventDateText = data[5] || "";
+
+            const fromVal = eventFrom?.value || "";
+            const toVal = eventTo?.value || "";
+            const fromNum = parseDateToYmdNumber(fromVal);
+            const toNum = parseDateToYmdNumber(toVal);
+            const rowNum = parseDateToYmdNumber(eventDateText);
+
+            if (fromNum && rowNum && rowNum < fromNum) return false;
+            if (toNum && rowNum && rowNum > toNum) return false;
+            if ((fromNum || toNum) && !rowNum) return false;
+
+            return true;
+          });
+        }
+
+        function refresh() {
+          const table = getTable();
+          if (!table) return;
+          applyStatusFilter(table);
+          table.draw();
+        }
+
+        // Wiring
+        wireDateFilters();
+
+        // Use our search input for DataTables global search
+        searchInput?.addEventListener("input", function () {
+          const table = getTable();
+          if (!table) return;
+          table.search(this.value || "").draw();
+        });
+
+        statusSelect?.addEventListener("change", refresh);
+        eventFrom?.addEventListener("change", refresh);
+        eventTo?.addEventListener("change", refresh);
+
+        clearBtn?.addEventListener("click", function () {
+          if (searchInput) searchInput.value = "";
+          if (statusSelect) statusSelect.value = "";
+          if (eventFrom) eventFrom.value = "";
+          if (eventTo) eventTo.value = "";
+
+          const table = getTable();
+          if (table) {
+            table.search("");
+            table.column(7).search("", false, false);
+            table.draw();
+          }
+        });
+
+        // In case DataTable initializes after this script, retry briefly
+        let tries = 0;
+        const t = setInterval(function () {
+          tries++;
+          const table = getTable();
+          if (table || tries > 40) {
+            clearInterval(t);
+            if (table && searchInput?.value) table.search(searchInput.value).draw();
+          }
+        }, 100);
+      })();
+    </script>
     
       <?php include_once "components/layout/footer.php"; ?>
