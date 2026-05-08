@@ -135,7 +135,7 @@
           <button class="btn-ghost" type="button" onclick="loadWorkflows()">
             <i class="ri-refresh-line me-1"></i> Refresh
           </button>
-          <a class="btn-blue" href="<?php echo $APP_BASE; ?>workflows/create.php">
+          <a class="btn-blue" href="<?php echo $APP_BASE; ?>create_workflow.php">
             <i class="ri-add-line me-1"></i> New Workflow
           </a>
         </div>

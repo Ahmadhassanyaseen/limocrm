@@ -76,8 +76,8 @@
           <div class="muted text-sm">Conditions first → then Actions.</div>
         </div>
         <div class="flex items-center gap-2 flex-wrap justify-end">
-          <a class="btn" href="index.php"><i class="ri-arrow-left-line me-1"></i> Back</a>
-          <button class="btn" type="button" onclick="resetAll()">Reset</button>
+          <!-- <a class="btn" href="index.php"><i class="ri-arrow-left-line me-1"></i> Back</a> -->
+          <!-- <button class="btn" type="button" onclick="resetAll()">Reset</button> -->
           <button class="btn btn-blue" id="btnSave" type="button" onclick="saveWorkflow()"><i class="ri-save-3-line me-1"></i> Save</button>
         </div>
       </div>
@@ -165,8 +165,8 @@
           This workflow is created via <span class="mono">action=save_workflow</span> (SuiteCRM CustomEntryPoint).
         </div>
         <div class="flex items-center gap-2">
-          <a class="btn" href="index.php"><i class="ri-arrow-left-line me-1"></i> Back</a>
-          <button class="btn" type="button" onclick="resetAll()">Reset</button>
+          <!-- <a class="btn" href="index.php"><i class="ri-arrow-left-line me-1"></i> Back</a> -->
+          <!-- <button class="btn" type="button" onclick="resetAll()">Reset</button> -->
           <button class="btn btn-blue" id="btnSave2" type="button" onclick="saveWorkflow()"><i class="ri-save-3-line me-1"></i> Save Changes</button>
         </div>
       </div>
