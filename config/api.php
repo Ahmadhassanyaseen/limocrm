@@ -119,6 +119,18 @@ function deleteVehicle($data){
     $data["action"] = "delete_vehicle";
     return curlRequest($data);
 }
+function fetchPricingDefaults($data) {
+    $data["action"] = "fetch_pricing_defaults";
+    return curlRequest($data);
+}
+function savePricingDefaults($data) {
+    $data["action"] = "save_pricing_defaults";
+    return curlRequest($data);
+}
+function updateVehiclePricing($data) {
+    $data["action"] = "update_vehicle_pricing";
+    return curlRequest($data);
+}
 function deleteworkflow($data){
     $data["action"] = "delete_workflow";
     return curlRequest($data);
@@ -174,12 +186,108 @@ function sendLeadEmail($data) {
 }
 
 function sendFormalQuoteEmail($data) {
-    $data["action"] = "send_formal_quote_email";
-    return curlRequest($data);
+    $id = trim((string)($data['id'] ?? $data['lead_id'] ?? ''));
+    return curlRequest([
+        'action' => 'send_formal_quote_email',
+        'id'     => $id,
+    ]);
 }
 
 function sendAgreementEmail($data) {
     $data["action"] = "send_agreement_email";
+    return curlRequest($data);
+}
+
+function saveLead($data) {
+    $data["action"] = "save_lead";
+    return curlRequest($data);
+}
+
+function fetchLeadEmails($data) {
+    $data["action"] = "fetch_lead_emails";
+    return curlRequest($data);
+}
+
+function fetchSingleEmail($data) {
+    $data["action"] = "fetch_single_email";
+    return curlRequest($data);
+}
+
+function fetchUserEmailAnalytics($data) {
+    $data["action"] = "fetch_user_email_analytics";
+    return curlRequest($data);
+}
+
+function fetchNotes($data) {
+    $data["action"] = "fetch_notes";
+    return curlRequest($data);
+}
+
+function saveNote($data) {
+    $data["action"] = "save_note";
+    return curlRequest($data);
+}
+
+function updateNoteApi($data) {
+    $data["action"] = "update_note";
+    return curlRequest($data);
+}
+
+function deleteNote($data) {
+    $data["action"] = "delete_note";
+    return curlRequest($data);
+}
+
+function fetchContacts($data) {
+    $data["action"] = "fetch_contacts";
+    return curlRequest($data);
+}
+
+function fetchContactsList($data) {
+    $data["action"] = "fetch_contacts_list";
+    return curlRequest($data);
+}
+
+function fetchContactDetail($data) {
+    $data["action"] = "fetch_contact_detail";
+    return curlRequest($data);
+}
+
+function saveContactRecord($data) {
+    $data["action"] = "save_contact";
+    return curlRequest($data);
+}
+
+function updateContactRecord($data) {
+    $data["action"] = "update_contact";
+    return curlRequest($data);
+}
+
+function deleteContactRecord($data) {
+    $data["action"] = "delete_contact";
+    return curlRequest($data);
+}
+
+function fetchEmbeddedDomains($data) {
+    $data["action"] = "fetch_embedded_domains";
+    return curlRequest($data);
+}
+
+/** Public signing page preview (validated by token on server). */
+function fetchAgreementLeadData($data) {
+    $data["action"] = "fetch_agreement_lead";
+    return curlRequest($data);
+}
+
+/** Payment + signature persisted in SuiteCRM (Stripe PaymentMethod id from Stripe.js). */
+function submitAgreementPayment($data) {
+    $data["action"] = "submit_agreement";
+    return curlRequest($data);
+}
+
+/** Staff-only: signed URL for agreement.php ?l=&t= */
+function getAgreementSigningLink($data) {
+    $data["action"] = "get_agreement_signing_link";
     return curlRequest($data);
 }
 

@@ -33,47 +33,21 @@
 
   /* DataTables controls (search/paging/info) */
   .leads-table-wrap div.dt-container {
-    padding: 14px 14px 10px 14px;
+    padding: 0;
   }
 
   .leads-table-wrap div.dt-container .dt-search {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 10px;
-  }
-
-  .leads-table-wrap div.dt-container .dt-search label {
     display: none;
-  }
-
-  .leads-table-wrap div.dt-container .dt-search input {
-    width: min(420px, 100%);
-    background: var(--lt-surface-2);
-    color: var(--lt-text);
-    border: 1px solid var(--lt-border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    outline: none;
-  }
-
-  .leads-table-wrap div.dt-container .dt-search input::placeholder {
-    color: var(--lt-muted-2);
-  }
-
-  .leads-table-wrap div.dt-container .dt-search input:focus {
-    border-color: var(--lt-accent);
-    box-shadow: 0 0 0 3px var(--lt-focus);
   }
 
   .leads-table-wrap div.dt-container .dt-info {
     color: var(--lt-muted);
-    padding-top: 12px;
+    padding: 12px 14px;
     font-size: 12px;
   }
 
   .leads-table-wrap div.dt-container .dt-paging {
-    padding-top: 10px;
+    padding: 10px 14px;
   }
 
   .leads-table-wrap div.dt-container .dt-paging .dt-paging-button {
@@ -133,6 +107,10 @@
     background: var(--lt-row-hover);
   }
 
+  .leads-table-wrap table.dataTable tbody tr[data-lead-id] {
+    cursor: pointer;
+  }
+
   /* Keep action buttons aligned like the reference */
   .leads-table-wrap .btn-list {
     display: inline-flex;
@@ -141,26 +119,25 @@
     white-space: nowrap;
   }
 
-  /* Horizontal scroll: keep cells from wrapping and let the wrapper scroll. */
+  /* Horizontal scroll via parent wrapper */
   .leads-table-wrap.has-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .leads-table-wrap table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
   .leads-table-wrap table.dataTable thead th,
   .leads-table-wrap table.dataTable tbody td {
     white-space: nowrap;
   }
 
-  /* DataTables' built-in scrollX wrapper styling. */
-  .leads-table-wrap div.dt-scroll {
-    width: 100%;
+  /* Hide DataTables sort icons */
+  .leads-table-wrap table.dataTable thead th.dt-orderable-asc span.dt-column-order,
+  .leads-table-wrap table.dataTable thead th.dt-orderable-desc span.dt-column-order,
+  .leads-table-wrap table.dataTable thead th .dt-column-order {
+    display: none !important;
   }
-
-  .leads-table-wrap div.dt-scroll-head,
-  .leads-table-wrap div.dt-scroll-body {
-    background: var(--lt-surface);
+  .leads-table-wrap table.dataTable thead th {
+    cursor: default !important;
   }
 
   /* Subtle two-line "Created" cell. */
@@ -195,13 +172,15 @@
                           <th scope="col">Event Date</th>
                           <th scope="col">Amount</th>
                           <th scope="col">Status</th>
+                          <th scope="col">Source</th>
+                          <th scope="col">Assigned To</th>
                           <th scope="col">Created</th>
                           <th scope="col">Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         <?php for ($i=0; $i < count($leads); $i++) { ?>
-                        <tr class="border-b border-defaultborder dark:border-defaultborder/10">
+                        <tr class="border-b border-defaultborder dark:border-defaultborder/10" data-lead-id="<?php echo $leads[$i]['id']; ?>">
                           <td><span class=""><?php echo $i+1; ?></span></td>
                           <td>
                             <div class="flex">
@@ -238,6 +217,22 @@
                             <span class="badge bg-success/10 text-success"
                               ><?php echo $leads[$i]['status']; ?></span
                             >
+                          </td>
+                          <td>
+                            <?php $leadSource = trim((string)($leads[$i]['lead_source'] ?? '')); ?>
+                            <?php if ($leadSource !== ''): ?>
+                              <span class="badge bg-info/10 text-info" style="font-size:11px;"><i class="ri-global-line" style="font-size:10px;margin-right:2px;"></i><?php echo htmlspecialchars($leadSource); ?></span>
+                            <?php else: ?>
+                              <span class="text-textmuted dark:text-textmuted/50">—</span>
+                            <?php endif; ?>
+                          </td>
+                          <td>
+                            <?php $assignedUserName = trim((string)($leads[$i]['assigned_user_name'] ?? '')); ?>
+                            <?php if ($assignedUserName !== ''): ?>
+                              <span class="badge bg-secondary/10 text-secondary" style="font-size:11px;"><i class="ri-user-star-line" style="font-size:10px;margin-right:2px;"></i><?php echo htmlspecialchars($assignedUserName); ?></span>
+                            <?php else: ?>
+                              <span class="text-textmuted dark:text-textmuted/50">—</span>
+                            <?php endif; ?>
                           </td>
                           <?php
                             $createdRaw = (string)($leads[$i]['date_entered'] ?? '');
@@ -303,11 +298,10 @@
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
 <script>
     $(document).ready(function() {
-        // Column index map after adding "Created":
         // 0 S.NO | 1 Name | 2 Phone | 3 Pickup | 4 Dropoff | 5 Event Date
-        // 6 Amount | 7 Status | 8 Created | 9 Action
-        const CREATED_COL = 8;
-        const ACTION_COL  = 9;
+        // 6 Amount | 7 Status | 8 Source | 9 Assigned To | 10 Created | 11 Action
+        const CREATED_COL = 10;
+        const ACTION_COL  = 11;
 
         const table = $('#leads-table').DataTable({
             language: {
@@ -316,23 +310,20 @@
             },
             lengthChange: false,
             pageLength: 10,
-            scrollX: true,
             autoWidth: false,
             order: [[CREATED_COL, 'desc']],
             columnDefs: [
                 { orderable: false, targets: [ACTION_COL] },
                 { type: 'num',      targets: [CREATED_COL] }
             ],
-            dom: '<"dt-top">rt<"dt-bottom flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"ip>'
+            dom: 'rt<"dt-bottom flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"ip>'
         });
 
         window.leadsDataTable = table;
 
-        // DataTables' scrollX recomputes column widths after layout settles.
-        // Trigger an extra adjust on next tick + on window resize so the
-        // header alignment stays solid in dark/light theme switches and after
-        // the surrounding cards finish loading.
-        setTimeout(function () { table.columns.adjust(); }, 0);
-        $(window).on('resize.leadsTable', function () { table.columns.adjust(); });
+        $('#leads-table tbody').on('click', 'tr[data-lead-id]', function (e) {
+            if ($(e.target).closest('a, button, .btn-list').length) return;
+            window.location.href = 'lead.php?id=' + $(this).data('lead-id');
+        });
     });
 </script>

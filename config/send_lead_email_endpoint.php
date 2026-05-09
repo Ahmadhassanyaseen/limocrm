@@ -44,10 +44,13 @@ $label   = $handler['label'];
 
 // The backend functions only need `id`. user_id is passed in case the
 // backend resolves a per-user template via session context.
+$sessionUserId = $_SESSION['user']['id'] ?? ($_SESSION['user_id'] ?? '');
+
+// Formal quote goes to CustomEntryPoint::send_formal_quote_email ($lead id only); do not use save_lead.
 $payload = [
     'id'               => $leadId,
-    'user_id'          => $_SESSION['user_id'] ?? '',
-    'assigned_user_id' => $_SESSION['user_id'] ?? '',
+    'user_id'          => $sessionUserId,
+    'assigned_user_id' => $sessionUserId,
 ];
 
 $response = call_user_func($handler['fn'], $payload);
