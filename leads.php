@@ -4,7 +4,11 @@
 
 <?php
   $data['id'] = $_SESSION['user']['id'];
-  $leads = fetchAllUserLeads($data);
+  if($_SESSION['user']['admin'] == 1){
+    $leads = fetchAllLeads($data);
+  } else {
+    $leads = fetchAllUserLeads($data);
+  }
   if (!is_array($leads)) { $leads = []; }
 
   $leadStats = ['total' => count($leads), 'new' => 0, 'converted' => 0, 'dead' => 0];
@@ -94,7 +98,7 @@
     border: 1px solid var(--ld-border);
     background: var(--ld-surface-2);
     color: var(--ld-text);
-    padding: 0 12px 0 36px;
+    padding: 0 12px 0 36px!important;
     font-size: 13px; outline: none;
     width: min(320px, 100%);
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -167,11 +171,13 @@
         </div>
         <p class="text-xs text-textmuted dark:text-textmuted/50 mt-1 mb-0 ms-10">Track, filter, and convert your leads into customers.</p>
       </div>
+      <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Leads', 'create') == 1): ?>
       <div class="flex items-center gap-2">
         <a href="add_lead.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> New Lead
         </a>
       </div>
+      <?php endif; ?>
     </div>
 
     <!-- Stat Cards -->

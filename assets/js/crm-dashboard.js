@@ -1,4 +1,10 @@
 /*  Sales Overview Crm chart */
+(function () {
+  var el = document.querySelector("#sales-overview-crm");
+  if (!el) {
+    return;
+  }
+
 var options = {
   series: [
       {
@@ -178,8 +184,30 @@ var options = {
       },
   },
 };
-var chart4 = new ApexCharts(document.querySelector("#sales-overview-crm"), options);
+
+  var limoSalesLive = null;
+  var limoJsonEl = document.getElementById("limo-dashboard-sales-json");
+  if (limoJsonEl && limoJsonEl.textContent) {
+    try {
+      limoSalesLive = JSON.parse(limoJsonEl.textContent.trim());
+    } catch (e) {
+      limoSalesLive = null;
+    }
+  }
+  if (!limoSalesLive && window.LIMO_SALES_OVERVIEW) {
+    limoSalesLive = window.LIMO_SALES_OVERVIEW;
+  }
+  if (limoSalesLive && limoSalesLive.series && limoSalesLive.series.length) {
+    options.series = JSON.parse(JSON.stringify(limoSalesLive.series));
+    if (limoSalesLive.categories && limoSalesLive.categories.length) {
+      options.xaxis = options.xaxis || {};
+      options.xaxis.categories = limoSalesLive.categories.slice();
+    }
+  }
+
+var chart4 = new ApexCharts(el, options);
 chart4.render();
+})();
 /*  Sales Overview Crm chart */
   
   /* Leads-overview chart */
@@ -241,8 +269,11 @@ chart4.render();
       axisBorder: { show: false },
     },
   };
-  var chart = new ApexCharts(document.querySelector("#Leads-overview"), options);
-  chart.render();
+  var leadsOvEl = document.querySelector("#Leads-overview");
+  if (leadsOvEl) {
+    var chart = new ApexCharts(leadsOvEl, options);
+    chart.render();
+  }
   /* Leads-overview chart */
 
 /* profit Report */

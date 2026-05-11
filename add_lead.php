@@ -120,7 +120,7 @@
   .al-vehicle-search {
     height: 38px; border-radius: 10px; border: 1px solid var(--al-border);
     background: var(--al-surface-2); color: var(--al-text);
-    padding: 0 12px 0 36px; font-size: 13px; outline: none;
+    padding: 0 12px 0 36px!important; font-size: 13px; outline: none;
     width: min(300px, 100%); transition: border-color 0.2s;
   }
   .al-vehicle-search:focus { border-color: rgb(var(--primary-rgb)); }
@@ -446,7 +446,8 @@ $(document).ready(function () {
 
     $.post('https://zabrin.xyz/limogen/index.php?entryPoint=CustomEntryPoint', {
       action: 'fetch_vehicles',
-      user_id: userId
+      user_id: userId,
+      is_admin: "<?php echo $_SESSION['user']['admin'] == 1 ? '1' : '0'; ?>"
     }, function (data) {
       if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { data = []; } }
       allVehicles = Array.isArray(data) ? data.filter(function (v) { return v.status !== 'Inactive'; }) : [];

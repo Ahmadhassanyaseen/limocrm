@@ -23,6 +23,8 @@ if (!isset($_SESSION['user'])) {
   header("Location: " . $APP_BASE . "login.php");
   exit;
 }
+
+require_once __DIR__ . '/../../config/session_permissions.php';
 ?>
  <html
   lang="en"
@@ -2915,21 +2917,23 @@ if (!isset($_SESSION['user'])) {
                 <li>
                   <a
                     class="ti-dropdown-item flex items-center"
-                    href="profile.php"
+                    href="settings.php"
                     ><i
                       class="ri-user-line p-1 rounded-full bg-primary/10 text-primary me-2 text-[1rem]"
                     ></i
                     >Profile</a
                   >
                 </li>
+                <?php if (limo_nav_can_module('EmailTracking')): ?>
                 <li>
-                  <a class="ti-dropdown-item flex items-center" href="mail.php"
+                  <a class="ti-dropdown-item flex items-center" href="email_analytics.php"
                     ><i
                       class="ri-mail-line p-1 rounded-full bg-primary/10 text-primary me-2 text-[1rem]"
                     ></i
                     >Mail Inbox</a
                   >
                 </li>
+                <?php endif; ?>
                
                 <li>
                   <a
@@ -2944,7 +2948,7 @@ if (!isset($_SESSION['user'])) {
                 <li
                   class="border-t border-defaultborder dark:border-defaultborder/10 bg-light"
                 >
-                  <a class="ti-dropdown-item flex items-center" href="chat.php"
+                  <a class="ti-dropdown-item flex items-center" href="https://shmai.com/contact"
                     ><i
                       class="ri-question-line p-1 rounded-full bg-primary/10 text-primary set me-2 text-[1rem]"
                     ></i

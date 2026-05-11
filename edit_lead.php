@@ -3,6 +3,13 @@
 <?php include_once "components/layout/sidebar.php"; ?>
 <?php include_once "config/api.php"; ?>
 <?php
+
+if($_SESSION['user']['admin'] == 0 && limo_user_module_access('Leads', 'update') == 0){
+  header('Location: leads.php');
+  exit;
+}
+
+
 $data['id'] = $_GET['id'];
 $response = fetchSingleLead($data);
 $lead = $response[0];

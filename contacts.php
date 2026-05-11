@@ -102,9 +102,11 @@
         <button type="button" class="ct-action-btn" title="Refresh" onclick="loadContacts()" style="width:36px;height:36px;font-size:16px;">
           <i class="ri-refresh-line"></i>
         </button>
+        <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Contacts', 'create') == 1): ?>
         <button type="button" onclick="openAddModal()" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> Add Contact
         </button>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -342,7 +344,7 @@ window.loadContacts = function() {
   $('#ct-empty').hide();
   $.ajax({
     url: API, type: 'POST',
-    data: { action: 'fetch_contacts_list', user_id: SESSION_USER_ID },
+    data: { action: 'fetch_contacts_list', user_id: SESSION_USER_ID , is_admin: "<?php echo $_SESSION['user']['admin'] == 1 ? '1' : '0'; ?>" },
     success: function(response) {
       try {
         var res = typeof response === 'string' ? JSON.parse(response) : response;
@@ -396,8 +398,12 @@ function renderTable(list) {
     html += '<td style="color:var(--ct-muted);white-space:nowrap;font-size:12px;">' + date + '</td>';
     html += '<td><div class="flex items-center justify-center gap-1" onclick="event.stopPropagation()">';
     html += '<a href="contact_detail.php?id=' + c.id + '" class="ct-action-btn" title="View"><i class="ri-eye-line"></i></a>';
+    <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Contacts', 'update') == 1): ?>
     html += '<button class="ct-action-btn" title="Edit" onclick="openEditModal(\'' + c.id + '\')"><i class="ri-edit-line"></i></button>';
+    <?php endif; ?>
+    <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Contacts', 'delete') == 1): ?>
     html += '<button class="ct-action-btn danger" title="Delete" onclick="deleteContact(\'' + c.id + '\')"><i class="ri-delete-bin-line"></i></button>';
+    <?php endif; ?>
     html += '</div></td>';
     html += '</tr>';
   });

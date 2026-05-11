@@ -3,7 +3,6 @@
    $url_string = $_SERVER['REQUEST_URI'];
    $url = explode('/', $url_string);
    $url = $url[2];
-   
    ?>
       <aside class="app-sidebar" id="sidebar">
         <!-- Start::main-sidebar-header -->
@@ -96,12 +95,14 @@
                         </li>
 
                         <!-- Leads -->
+                        <?php if (limo_nav_can_module('Leads')): ?>
                         <li data-module="Leads" class="slide <?php echo $url == 'leads.php' ? 'active' : ''; ?>">
                           <a href="./leads.php" class="side-menu__item <?php echo $url == 'leads.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"></path></svg>
                             <span class="side-menu__label">Leads</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Vendors -->
                         <!-- <li data-module="Vendors" class="slide <?php echo $url == 'vendors.php' ? 'active' : ''; ?>">
@@ -112,12 +113,14 @@
                         </li> -->
 
                         <!-- Vehicles -->
+                        <?php if (limo_nav_can_module('Vehicles')): ?>
                         <li data-module="Vehicles" class="slide <?php echo $url == 'vehicles.php' ? 'active' : ''; ?>">
                           <a href="./vehicles.php" class="side-menu__item <?php echo $url == 'vehicles.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 20H5V21C5 21.5523 4.55228 22 4 22H3C2.44772 22 2 21.5523 2 21V11L4.4805 5.21216C4.79566 4.47679 5.51874 4 6.31879 4H17.6812C18.4813 4 19.2043 4.47679 19.5195 5.21216L22 11V21C22 21.5523 21.5523 22 21 22H20C19.4477 22 19 21.5523 19 21V20ZM20 13H4V18H20V13ZM4.17594 11H19.8241L17.6812 6H6.31879L4.17594 11ZM6.5 17C5.67157 17 5 16.3284 5 15.5C5 14.6716 5.67157 14 6.5 14C7.32843 14 8 14.6716 8 15.5C8 16.3284 7.32843 17 6.5 17ZM17.5 17C16.6716 17 16 16.3284 16 15.5C16 14.6716 16.6716 14 17.5 14C18.3284 14 19 14.6716 19 15.5C19 16.3284 18.3284 17 17.5 17Z"></path></svg>
                             <span class="side-menu__label">Vehicles</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Quotes -->
                         <!-- <li data-module="Quotes" class="slide <?php echo $url == 'quotes.php' ? 'active' : ''; ?>">
@@ -128,22 +131,27 @@
                         </li> -->
 
                         <!-- Agreements -->
+                        <?php if (limo_nav_can_module('Agreements')): ?>
                         <li data-module="Agreements" class="slide <?php echo $url == 'agreements.php' ? 'active' : ''; ?>">
                           <a href="./agreements.php" class="side-menu__item <?php echo $url == 'agreements.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15a2.25 2.25 0 0 1 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path></svg>
                             <span class="side-menu__label">Agreements</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Notes -->
+                        <?php if (limo_nav_can_module('Notes')): ?>
                         <li data-module="Notes" class="slide <?php echo $url == 'notes.php' ? 'active' : ''; ?>">
                           <a href="./notes.php" class="side-menu__item <?php echo $url == 'notes.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
                             <span class="side-menu__label">Notes</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Contacts -->
+                        <?php if (limo_nav_can_module('Contacts')): ?>
                         <?php $contactsActive = in_array($url, ['contacts.php','contact_detail.php','edit_contact.php']); ?>
                         <li data-module="Contacts" class="slide <?php echo $contactsActive ? 'active' : ''; ?>">
                           <a href="./contacts.php" class="side-menu__item <?php echo $contactsActive ? 'active' : ''; ?>">
@@ -151,6 +159,7 @@
                             <span class="side-menu__label">Contacts</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Calendar -->
                         <!-- <li data-module="Calendar" class="slide <?php echo $url == 'calendar.php' ? 'active' : ''; ?>">
@@ -161,12 +170,14 @@
                         </li> -->
 
                         <!-- Reports & Analytics -->
+                        <?php if (limo_nav_can_module('Reports')): ?>
                         <li data-module="Reports" class="slide <?php echo $url == 'reports.php' ? 'active' : ''; ?>">
                           <a href="./reports.php" class="side-menu__item <?php echo $url == 'reports.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605"></path></svg>
                             <span class="side-menu__label">Reports & Analytics</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Email Tracking -->
                         <!-- <li data-module="EmailTracking" class="slide <?php echo $url == 'email_tracking.php' ? 'active' : ''; ?>">
@@ -177,12 +188,14 @@
                         </li> -->
 
                         <!-- Pricing -->
+                        <?php if (limo_nav_session_admin_full_access()): ?>
                         <li data-module="Vehicles" class="slide <?php echo $url == 'pricing.php' ? 'active' : ''; ?>">
                           <a href="./pricing.php" class="side-menu__item <?php echo $url == 'pricing.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
                             <span class="side-menu__label">Pricing</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Commissions -->
                         <!-- <li data-module="Commissions" class="slide <?php echo $url == 'commissions.php' ? 'active' : ''; ?>">
@@ -210,6 +223,7 @@
                         </li> -->
 
                       <!-- ADMIN Section -->
+                      <?php if (limo_nav_session_admin_full_access()): ?>
                       <li class="slide__category"><span class="category-name" style="color: #e74c3c;">ADMIN</span></li>
 
                         <!-- User Management (Expandable) -->
@@ -258,12 +272,28 @@
                           </a>
                         </li> -->
 
-                        <!-- Payments -->
-                        <li data-module="Payments" class="slide <?php echo $url == 'payments.php' ? 'active' : ''; ?>">
-                          <a href="./payments.php" class="side-menu__item <?php echo $url == 'payments.php' ? 'active' : ''; ?>">
+                        <!-- Payment Management (Expandable) -->
+                        <?php $payMgmtActive = in_array($url, ['transactions.php','payment_methods.php']); ?>
+                        <li class="slide has-sub open">
+                          <a href="javascript:void(0);" class="side-menu__item <?php echo $payMgmtActive ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25h-15a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-                            <span class="side-menu__label">Payments</span>
+                            <span class="side-menu__label">Payment Management</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__angle" style="width:16px;height:16px;transition:transform .3s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                           </a>
+                          <ul class="slide-menu child1" style="display:block;">
+                            <li class="slide <?php echo $url == 'transactions.php' ? 'active' : ''; ?>">
+                              <a href="./transactions.php" class="side-menu__item <?php echo $url == 'transactions.php' ? 'active' : ''; ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"></path></svg>
+                                Transactions
+                              </a>
+                            </li>
+                            <li class="slide <?php echo $url == 'payment_methods.php' ? 'active' : ''; ?>">
+                              <a href="./payment_methods.php" class="side-menu__item <?php echo $url == 'payment_methods.php' ? 'active' : ''; ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"></path></svg>
+                                Payment Methods
+                              </a>
+                            </li>
+                          </ul>
                         </li>
 
                         <!-- Email Settings (Expandable) -->
@@ -275,6 +305,12 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__angle" style="width:16px;height:16px;transition:transform .3s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                           </a>
                           <ul class="slide-menu child1" style="display:block;">
+                            <li class="slide <?php echo $url == 'email_settings.php' ? 'active' : ''; ?>">
+                              <a href="./email_settings.php" class="side-menu__item <?php echo $url == 'email_settings.php' ? 'active' : ''; ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path></svg>
+                            Email Settings
+                              </a>
+                            </li>
                             <li class="slide <?php echo $url == 'email_templates.php' || $url == 'email_template.php' ? 'active' : ''; ?>">
                               <a href="./email_templates.php" class="side-menu__item <?php echo $url == 'email_templates.php' || $url == 'email_template.php' ? 'active' : ''; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
@@ -301,20 +337,25 @@
                             </li> -->
                           </ul>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Integrations -->
+                        <?php if (limo_nav_can_module('Workflows')): ?>
                         <li data-module="Workflows" class="slide <?php echo $url == 'workflows.php' ? 'active' : ''; ?>">
                           <a href="./workflows.php" class="side-menu__item <?php echo $url == 'workflows.php' ? 'active' : ''; ?>">
                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"></path></svg>
                              <span class="side-menu__label">Workflows</span>
                           </a>
                         </li>
+                        <?php endif; ?>
+                        <?php if (limo_nav_can_module('Integrations')): ?>
                         <li data-module="Integrations" class="slide <?php echo $url == 'integration.php' ? 'active' : ''; ?>">
                           <a href="./integration.php" class="side-menu__item <?php echo $url == 'integration.php' ? 'active' : ''; ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 side-menu__icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"></path></svg>
                             <span class="side-menu__label">Integrations</span>
                           </a>
                         </li>
+                        <?php endif; ?>
 
                         <!-- Vendor Tiers -->
                         <!-- <li data-module="VendorTiers" class="slide <?php echo $url == 'vendor_tiers.php' ? 'active' : ''; ?>">

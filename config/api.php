@@ -1,4 +1,3 @@
-
 <?php
 
 function curlRequest($data) {
@@ -39,10 +38,15 @@ function curlRequest($data) {
     return $decoded;
 }
 
+function fetchAllLeads($data){
+    $data["action"] = "fetchAllLeads";
+    return curlRequest($data);
+}
 function fetchAllUserLeads($data){
     $data["action"] = "fetchAllUserLeads";
     return curlRequest($data);
 }
+
 function createNote($data){
     $data["action"] = "createNote";
     return curlRequest($data);
@@ -57,6 +61,10 @@ function fetchSingleLead($data){
 }
 function updateLead($data){
     $data["action"] = "update_lead";
+    return curlRequest($data);
+}
+function updateLeadAfterPayment($data){
+    $data["action"] = "update_lead_after_payment";
     return curlRequest($data);
 }
 function userLogin($data){
@@ -291,3 +299,52 @@ function getAgreementSigningLink($data) {
     return curlRequest($data);
 }
 
+function fetchLeadStripeKey($data) {
+    $data["action"] = "fetch_lead_stripe_key";
+    return curlRequest($data);
+}
+
+function fetchUserStripeKeys($data) {
+    $data["action"] = "fetch_user_stripe_keys";
+    return curlRequest($data);
+}
+
+function saveUserStripeKeys($data) {
+    $data["action"] = "save_user_stripe_keys";
+    return curlRequest($data);
+}
+
+function deleteUserStripeKeys($data) {
+    $data["action"] = "delete_user_stripe_keys";
+    return curlRequest($data);
+}
+
+function fetchUserTransactions($data) {
+    $data["action"] = "fetch_user_transactions";
+    return curlRequest($data);
+}
+
+function fetchOutboundEmailAccounts($data = []) {
+    $data["action"] = "fetch_outbound_email_accounts";
+    return curlRequest($data);
+}
+
+function fetchOutboundEmailAccountDetail($data) {
+    $data["action"] = "fetch_outbound_email_account_detail";
+    return curlRequest($data);
+}
+
+function saveOutboundEmailAccount($data) {
+    $data["action"] = "save_outbound_email_account";
+    return curlRequest($data);
+}
+
+function deleteOutboundEmailAccount($data) {
+    $data["action"] = "delete_outbound_email_account";
+    return curlRequest($data);
+}
+
+function testOutboundEmailAccountConnection($data) {
+    $data["action"] = "test_outbound_email_account_connection";
+    return curlRequest($data);
+}

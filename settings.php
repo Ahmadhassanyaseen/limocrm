@@ -1,1787 +1,527 @@
-<?php include_once "components/layout/header.php"; ?>
-<?php include_once "components/layout/sidebar.php"; ?>
- 
+<?php include_once 'components/layout/header.php'; ?>
+<?php include_once 'components/layout/sidebar.php'; ?>
+
+<?php
+$u = $_SESSION['user'] ?? [];
+$userId = trim((string)($u['id'] ?? ''));
+$firstName = trim((string)($u['first_name'] ?? ''));
+$lastName  = trim((string)($u['last_name'] ?? ''));
+$userName  = trim((string)($u['user_name'] ?? ''));
+$email     = trim((string)($u['email'] ?? ($u['email1'] ?? '')));
+$phone     = trim((string)($u['phone_work'] ?? ($u['phone'] ?? '')));
+
+$displayName = trim($firstName . ' ' . $lastName);
+if ($displayName === '') {
+  $displayName = $userName !== '' ? $userName : 'User';
+}
+
+$initials = '?';
+$n1 = mb_substr($firstName !== '' ? $firstName : $displayName, 0, 1, 'UTF-8');
+$n2 = $lastName !== '' ? mb_substr($lastName, 0, 1, 'UTF-8') : '';
+if ($n2 === '' && $userName !== '') {
+  $n2 = mb_substr($userName, 0, 1, 'UTF-8');
+}
+$initials = strtoupper(mb_substr(trim($n1 . $n2), 0, 2, 'UTF-8') ?: '?');
+
+// Badge: admins / owners typically have empty role assignment in this CRM build
+$accountBadge = (!empty($u['role_id'])) ? 'Team' : 'Admin';
+?>
+
+<style>
+  .stg-page {
+    --stg-card: rgba(255,255,255,0.04);
+    --stg-card-border: rgba(255,255,255,0.08);
+    --stg-inner: rgba(15,23,42,0.45);
+    --stg-muted: rgba(226,232,240,0.55);
+    --stg-heading: rgba(248,250,252,0.96);
+    --stg-accent: #2dd4bf;
+    --stg-accent-dim: rgba(45,212,191,0.15);
+    --stg-gold: linear-gradient(135deg,#d4af37 0%,#b8922e 55%,#9a7b24 100%);
+    --stg-input-bg: rgba(15,23,42,0.55);
+    --stg-input-border: rgba(148,163,184,0.18);
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  html:not(.dark) .stg-page {
+    --stg-card: #ffffff;
+    --stg-card-border: rgba(15,23,42,0.08);
+    --stg-inner: #f8fafc;
+    --stg-muted: rgba(15,23,42,0.55);
+    --stg-heading: #0f172a;
+    --stg-accent: #0d9488;
+    --stg-accent-dim: rgba(13,148,136,0.12);
+    --stg-input-bg: #f1f5f9;
+    --stg-input-border: rgba(15,23,42,0.12);
+  }
+
+  .stg-card {
+    background: var(--stg-card);
+    border: 1px solid var(--stg-card-border);
+    border-radius: 18px;
+    padding: 24px 26px 28px;
+    height: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  }
+  html:not(.dark) .stg-card {
+    box-shadow: 0 8px 30px rgba(15,23,42,0.06);
+  }
+
+  .stg-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--stg-heading);
+    margin: 0 0 22px;
+  }
+  .stg-card-title i { font-size: 1.15rem; color: var(--stg-accent); }
+
+  .stg-header-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--stg-card-border);
+  }
+  .stg-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--stg-accent-dim);
+    color: var(--stg-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    border: 2px solid rgba(45,212,191,0.35);
+  }
+  html:not(.dark) .stg-avatar {
+    border-color: rgba(13,148,136,0.25);
+  }
+  .stg-meta-name { font-size: 1.12rem; font-weight: 700; color: var(--stg-heading); line-height: 1.2; }
+  .stg-meta-handle { font-size: 0.82rem; color: var(--stg-muted); margin-top: 4px; }
+  .stg-badge-admin {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--stg-gold);
+    color: #1a1508;
+    box-shadow: 0 2px 8px rgba(212,175,55,0.25);
+  }
+
+  .stg-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--stg-muted);
+    margin-bottom: 7px;
+  }
+  .stg-input, .stg-input-wrap input {
+    width: 100%;
+    height: 42px;
+    border-radius: 11px;
+    border: 1px solid var(--stg-input-border);
+    background: var(--stg-input-bg);
+    color: var(--stg-heading);
+    padding: 0 14px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .stg-input:focus, .stg-input-wrap input:focus {
+    border-color: var(--stg-accent);
+    box-shadow: 0 0 0 3px var(--stg-accent-dim);
+  }
+  .stg-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .stg-row-2 { grid-template-columns: 1fr; } }
+  .stg-field { margin-bottom: 16px; }
+
+  .stg-input-wrap { position: relative; }
+  .stg-input-wrap input { padding-right: 44px; }
+  .stg-toggle-pw {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: var(--stg-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .stg-toggle-pw:hover { color: var(--stg-accent); }
+
+  .stg-actions { display: flex; justify-content: flex-end; margin-top: 8px; gap: 10px; }
+  .stg-btn-primary {
+    height: 42px;
+    padding: 0 22px;
+    border-radius: 11px;
+    border: none;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    background: rgb(var(--primary-rgb));
+    color: #fff;
+    transition: filter 0.15s, transform 0.15s;
+  }
+  .stg-btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+  .stg-btn-gold {
+    height: 42px;
+    padding: 0 22px;
+    border-radius: 11px;
+    border: none;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    background: linear-gradient(135deg,#d4af37,#b8922e);
+    color: #17130a;
+    box-shadow: 0 4px 14px rgba(212,175,55,0.28);
+    transition: filter 0.15s;
+  }
+  .stg-btn-gold:hover { filter: brightness(1.06); }
+
+  .stg-head {
+    margin-bottom: 28px;
+  }
+  .stg-head h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--stg-heading);
+    margin: 0 0 6px;
+  }
+  .stg-head p { margin: 0; font-size: 13px; color: var(--stg-muted); }
+
+  .stg-input.stg-invalid, .stg-input-wrap input.stg-invalid {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgba(220,38,38,0.22);
+  }
+  .stg-field-hint {
+    font-size: 11px;
+    color: var(--stg-muted);
+    margin-top: 5px;
+    line-height: 1.35;
+  }
+  .stg-field-hint.stg-invalid-text { color: #f87171; }
+  html:not(.dark) .stg-field-hint.stg-invalid-text { color: #dc2626; }
+</style>
+
 <div class="main-content app-content">
-     <div class="container-fluid"> 
-        <!-- Page Header --> 
-        <div class="flex items-center justify-between page-header-breadcrumb flex-wrap gap-2"> <div>
-             <h1 class="page-title font-medium text-lg mb-0">Profile</h1>
-        </div> 
-        <div class="btn-list">
-            <button type="button" class="ti-btn bg-white dark:bg-bodybg border border-defaultborder dark:border-defaultborder/10 btn-wave !my-0 waves-effect waves-light"> <i class="ri-filter-3-line align-middle me-1 leading-none"></i> Filter </button> 
-            <button type="button" class="ti-btn ti-btn-primary !border-0 btn-wave me-0 waves-effect waves-light"> <i class="ri-share-forward-line me-1"></i> Share </button> 
-        </div> 
-    </div> 
-    <div class="grid grid-cols-12 gap-x-6 mb-5">
-      <div class="xl:col-span-3 col-span-12">
-        <div class="box">
-          <div class="box-body">
-            <ul
-              class="nav nav-tabs flex-col nav-tabs-header mb-0 mail-settings-tab"
-              role="tablist"
-            >
-              <li class="nav-item me-0">
-                <a
-                  class="nav-link flex items-center w-full active"
-                  role="tab"
-                  data-hs-tab="#email-settings"
-                  ><i
-                    class="ri-mail-line me-2 align-middle text-[14px] leading-none text-primary"
-                  ></i
-                  >Email</a
-                >
-              </li>
-              <li class="nav-item me-0">
-                <a
-                  class="nav-link flex items-center w-full"
-                  role="tab"
-                  data-hs-tab="#security"
-                  ><i
-                    class="ri-lock-star-line me-2 align-middle text-[14px] leading-none text-primary"
-                  ></i
-                  >Security</a
-                >
-              </li>
-              <li class="nav-item me-0">
-                <a
-                  class="nav-link flex items-center w-full"
-                  role="tab"
-                  data-hs-tab="#notification-settings"
-                  ><i
-                    class="ri-notification-3-line me-2 align-middle text-[14px] leading-none text-primary"
-                  ></i
-                  >Notifications</a
-                >
-              </li>
-              <li class="nav-item me-0">
-                <a
-                  class="nav-link flex items-center w-full"
-                  role="tab"
-                  data-hs-tab="#account-settings"
-                  ><i
-                    class="ri-shield-user-line me-2 align-middle text-[14px] leading-none text-primary"
-                  ></i
-                  >Account Settings</a
-                >
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="box">
-          <div class="box-header">
-            <div class="box-title">Social Links</div>
-          </div>
-          <div class="box-body">
-            <div class="grid grid-cols-12 gap-y-3">
-              <div class="xl:col-span-12 col-span-12">
-                <label for="facebook" class="form-label">Facebook :</label>
-                <input
-                  type="text"
-                  class="form-control !bg-light dark:!bg-light"
-                  id="facebook"
-                  placeholder="https://"
-                  value="https://www.facebook.com"
-                />
-              </div>
-              <div class="xl:col-span-12 col-span-12">
-                <label for="Twitter" class="form-label">Twitter :</label>
-                <input
-                  type="text"
-                  class="form-control !bg-light dark:!bg-light"
-                  id="Twitter"
-                  placeholder="https://"
-                  value="https://twitter.com"
-                />
-              </div>
-              <div class="xl:col-span-12 col-span-12">
-                <label for="Pinterest" class="form-label">Pinterest:</label>
-                <input
-                  type="text"
-                  class="form-control !bg-light dark:!bg-light"
-                  id="Pinterest"
-                  placeholder="https://"
-                  value="https://in.pinterest.com"
-                />
-              </div>
-              <div class="xl:col-span-12 col-span-12">
-                <label for="Linkedin" class="form-label">Linkedin :</label>
-                <input
-                  type="text"
-                  class="form-control !bg-light dark:!bg-light"
-                  id="Linkedin"
-                  placeholder="https://"
-                  value="https://www.linkedin.com"
-                />
+  <div class="container-fluid py-4">
+    <div class="stg-page">
+      <div class="stg-head">
+        <h1>Settings</h1>
+        <p>Update your profile and password. Changes apply to your LimoCRM account.</p>
+      </div>
+
+      <div class="grid grid-cols-12 gap-6">
+        <!-- Profile -->
+        <div class="xl:col-span-6 lg:col-span-6 col-span-12">
+          <div class="stg-card">
+            <h2 class="stg-card-title"><i class="ri-user-settings-line"></i> Profile</h2>
+
+            <div class="stg-header-block">
+              <div class="stg-avatar" aria-hidden="true"><?php echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); ?></div>
+              <div>
+                <div class="stg-meta-name"><?php echo htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="stg-meta-handle">@<?php echo htmlspecialchars($userName ?: 'username', ENT_QUOTES, 'UTF-8'); ?></div>
+                <span class="stg-badge-admin"><?php echo htmlspecialchars($accountBadge, ENT_QUOTES, 'UTF-8'); ?></span>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="xl:col-span-9 col-span-12">
-        <div class="box">
-          <div class="box-body p-0">
-            <div class="tab-content border-0">
-              <div
-                class="tab-pane active show p-0"
-                id="email-settings"
-                role="tabpanel"
-              >
-                <ul class="ti-list-group list-group-flush !rounded-none">
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 gap-x-6 gap-y-2 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Keyboard Shortcuts :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="keyboard-enable"
-                            id="keyboard-enable1"
-                          />
-                          <label
-                            class="form-check-label"
-                            for="keyboard-enable1"
-                          >
-                            Keyboard Shortcuts Enable
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="keyboard-enable"
-                            id="keyboard-disable2"
-                            checked=""
-                          />
-                          <label
-                            class="form-check-label"
-                            for="keyboard-disable2"
-                          >
-                            Keyboard Shortcuts Disable
-                          </label>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success mb-0 sm:float-end"
-                          id="keyboard-shortcuts"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 gap-x-6 gap-y-2 justify-between"
-                    >
-                      <div
-                        class="xl:col-span-3 lg:col-span-3 md:col-span-3 sm:col-span-12 col-span-12"
-                      >
-                        <span class="text-[14px] font-medium mb-0"
-                          >Menu View :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="flexRadioDefault"
-                            id="flexRadioDefault1"
-                          />
-                          <label
-                            class="form-check-label"
-                            for="flexRadioDefault1"
-                          >
-                            Default View
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="flexRadioDefault"
-                            id="flexRadioDefault2"
-                            checked=""
-                          />
-                          <label
-                            class="form-check-label"
-                            for="flexRadioDefault2"
-                          >
-                            Advanced View
-                          </label>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success on mb-0 sm:float-end"
-                          id="menu-view"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 gap-x-6 gap-y-2 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Images :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="images-open"
-                            id="images-open1"
-                          />
-                          <label class="form-check-label" for="images-open1">
-                            Always Open Images
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="images-open"
-                            id="images-hide2"
-                            checked=""
-                          />
-                          <label class="form-check-label" for="images-hide2">
-                            Ask For Permission
-                          </label>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success mb-0 sm:float-end"
-                          id="mails-images"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 gap-x-6 gap-y-2 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Mail Send Action :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            value=""
-                            id="on-keyboard"
-                            checked=""
-                          />
-                          <label class="form-check-label" for="on-keyboard">
-                            On Keyboard Action
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="checkbox"
-                            value=""
-                            id="on-buttonclick"
-                          />
-                          <label class="form-check-label" for="on-buttonclick">
-                            On Button Click
-                          </label>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div class="sm:float-end">
-                          <a
-                            href="javascript:void(0)"
-                            class="ti-btn ti-btn-outline-success ti-btn-sm"
-                            >Learn-more</a
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 sm:gap-x-6 gap-y-3 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Maximum Mails Per Page :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div
-                          class="choices"
-                          data-type="select-one"
-                          tabindex="0"
-                          role="combobox"
-                          aria-autocomplete="list"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                        >
-                          <div class="choices__inner">
-                            <select
-                              class="form-control choices__input"
-                              data-trigger=""
-                              name="mail-per-page"
-                              id="mail-per-page"
-                              hidden=""
-                              tabindex="-1"
-                              data-choice="active"
-                            >
-                              <option
-                                value="Choice 1"
-                                data-custom-properties="[object Object]"
-                              >
-                                10
-                              </option>
-                            </select>
-                            <div class="choices__list choices__list--single">
-                              <div
-                                class="choices__item choices__item--selectable"
-                                data-item=""
-                                data-id="1"
-                                data-value="Choice 1"
-                                data-custom-properties="[object Object]"
-                                aria-selected="true"
-                              >
-                                10
-                              </div>
-                            </div>
-                          </div>
-                          <div
-                            class="choices__list choices__list--dropdown"
-                            aria-expanded="false"
-                          >
-                            <input
-                              type="search"
-                              name="search_terms"
-                              class="choices__input choices__input--cloned"
-                              autocomplete="off"
-                              autocapitalize="off"
-                              spellcheck="false"
-                              role="textbox"
-                              aria-autocomplete="list"
-                              aria-label="This is a placeholder set in the config"
-                              placeholder="Search"
-                            />
-                            <div class="choices__list" role="listbox">
-                              <div
-                                id="choices--mail-per-page-item-choice-1"
-                                class="choices__item choices__item--choice is-selected choices__item--selectable is-highlighted"
-                                role="option"
-                                data-choice=""
-                                data-id="1"
-                                data-value="Choice 1"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                                aria-selected="true"
-                              >
-                                10
-                              </div>
-                              <div
-                                id="choices--mail-per-page-item-choice-2"
-                                class="choices__item choices__item--choice choices__item--selectable"
-                                role="option"
-                                data-choice=""
-                                data-id="2"
-                                data-value="Choice 2"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                              >
-                                50
-                              </div>
-                              <div
-                                id="choices--mail-per-page-item-choice-3"
-                                class="choices__item choices__item--choice choices__item--selectable"
-                                role="option"
-                                data-choice=""
-                                data-id="3"
-                                data-value="Choice 3"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                              >
-                                100
-                              </div>
-                              <div
-                                id="choices--mail-per-page-item-choice-4"
-                                class="choices__item choices__item--choice choices__item--selectable"
-                                role="option"
-                                data-choice=""
-                                data-id="4"
-                                data-value="Choice 3"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                              >
-                                120
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success mb-0 sm:float-end"
-                          id="mails-per-page"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 sm:gap-x-6 gap-y-2 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Mail Composer :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div class="flex gap-4 items-center">
-                          <div class="form-check">
-                            <input
-                              class="form-check-input"
-                              type="radio"
-                              name="mail-composer"
-                              id="mail-composeron1"
-                            />
-                            <label
-                              class="form-check-label"
-                              for="mail-composeron1"
-                            >
-                              Mail Composer On
-                            </label>
-                          </div>
-                          <div class="form-check">
-                            <input
-                              class="form-check-input"
-                              type="radio"
-                              name="mail-composer"
-                              id="mail-composeroff2"
-                              checked=""
-                            />
-                            <label
-                              class="form-check-label"
-                              for="mail-composeroff2"
-                            >
-                              Mail Composer Off
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success mb-0 sm:float-end"
-                          id="mail-composer"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 sm:gap-x-6 gap-y-3 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Language :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <label for="mail-language" class="form-label"
-                          >Languages :</label
-                        >
-                        <div
-                          class="choices"
-                          data-type="select-multiple"
-                          role="combobox"
-                          aria-autocomplete="list"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                        >
-                          <div class="choices__inner">
-                            <select
-                              class="form-control choices__input"
-                              name="mail-language"
-                              id="mail-language"
-                              multiple=""
-                              hidden=""
-                              tabindex="-1"
-                              data-choice="active"
-                            >
-                              <option
-                                value="Choice 1"
-                                data-custom-properties="[object Object]"
-                              >
-                                English
-                              </option>
-                            </select>
-                            <div class="choices__list choices__list--multiple">
-                              <div
-                                class="choices__item choices__item--selectable"
-                                data-item=""
-                                data-id="1"
-                                data-value="Choice 1"
-                                data-custom-properties="[object Object]"
-                                aria-selected="true"
-                                data-deletable=""
-                              >
-                                English<button
-                                  type="button"
-                                  class="choices__button"
-                                  aria-label="Remove item: 'Choice 1'"
-                                  data-button=""
-                                >
-                                  Remove item
-                                </button>
-                              </div>
-                            </div>
-                            <input
-                              type="search"
-                              name="search_terms"
-                              class="choices__input choices__input--cloned"
-                              autocomplete="off"
-                              autocapitalize="off"
-                              spellcheck="false"
-                              role="textbox"
-                              aria-autocomplete="list"
-                              aria-label="null"
-                            />
-                          </div>
-                          <div
-                            class="choices__list choices__list--dropdown"
-                            aria-expanded="false"
-                          >
-                            <div
-                              class="choices__list"
-                              aria-multiselectable="true"
-                              role="listbox"
-                            >
-                              <div
-                                id="choices--mail-language-item-choice-1"
-                                class="choices__item choices__item--choice choices__item--selectable is-highlighted"
-                                role="option"
-                                data-choice=""
-                                data-id="1"
-                                data-value="Choice 3"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                                aria-selected="true"
-                              >
-                                Arabic
-                              </div>
-                              <div
-                                id="choices--mail-language-item-choice-3"
-                                class="choices__item choices__item--choice choices__item--selectable"
-                                role="option"
-                                data-choice=""
-                                data-id="3"
-                                data-value="Choice 2"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                              >
-                                French
-                              </div>
-                              <div
-                                id="choices--mail-language-item-choice-4"
-                                class="choices__item choices__item--choice choices__item--selectable"
-                                role="option"
-                                data-choice=""
-                                data-id="4"
-                                data-value="Choice 4"
-                                data-select-text="Press to select"
-                                data-choice-selectable=""
-                              >
-                                Hindi
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success mb-0 sm:float-end"
-                          id="mail-languages"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div
-                      class="grid grid-cols-12 sm:gap-x-6 gap-y-2 justify-between"
-                    >
-                      <div class="xl:col-span-3 col-span-12">
-                        <span class="text-[14px] font-medium mb-0"
-                          >Auto Correct :</span
-                        >
-                      </div>
-                      <div class="xl:col-span-4 col-span-12">
-                        <div class="flex gap-4 items-center">
-                          <div class="form-check">
-                            <input
-                              class="form-check-input"
-                              type="radio"
-                              name="auto-correct"
-                              id="auto-correcton1"
-                            />
-                            <label
-                              class="form-check-label"
-                              for="auto-correcton1"
-                            >
-                              Auto Correct On
-                            </label>
-                          </div>
-                          <div class="form-check">
-                            <input
-                              class="form-check-input"
-                              type="radio"
-                              name="auto-correct"
-                              id="auto-correctoff2"
-                              checked=""
-                            />
-                            <label
-                              class="form-check-label"
-                              for="auto-correctoff2"
-                            >
-                              Auto Correct Off
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="xl:col-span-5 col-span-12">
-                        <div
-                          class="toggle toggle-success mb-0 sm:float-end"
-                          id="auto-correct"
-                        >
-                          <span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <div class="tab-pane p-0 hidden" id="security" role="tabpanel">
-                <ul
-                  class="ti-list-group list-group-flush list-none !rounded-none"
-                >
-                  <li class="ti-list-group-item">
-                    <div class="grid grid-cols-12 gap-x-5 gap-y-3">
-                      <div class="xl:col-span-4 col-span-12">
-                        <p class="text-[1rem] mb-1 font-medium">Logging In</p>
-                        <p
-                          class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                        >
-                          Security settings related to logging into our email
-                          account and taking down account if any mischevious
-                          action happended.
-                        </p>
-                      </div>
-                      <div class="xl:col-span-8 col-span-12">
-                        <div
-                          class="sm:flex block items-top justify-between mt-sm-0 mt-3"
-                        >
-                          <div class="mail-security-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Max Limit for login attempts
-                            </p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-sm-0 mb-2"
-                            >
-                              Account will freeze for 24hrs while attempt to
-                              login with wrong credentials for selected number
-                              of times
-                            </p>
-                          </div>
-                          <div>
-                            <div
-                              class="choices"
-                              data-type="select-one"
-                              tabindex="0"
-                              role="combobox"
-                              aria-autocomplete="list"
-                              aria-haspopup="true"
-                              aria-expanded="false"
-                            >
-                              <div class="choices__inner">
-                                <select
-                                  class="form-control choices__input"
-                                  data-trigger=""
-                                  name="max-login-attempts"
-                                  id="max-login-attempts"
-                                  hidden=""
-                                  tabindex="-1"
-                                  data-choice="active"
-                                >
-                                  <option
-                                    value="Choice 1"
-                                    data-custom-properties="[object Object]"
-                                  >
-                                    3 Attempts
-                                  </option>
-                                </select>
-                                <div
-                                  class="choices__list choices__list--single"
-                                >
-                                  <div
-                                    class="choices__item choices__item--selectable"
-                                    data-item=""
-                                    data-id="1"
-                                    data-value="Choice 1"
-                                    data-custom-properties="[object Object]"
-                                    aria-selected="true"
-                                  >
-                                    3 Attempts
-                                  </div>
-                                </div>
-                              </div>
-                              <div
-                                class="choices__list choices__list--dropdown"
-                                aria-expanded="false"
-                              >
-                                <input
-                                  type="search"
-                                  name="search_terms"
-                                  class="choices__input choices__input--cloned"
-                                  autocomplete="off"
-                                  autocapitalize="off"
-                                  spellcheck="false"
-                                  role="textbox"
-                                  aria-autocomplete="list"
-                                  aria-label="This is a placeholder set in the config"
-                                  placeholder="Search"
-                                />
-                                <div class="choices__list" role="listbox">
-                                  <div
-                                    id="choices--max-login-attempts-item-choice-1"
-                                    class="choices__item choices__item--choice is-selected choices__item--selectable is-highlighted"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="1"
-                                    data-value="Choice 1"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                    aria-selected="true"
-                                  >
-                                    3 Attempts
-                                  </div>
-                                  <div
-                                    id="choices--max-login-attempts-item-choice-2"
-                                    class="choices__item choices__item--choice choices__item--selectable"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="2"
-                                    data-value="Choice 2"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                  >
-                                    5 Attempts
-                                  </div>
-                                  <div
-                                    id="choices--max-login-attempts-item-choice-3"
-                                    class="choices__item choices__item--choice choices__item--selectable"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="3"
-                                    data-value="Choice 3"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                  >
-                                    10 Attempts
-                                  </div>
-                                  <div
-                                    id="choices--max-login-attempts-item-choice-4"
-                                    class="choices__item choices__item--choice choices__item--selectable"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="4"
-                                    data-value="Choice 3"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                  >
-                                    20 Attempts
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top justify-between mt-3"
-                        >
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              Account Freeze time management
-                            </p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-sm-0 mb-2"
-                            >
-                              You can change the time for the account freeze
-                              when attempts for
-                            </p>
-                          </div>
-                          <div>
-                            <div
-                              class="choices"
-                              data-type="select-one"
-                              tabindex="0"
-                              role="combobox"
-                              aria-autocomplete="list"
-                              aria-haspopup="true"
-                              aria-expanded="false"
-                            >
-                              <div class="choices__inner">
-                                <select
-                                  class="form-control choices__input"
-                                  data-trigger=""
-                                  name="account-freeze-time-format"
-                                  id="account-freeze-time-format"
-                                  hidden=""
-                                  tabindex="-1"
-                                  data-choice="active"
-                                >
-                                  <option
-                                    value="Choice 1"
-                                    data-custom-properties="[object Object]"
-                                  >
-                                    1 Day
-                                  </option>
-                                </select>
-                                <div
-                                  class="choices__list choices__list--single"
-                                >
-                                  <div
-                                    class="choices__item choices__item--selectable"
-                                    data-item=""
-                                    data-id="1"
-                                    data-value="Choice 1"
-                                    data-custom-properties="[object Object]"
-                                    aria-selected="true"
-                                  >
-                                    1 Day
-                                  </div>
-                                </div>
-                              </div>
-                              <div
-                                class="choices__list choices__list--dropdown"
-                                aria-expanded="false"
-                              >
-                                <input
-                                  type="search"
-                                  name="search_terms"
-                                  class="choices__input choices__input--cloned"
-                                  autocomplete="off"
-                                  autocapitalize="off"
-                                  spellcheck="false"
-                                  role="textbox"
-                                  aria-autocomplete="list"
-                                  aria-label="This is a placeholder set in the config"
-                                  placeholder="Search"
-                                />
-                                <div class="choices__list" role="listbox">
-                                  <div
-                                    id="choices--account-freeze-time-format-item-choice-1"
-                                    class="choices__item choices__item--choice is-selected choices__item--selectable is-highlighted"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="1"
-                                    data-value="Choice 1"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                    aria-selected="true"
-                                  >
-                                    1 Day
-                                  </div>
-                                  <div
-                                    id="choices--account-freeze-time-format-item-choice-2"
-                                    class="choices__item choices__item--choice choices__item--selectable"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="2"
-                                    data-value="Choice 2"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                  >
-                                    1 Hour
-                                  </div>
-                                  <div
-                                    id="choices--account-freeze-time-format-item-choice-3"
-                                    class="choices__item choices__item--choice choices__item--selectable"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="3"
-                                    data-value="Choice 3"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                  >
-                                    1 Month
-                                  </div>
-                                  <div
-                                    id="choices--account-freeze-time-format-item-choice-4"
-                                    class="choices__item choices__item--choice choices__item--selectable"
-                                    role="option"
-                                    data-choice=""
-                                    data-id="4"
-                                    data-value="Choice 3"
-                                    data-select-text="Press to select"
-                                    data-choice-selectable=""
-                                  >
-                                    1 Year
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div class="grid grid-cols-12 gap-x-5 gap-y-3">
-                      <div class="xl:col-span-4 col-span-12">
-                        <p class="text-[1rem] mb-1 font-medium">
-                          Password Requirements
-                        </p>
-                        <p
-                          class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                        >
-                          Security settings related to password strength.
-                        </p>
-                      </div>
-                      <div class="xl:col-span-8 col-span-12">
-                        <div
-                          class="sm:flex block items-top justify-between mt-sm-0 mt-3 gap-4"
-                        >
-                          <div class="mail-security-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Minimum number of characters in the password
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              There should be a minimum number of characters for
-                              a password to be validated that shouls be set
-                              here.
-                            </p>
-                          </div>
-                          <div>
-                            <input type="text" class="form-control" value="8" />
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top justify-between mt-3"
-                        >
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              Contain A Number
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Password should contain a number.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="password-number"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top justify-between mt-3"
-                        >
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              Contain A Special Character
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Password should contain a special Character.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="password-special-character"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top justify-between mt-3"
-                        >
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              Atleast One Capital Letter
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Password should contain atleast one capital
-                              letter.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success mb-0 sm:float-end"
-                            id="password-capital"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top justify-between mt-3"
-                        >
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              Maximum Password Length
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Maximum password lenth should be selected here.
-                            </p>
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              class="form-control"
-                              value="16"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div class="grid grid-cols-12 gap-x-5 gap-y-3">
-                      <div class="xl:col-span-4 col-span-12">
-                        <p class="text-[1rem] mb-1 font-medium">
-                          Unknown Chats
-                        </p>
-                        <p
-                          class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                        >
-                          Security settings related to unknown chats.
-                        </p>
-                      </div>
-                      <div class="xl:col-span-8 col-span-12 ms-auto">
-                        <div
-                          class="btn-group inline-flex"
-                          role="group"
-                          aria-label="Basic radio toggle button group"
-                        >
-                          <input
-                            type="radio"
-                            class="btn-check opacity-0 absolute"
-                            name="strap-material"
-                            id="strap1"
-                            checked=""
-                          />
-                          <label
-                            class="!mb-0 ti-btn btn-wave !m-0 !block sm:!inline-flex ti-btn-outline-light z-0 !rounded-e-none !border-e-0 sm:text-[0.813rem] text-[0.75rem] waves-effect waves-light"
-                            for="strap1"
-                          >
-                            Show
-                          </label>
-                          <input
-                            type="radio"
-                            class="btn-check opacity-0 absolute"
-                            name="strap-material"
-                            id="strap31"
-                          />
-                          <label
-                            class="!mb-0 ti-btn btn-wave !m-0 !block sm:!inline-flex ti-btn-outline-light !rounded-s-none !text-defaulttextcolor z-0 sm:text-[0.813rem] text-[0.75rem] waves-effect waves-light"
-                            for="strap31"
-                          >
-                            Hide
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <div
-                class="tab-pane p-0 hidden"
-                id="notification-settings"
-                role="tabpanel"
-              >
-                <ul
-                  class="ti-list-group list-group-flush list-none !rounded-none"
-                >
-                  <li class="ti-list-group-item">
-                    <div class="grid grid-cols-12 gap-x-5 gap-y-3">
-                      <div class="xl:col-span-5 col-span-12">
-                        <p class="text-[1rem] mb-1 font-medium">
-                          Email Notifications
-                        </p>
-                        <p
-                          class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                        >
-                          Email notifications are the notifications you will
-                          receeive when you are offline, you can customize them
-                          by enabling or disabling them.
-                        </p>
-                      </div>
-                      <div class="xl:col-span-7 col-span-12">
-                        <div
-                          class="flex items-top justify-between mt-sm-0 mt-3"
-                        >
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Updates &amp; Features
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Notifications about new updates and their
-                              features.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="update-features"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between mt-3">
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Early Access
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Users are selected for beta testing of new
-                              update,notifications relating or participate in
-                              any of paid product promotion.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success mb-0 sm:float-end"
-                            id="early-access"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between mt-3">
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Email Shortcuts
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Shortcut notifications for email.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="email-shortcut"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between mt-3">
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              New Mails
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Notifications related to new mails received.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="new-mails"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between mt-3">
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Mail Chat Messages
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Any of new messages are received will be updated
-                              through notifications.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="mail-chat-messages"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="ti-list-group-item">
-                    <div class="grid grid-cols-12 gap-x-5 gap-y-3">
-                      <div class="xl:col-span-5 col-span-12">
-                        <p class="text-[1rem] mb-1 font-medium">
-                          Push Notifications
-                        </p>
-                        <p
-                          class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                        >
-                          Push notifications are recieved when you are online,
-                          you can customize them by enabling or disabling them.
-                        </p>
-                      </div>
-                      <div class="xl:col-span-7 col-span-12">
-                        <div
-                          class="flex items-top justify-between mt-sm-0 mt-3"
-                        >
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              New Mails
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Notifications related to new mails received.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="push-new-mails"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between mt-3">
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Mail Chat Messages
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Any of new messages are received will be updated
-                              through notifications.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 sm:float-end"
-                            id="push-mail-chat-messages"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between mt-3">
-                          <div class="mail-notification-settings">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Mail Extensions
-                            </p>
-                            <p
-                              class="text-xs mb-0 text-textmuted dark:text-textmuted/50"
-                            >
-                              Notifications related to the extensions received
-                              by new emails and thier propertied also been
-                              displayed.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success mb-0 sm:float-end"
-                            id="mail-extensions"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <div
-                class="tab-pane p-0 hidden"
-                id="account-settings"
-                role="tabpanel"
-              >
-                <div class="grid grid-cols-12 gap-x-6 gap-y-3">
-                  <div class="xxl:col-span-7 col-span-12">
-                    <div class="box shadow-none mb-0">
-                      <div class="box-body">
-                        <div
-                          class="sm:flex block items-top mb-4 justify-between"
-                        >
-                          <div class="w-[75%]">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Two Step Verification
-                            </p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              Two-step verification provides enhanced security
-                              measures and helps prevent unauthorized access and
-                              fraudulent activities.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0"
-                            id="two-step-verification"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top mb-4 justify-between"
-                        >
-                          <div class="mb-sm-0 mb-2 w-[75%]">
-                            <p class="text-[14px] mb-2 font-medium">
-                              Authentication
-                            </p>
-                            <div
-                              class="btn-group inline-flex"
-                              role="group"
-                              aria-label="Basic radio toggle button group"
-                            >
-                              <input
-                                type="radio"
-                                class="btn-check opacity-0 absolute"
-                                name="strap-material"
-                                id="strap11"
-                                checked=""
-                              />
-                              <label
-                                class="!mb-0 ti-btn btn-wave !m-0 !block sm:!inline-flex ti-btn-outline-light z-0 !rounded-e-none !border-e-0 sm:text-[0.813rem] text-[0.75rem] waves-effect waves-light"
-                                for="strap11"
-                                ><i
-                                  class="ri-lock-unlock-line me-1 align-middle inline-block"
-                                ></i
-                                >Pin
-                              </label>
-                              <input
-                                type="radio"
-                                class="btn-check opacity-0 absolute"
-                                name="strap-material"
-                                id="strap2"
-                              />
-                              <label
-                                class="!mb-0 ti-btn btn-wave !m-0 !block sm:!inline-flex ti-btn-outline-light !text-defaulttextcolor !rounded-none !border-e-0 z-0 sm:text-[0.813rem] text-[0.75rem] waves-effect waves-light"
-                                for="strap2"
-                                ><i
-                                  class="ri-lock-password-line me-1 align-middle inline-block"
-                                ></i
-                                >Password
-                              </label>
-                              <input
-                                type="radio"
-                                class="btn-check opacity-0 absolute"
-                                name="strap-material"
-                                id="strap3"
-                              />
-                              <label
-                                class="!mb-0 ti-btn btn-wave !m-0 !block sm:!inline-flex ti-btn-outline-light !rounded-s-none !text-defaulttextcolor z-0 sm:text-[0.813rem] text-[0.75rem] waves-effect waves-light"
-                                for="strap3"
-                                ><i
-                                  class="ri-fingerprint-line me-1 align-middle inline-block"
-                                ></i
-                                >Finger Print
-                              </label>
-                            </div>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 ms-0 mt-sm-0 mt-2"
-                            id="authentication"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top mb-4 justify-between"
-                        >
-                          <div class="w-[75%]">
-                            <p class="text-[14px] mb-1 font-medium">
-                              Recovery Mail
-                            </p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              In case of forgetting passwords, emails are sent
-                              to aana14@gmail.com.
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 ms-0 mt-sm-0 mt-2"
-                            id="recovery-mail"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div
-                          class="sm:flex block items-top mb-4 justify-between"
-                        >
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              SMS Recovery
-                            </p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              In case of recovery, SMS messages are sent to
-                              9876543xx
-                            </p>
-                          </div>
-                          <div
-                            class="toggle toggle-success on mb-0 ms-0 mt-sm-0 mt-2"
-                            id="sms-recovery"
-                          >
-                            <span></span>
-                          </div>
-                        </div>
-                        <div class="flex items-top justify-between">
-                          <div>
-                            <p class="text-[14px] mb-1 font-medium">
-                              Reset Password
-                            </p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50"
-                            >
-                              Password should be min of
-                              <b class="text-success">8 digits<sup>*</sup></b
-                              >,atleast
-                              <b class="text-success"
-                                >One Capital letter<sup>*</sup></b
-                              >
-                              and
-                              <b class="text-success"
-                                >One Special Character<sup>*</sup></b
-                              >
-                              included.
-                            </p>
-                            <div class="mb-2">
-                              <label for="current-password" class="form-label"
-                                >Current Password</label
-                              >
-                              <input
-                                type="text"
-                                class="form-control"
-                                id="current-password"
-                                placeholder="Current Password"
-                              />
-                            </div>
-                            <div class="mb-2">
-                              <label for="new-password" class="form-label"
-                                >New Password</label
-                              >
-                              <input
-                                type="text"
-                                class="form-control"
-                                id="new-password"
-                                placeholder="New Password"
-                              />
-                            </div>
-                            <div class="mb-0">
-                              <label for="confirm-password" class="form-label"
-                                >Confirm Password</label
-                              >
-                              <input
-                                type="text"
-                                class="form-control"
-                                id="confirm-password"
-                                placeholder="Confirm Password"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="xxl:col-span-5 col-span-12">
-                    <div class="box shadow-none mb-0">
-                      <div class="box-header justify-between sm:flex block">
-                        <div class="box-title">Registered Devices</div>
-                        <div class="mt-sm-0 mt-2">
-                          <button class="ti-btn ti-btn-sm ti-btn-primary">
-                            Signout from all devices
-                          </button>
-                        </div>
-                      </div>
-                      <div class="box-body">
-                        <ul class="ti-list-group">
-                          <li class="ti-list-group-item">
-                            <div class="sm:flex block items-top">
-                              <div class="leading-none mb-sm-0 mb-2">
-                                <i
-                                  class="bi bi-phone me-2 text-[1rem] align-middle text-textmuted dark:text-textmuted/50"
-                                ></i>
-                              </div>
-                              <div class="leading-none flex-auto">
-                                <p class="mb-1">
-                                  <span class="font-medium"
-                                    >Mobile-LG-1023</span
-                                  >
-                                </p>
-                                <p class="mb-0">
-                                  <span
-                                    class="text-textmuted dark:text-textmuted/50 text-[11px]"
-                                    >Manchester, UK-Nov 30, 04:45PM</span
-                                  >
-                                </p>
-                              </div>
-                              <div class="ti-dropdown hs-dropdown mt-sm-0 mt-2">
-                                <a
-                                  href="javascript:void(0);"
-                                  class="ti-btn ti-btn-icon ti-btn-sm bg-light ti-dropdown-toggle hs-dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <i class="fe fe-more-vertical"></i>
-                                </a>
-                                <ul
-                                  class="ti-dropdown-menu hs-dropdown-menu hidden"
-                                  role="menu"
-                                >
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Another action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Something else here</a
-                                    >
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          </li>
-                          <li class="ti-list-group-item">
-                            <div class="sm:flex block items-top">
-                              <div class="leading-none mb-sm-0 mb-2">
-                                <i
-                                  class="bi bi-laptop me-2 text-[1rem] align-middle text-textmuted dark:text-textmuted/50"
-                                ></i>
-                              </div>
-                              <div class="leading-none flex-auto">
-                                <p class="mb-1">
-                                  <span class="font-medium"
-                                    >Lenovo-1291203</span
-                                  >
-                                </p>
-                                <p class="mb-0">
-                                  <span
-                                    class="text-textmuted dark:text-textmuted/50 text-[11px]"
-                                    >England, UK-Aug 12, 12:25PM</span
-                                  >
-                                </p>
-                              </div>
-                              <div class="ti-dropdown hs-dropdown mt-sm-0 mt-2">
-                                <a
-                                  href="javascript:void(0);"
-                                  class="ti-btn ti-btn-icon ti-btn-sm bg-light ti-dropdown-toggle hs-dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <i class="fe fe-more-vertical"></i>
-                                </a>
-                                <ul
-                                  class="ti-dropdown-menu hs-dropdown-menu hidden"
-                                  role="menu"
-                                >
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Another action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Something else here</a
-                                    >
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          </li>
-                          <li class="ti-list-group-item">
-                            <div class="sm:flex block items-top">
-                              <div class="leading-none mb-sm-0 mb-2">
-                                <i
-                                  class="bi bi-laptop me-2 text-[1rem] align-middle text-textmuted dark:text-textmuted/50"
-                                ></i>
-                              </div>
-                              <div class="leading-none flex-auto">
-                                <p class="mb-1">
-                                  <span class="font-medium"
-                                    >Macbook-Suzika</span
-                                  >
-                                </p>
-                                <p class="mb-0">
-                                  <span
-                                    class="text-textmuted dark:text-textmuted/50 text-[11px]"
-                                    >Brightoon, UK-Jul 18, 8:34AM</span
-                                  >
-                                </p>
-                              </div>
-                              <div class="ti-dropdown hs-dropdown mt-sm-0 mt-2">
-                                <a
-                                  href="javascript:void(0);"
-                                  class="ti-btn ti-btn-icon ti-btn-sm bg-light ti-dropdown-toggle hs-dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <i class="fe fe-more-vertical"></i>
-                                </a>
-                                <ul
-                                  class="ti-dropdown-menu hs-dropdown-menu hidden"
-                                  role="menu"
-                                >
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Another action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Something else here</a
-                                    >
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          </li>
-                          <li class="ti-list-group-item">
-                            <div class="sm:flex block items-top">
-                              <div class="leading-none mb-sm-0 mb-2">
-                                <i
-                                  class="bi bi-pc-display-horizontal me-2 text-[1rem] align-middle text-textmuted dark:text-textmuted/50"
-                                ></i>
-                              </div>
-                              <div class="leading-none flex-auto">
-                                <p class="mb-1">
-                                  <span class="font-medium">Apple-Desktop</span>
-                                </p>
-                                <p class="mb-0">
-                                  <span
-                                    class="text-textmuted dark:text-textmuted/50 text-[11px]"
-                                    >Darlington, UK-Jan 14, 11:14AM</span
-                                  >
-                                </p>
-                              </div>
-                              <div class="ti-dropdown hs-dropdown mt-sm-0 mt-2">
-                                <a
-                                  href="javascript:void(0);"
-                                  class="ti-btn ti-btn-icon ti-btn-sm bg-light ti-dropdown-toggle hs-dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <i class="fe fe-more-vertical"></i>
-                                </a>
-                                <ul
-                                  class="ti-dropdown-menu hs-dropdown-menu hidden"
-                                  role="menu"
-                                >
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Another action</a
-                                    >
-                                  </li>
-                                  <li>
-                                    <a
-                                      class="ti-dropdown-item"
-                                      href="javascript:void(0);"
-                                      >Something else here</a
-                                    >
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+
+            <form id="stg-profile-form" autocomplete="on" novalidate>
+              <input type="hidden" name="id" value="<?php echo htmlspecialchars($userId, ENT_QUOTES, 'UTF-8'); ?>">
+
+              <div class="stg-row-2">
+                <div class="stg-field">
+                  <label class="stg-label" for="pf-first">First name</label>
+                  <input class="stg-input" id="pf-first" name="first_name" type="text" required maxlength="100"
+                         autocomplete="given-name"
+                         value="<?php echo htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8'); ?>">
+                  <div class="stg-field-hint" data-hint-for="pf-first"></div>
+                </div>
+                <div class="stg-field">
+                  <label class="stg-label" for="pf-last">Last name</label>
+                  <input class="stg-input" id="pf-last" name="last_name" type="text" required maxlength="100"
+                         autocomplete="family-name"
+                         value="<?php echo htmlspecialchars($lastName, ENT_QUOTES, 'UTF-8'); ?>">
+                  <div class="stg-field-hint" data-hint-for="pf-last"></div>
                 </div>
               </div>
-            </div>
+
+              <div class="stg-field">
+                <label class="stg-label" for="pf-email">Email</label>
+                <input class="stg-input" id="pf-email" name="email" type="email" required maxlength="254"
+                       autocomplete="email" inputmode="email"
+                       value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="stg-field-hint" data-hint-for="pf-email"></div>
+              </div>
+
+              <div class="stg-field">
+                <label class="stg-label" for="pf-phone">Phone</label>
+                <input class="stg-input" id="pf-phone" name="phone" type="tel" maxlength="32" autocomplete="tel"
+                       placeholder="+1 555 123 4567 (optional)"
+                       value="<?php echo htmlspecialchars($phone, ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="stg-field-hint" data-hint-for="pf-phone"></div>
+              </div>
+
+              <div class="stg-field">
+                <label class="stg-label" for="pf-username">Username</label>
+                <input class="stg-input" id="pf-username" name="user_name" type="text" required maxlength="64"
+                       autocomplete="username" autocapitalize="none" spellcheck="false"
+                       value="<?php echo htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="stg-field-hint" data-hint-for="pf-username"></div>
+              </div>
+
+              <div class="stg-actions">
+                <button type="submit" class="stg-btn-primary" id="pf-save-btn">Save profile</button>
+              </div>
+            </form>
           </div>
-          <div
-            class="box-footer border-t-0 flex justify-between gap-2 flex-wrap"
-          >
-            <button class="ti-btn ti-btn-soft-primary1">
-              Restore Defaults
-            </button>
-            <div class="ms-auto">
-              <button class="ti-btn ti-btn-primary">Save Changes</button>
-            </div>
+        </div>
+
+        <!-- Password -->
+        <div class="xl:col-span-6 lg:col-span-6 col-span-12">
+          <div class="stg-card">
+            <h2 class="stg-card-title"><i class="ri-lock-2-line"></i> Change password</h2>
+
+            <form id="stg-password-form" autocomplete="off" novalidate>
+              <div class="stg-field">
+                <label class="stg-label" for="pw-current">Current password</label>
+                <div class="stg-input-wrap">
+                  <input class="stg-input" id="pw-current" name="current_password" type="password" maxlength="128"
+                         autocomplete="current-password" placeholder="Enter current password">
+                  <button type="button" class="stg-toggle-pw" data-target="pw-current" aria-label="Show password"><i class="ri-eye-line"></i></button>
+                </div>
+                <div class="stg-field-hint" data-hint-for="pw-current"></div>
+              </div>
+              <div class="stg-field">
+                <label class="stg-label" for="pw-new">New password</label>
+                <div class="stg-input-wrap">
+                  <input class="stg-input" id="pw-new" name="new_password" type="password" maxlength="128"
+                         autocomplete="new-password" placeholder="8+ chars, include a letter and a number">
+                  <button type="button" class="stg-toggle-pw" data-target="pw-new" aria-label="Show password"><i class="ri-eye-line"></i></button>
+                </div>
+                <div class="stg-field-hint" data-hint-for="pw-new"></div>
+              </div>
+              <div class="stg-field">
+                <label class="stg-label" for="pw-confirm">Confirm new password</label>
+                <input class="stg-input" id="pw-confirm" name="confirm_password" type="password" maxlength="128"
+                       autocomplete="new-password" placeholder="Re-enter new password">
+                <div class="stg-field-hint" data-hint-for="pw-confirm"></div>
+              </div>
+
+              <div class="stg-actions">
+                <button type="submit" class="stg-btn-gold" id="pw-save-btn">Change password</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
+  </div>
 </div>
 
- <?php include_once "components/layout/footer.php"; ?>
+<?php include_once 'components/layout/footer.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(function () {
+  var USER_ID = <?php echo json_encode($userId, JSON_HEX_TAG | JSON_HEX_APOS); ?>;
+
+  var RE_NAME = /^[\p{L}\p{M}\s.'\-]{1,100}$/u;
+  /* Practical email shape; server still validates with PHP filter_var. */
+  var RE_EMAIL = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)+$/;
+  var RE_USERNAME = /^[a-zA-Z0-9._@-]{3,64}$/;
+  var RE_NEW_PASSWORD = /^(?=.*[A-Za-z\p{L}])(?=.*\d).{8,128}$/u;
+
+  function clearFieldErrors(ids) {
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      var hint = document.querySelector('.stg-field-hint[data-hint-for="' + id + '"]');
+      if (el) el.classList.remove('stg-invalid');
+      if (hint) { hint.textContent = ''; hint.classList.remove('stg-invalid-text'); }
+    });
+  }
+
+  function setFieldError(id, message) {
+    var el = document.getElementById(id);
+    var hint = document.querySelector('.stg-field-hint[data-hint-for="' + id + '"]');
+    if (el) el.classList.add('stg-invalid');
+    if (hint) {
+      hint.textContent = message;
+      hint.classList.add('stg-invalid-text');
+    }
+  }
+
+  /** Optional phone: 7–15 digits, max 32 chars, common formatting only. */
+  function validOptionalPhone(raw) {
+    var p = raw.trim();
+    if (p === '') return { ok: true };
+    if (p.length > 32) return { ok: false, msg: 'Phone is too long (max 32 characters).' };
+    var ext = /\s*(?:ext\.?|extension)\s*\d+/i;
+    var base = p.replace(ext, '').trim();
+    /* Allow ASCII phone chars only (blocks emoji / stray symbols). */
+    if (!/^[\d\s()+\-\.]+$/.test(base)) return { ok: false, msg: 'Use digits, spaces, + ( ) . and - only.' };
+    var digits = base.replace(/\D/g, '');
+    if (digits.length < 7) return { ok: false, msg: 'Enter at least 7 digits, or leave phone blank.' };
+    if (digits.length > 15) return { ok: false, msg: 'Too many digits (max 15).' };
+    return { ok: true };
+  }
+
+  function validateProfile() {
+    var ids = ['pf-first', 'pf-last', 'pf-email', 'pf-phone', 'pf-username'];
+    clearFieldErrors(ids);
+
+    var first = $('#pf-first').val().trim();
+    var last = $('#pf-last').val().trim();
+    var email = $('#pf-email').val().trim();
+    var phone = $('#pf-phone').val();
+    var user = $('#pf-username').val().trim();
+
+    if (!first) { setFieldError('pf-first', 'First name is required.'); return null; }
+    if (!RE_NAME.test(first)) { setFieldError('pf-first', 'Use letters and common name characters only (spaces, . \' -).'); return null; }
+    if (!last) { setFieldError('pf-last', 'Last name is required.'); return null; }
+    if (!RE_NAME.test(last)) { setFieldError('pf-last', 'Use letters and common name characters only (spaces, . \' -).'); return null; }
+
+    if (!email) { setFieldError('pf-email', 'Email is required.'); return null; }
+    if (email.length > 254) { setFieldError('pf-email', 'Email is too long.'); return null; }
+    if (!RE_EMAIL.test(email)) { setFieldError('pf-email', 'Enter a valid email address.'); return null; }
+
+    var phoneChk = validOptionalPhone(phone);
+    if (!phoneChk.ok) { setFieldError('pf-phone', phoneChk.msg); return null; }
+
+    if (!user) { setFieldError('pf-username', 'Username is required.'); return null; }
+    if (!RE_USERNAME.test(user)) { setFieldError('pf-username', '3–64 characters: letters, numbers, . _ @ - only.'); return null; }
+
+    return $('#stg-profile-form').serialize();
+  }
+
+  function validatePasswordForm() {
+    var ids = ['pw-current', 'pw-new', 'pw-confirm'];
+    clearFieldErrors(ids);
+    /* Do not trim passwords — spaces may be intentional. */
+    var cur = $('#pw-current').val();
+    var nw = $('#pw-new').val();
+    var cf = $('#pw-confirm').val();
+
+    if (!cur.length) {
+      setFieldError('pw-current', 'Enter your current password.');
+      return null;
+    }
+    if (cur.length > 128) {
+      setFieldError('pw-current', 'Password is too long.');
+      return null;
+    }
+
+    if (nw.length < 8 || nw.length > 128 || !RE_NEW_PASSWORD.test(nw)) {
+      setFieldError('pw-new', 'Use 8–128 characters with at least one letter and one number.');
+      return null;
+    }
+    if (nw !== cf) {
+      setFieldError('pw-confirm', 'Does not match the new password.');
+      return null;
+    }
+
+    return { current_password: cur, new_password: nw };
+  }
+
+  $('.stg-toggle-pw').on('click', function () {
+    var id = $(this).data('target');
+    var $input = $('#' + id);
+    var $ico = $(this).find('i');
+    var isPw = $input.attr('type') === 'password';
+    $input.attr('type', isPw ? 'text' : 'password');
+    $ico.attr('class', isPw ? 'ri-eye-off-line' : 'ri-eye-line');
+  });
+
+  $('#stg-profile-form').on('input change', '.stg-input', function () {
+    var id = this.id;
+    if (['pf-first', 'pf-last', 'pf-email', 'pf-phone', 'pf-username'].indexOf(id) === -1) return;
+    this.classList.remove('stg-invalid');
+    var hint = document.querySelector('.stg-field-hint[data-hint-for="' + id + '"]');
+    if (hint) { hint.textContent = ''; hint.classList.remove('stg-invalid-text'); }
+  });
+
+  $('#stg-password-form').on('input change', 'input.stg-input', function () {
+    this.classList.remove('stg-invalid');
+    var id = this.id;
+    var hint = document.querySelector('.stg-field-hint[data-hint-for="' + id + '"]');
+    if (hint) { hint.textContent = ''; hint.classList.remove('stg-invalid-text'); }
+  });
+
+  $('#stg-profile-form').on('submit', function (e) {
+    e.preventDefault();
+    var payload = validateProfile();
+    if (payload === null) {
+      var firstBad = document.querySelector('#stg-profile-form .stg-invalid');
+      if (firstBad) firstBad.focus();
+      return;
+    }
+    var $btn = $('#pf-save-btn');
+    $btn.prop('disabled', true);
+    $.post('config/profile_update_endpoint.php', payload)
+      .done(function (res) {
+        if (typeof res === 'string') { try { res = JSON.parse(res); } catch (x) { res = {}; } }
+        if (res.success) {
+          Swal.fire({ icon: 'success', title: 'Saved', text: res.message || 'Profile updated.', timer: 2000, showConfirmButton: false });
+          setTimeout(function () { window.location.reload(); }, 850);
+        } else {
+          Swal.fire({ icon: 'error', title: 'Could not save', text: res.message || 'Please try again.' });
+        }
+      })
+      .fail(function () {
+        Swal.fire({ icon: 'error', title: 'Network error', text: 'Please try again.' });
+      })
+      .always(function () { $btn.prop('disabled', false); });
+  });
+
+  $('#stg-password-form').on('submit', function (e) {
+    e.preventDefault();
+    var creds = validatePasswordForm();
+    if (creds === null) {
+      var firstBad = document.querySelector('#stg-password-form .stg-invalid');
+      if (firstBad) firstBad.focus();
+      return;
+    }
+    var $btn = $('#pw-save-btn');
+    $btn.prop('disabled', true);
+    $.ajax({
+      url: 'config/change_password_endpoint.php',
+      method: 'POST',
+      dataType: 'json',
+      data: { id: USER_ID, current_password: creds.current_password, new_password: creds.new_password }
+    })
+      .done(function (data) {
+        if (data && data.success) {
+          $('#stg-password-form')[0].reset();
+          clearFieldErrors(['pw-current', 'pw-new', 'pw-confirm']);
+          Swal.fire({ icon: 'success', title: 'Password updated', text: data.message || 'You can continue with your new password.', timer: 2200, showConfirmButton: false });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Could not update', text: (data && data.message) || 'Check your current password.' });
+        }
+      })
+      .fail(function () {
+        Swal.fire({ icon: 'error', title: 'Network error', text: 'Please try again.' });
+      })
+      .always(function () { $btn.prop('disabled', false); });
+  });
+})();
+</script>

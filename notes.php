@@ -110,9 +110,11 @@
         <button type="button" class="nt-action-btn" title="Refresh" onclick="loadNotes()" style="width:36px;height:36px;font-size:16px;">
           <i class="ri-refresh-line"></i>
         </button>
+        <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Notes', 'create') == 1): ?>
         <button type="button" onclick="openAddModal()" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> Add Note
         </button>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -297,7 +299,7 @@ window.loadNotes = function() {
   $('#nt-empty').hide();
   $.ajax({
     url: API, type: 'POST',
-    data: { action: 'fetch_notes', user_id: SESSION_USER_ID },
+    data: { action: 'fetch_notes', user_id: SESSION_USER_ID , is_admin: "<?php echo $_SESSION['user']['admin'] == 1 ? '1' : '0'; ?>" },
     success: function(response) {
       try {
         var res = typeof response === 'string' ? JSON.parse(response) : response;
@@ -347,8 +349,12 @@ function renderTable(list) {
     html += '<td style="color:var(--nt-muted);white-space:nowrap;font-size:12px;">' + date + '</td>';
     html += '<td><div class="flex items-center justify-center gap-1" onclick="event.stopPropagation()">';
     html += '<button class="nt-action-btn" title="View" onclick="openViewModal(\'' + n.id + '\')"><i class="ri-eye-line"></i></button>';
+    <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Notes', 'update') == 1): ?>
     html += '<button class="nt-action-btn" title="Edit" onclick="openEditModal(\'' + n.id + '\')"><i class="ri-edit-line"></i></button>';
+    <?php endif; ?>
+    <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Notes', 'delete') == 1): ?>
     html += '<button class="nt-action-btn danger" title="Delete" onclick="deleteNote(\'' + n.id + '\')"><i class="ri-delete-bin-line"></i></button>';
+    <?php endif; ?>
     html += '</div></td>';
     html += '</tr>';
   });

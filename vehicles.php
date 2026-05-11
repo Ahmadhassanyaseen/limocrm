@@ -91,7 +91,7 @@
     border: 1px solid var(--fl-border);
     background: var(--fl-surface-2);
     color: var(--fl-text);
-    padding: 0 12px 0 36px;
+    padding: 0 12px 0 36px!important;
     font-size: 13px;
     outline: none;
     width: min(320px, 100%);
@@ -285,9 +285,11 @@
         <button type="button" class="fl-filter-btn" onclick="loadVehicles()" title="Refresh">
           <i class="ri-refresh-line text-sm"></i> Refresh
         </button>
+        <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Vehicles', 'create') == 1): ?>
         <a href="vehicle.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> Add Vehicle
         </a>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -414,7 +416,7 @@
         $.ajax({
             url: 'https://zabrin.xyz/limogen/index.php?entryPoint=CustomEntryPoint',
             type: 'POST',
-            data: { action: 'fetch_vehicles', user_id: '<?php echo $_SESSION['user']['id']; ?>' },
+            data: { action: 'fetch_vehicles', user_id: '<?php echo $_SESSION['user']['id']; ?>' , is_admin: "<?php echo $_SESSION['user']['admin'] == 1 ? '1' : '0'; ?>" },
             success: function (response) {
                 try {
                     allVehicles = typeof response === 'string' ? JSON.parse(response) : response;
@@ -553,8 +555,12 @@
                   <td class="text-end">
                     <div class="flex items-center justify-end gap-2">
                       <a href="vehicle_detail.php?id=${vehicle.id}" class="fl-action-btn" title="View details"><i class="ri-eye-line"></i></a>
+                      <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Vehicles', 'update') == 1): ?>
                       <a href="vehicle.php?id=${vehicle.id}" class="fl-action-btn" title="Edit"><i class="ri-edit-line"></i></a>
+                      <?php endif; ?>
+                      <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Vehicles', 'delete') == 1): ?>
                       <button type="button" onclick="deleteVehicleBtn('${safeId}')" class="fl-action-btn fl-action-danger" title="Delete"><i class="ri-delete-bin-line"></i></button>
+                      <?php endif; ?>
                     </div>
                   </td>
                 </tr>

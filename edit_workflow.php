@@ -270,11 +270,10 @@ function onConditionTypeChange(statusVal, eventField){
             <option value="">Select status...</option>
             <option value="Formal">Formal</option>
             <option value="Converted">Converted</option>
+            <option value="Agreement Sent">Agreement Sent</option>
             <option value="Dead">Dead</option>
             <option value="New">New</option>
             <option value="Assigned">Assigned</option>
-            <option value="In Process">In Process</option>
-            <option value="Recycled">Recycled</option>
           </select>
         </div>
         <div class="cw-hint">The workflow will trigger when a lead's status changes to the selected value.</div>

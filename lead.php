@@ -171,7 +171,7 @@ $hasMismatch      = $totalNum > 0 && abs($sumOfParts - $totalNum) >= 0.01 && ($q
                 <?php echo $leadName !== '' ? lead_text($leadName) : 'Lead Details'; ?>
               </h1>
               <?php if (!empty($leadStatus)): ?>
-                <span class="ld-badge bg-primary/10 text-primary"><?php echo lead_text($leadStatus); ?></span>
+                <span class="ld-badge bg-primary/10 text-primary <?php if (!empty($leadStatus) && $leadStatus == 'Converted'): ?>bg-success/10 text-success<?php endif; ?>"><?php echo lead_text($leadStatus); ?></span>
               <?php endif; ?>
               <?php if (!empty($lead['service_type_c'])): ?>
                 <span class="ld-badge bg-secondary/10 text-secondary"><?php echo lead_text($lead['service_type_c']); ?></span>
@@ -197,20 +197,22 @@ $hasMismatch      = $totalNum > 0 && abs($sumOfParts - $totalNum) >= 0.01 && ($q
             </div>
           </div>
         </div>
+        <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Leads', 'update') == 1): ?>
         <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
           <button type="button" id="send-formal-quote-btn" class="ld-action-btn btn-quote" data-email-type="formal_quote" data-email-label="Formal Quote" <?php echo $hasEmail ? '' : 'disabled title="No email on file"'; ?>>
-            <i class="ri-mail-send-line"></i> Formal Quote
+            <i class="ri-mail-send-line"></i> Send Formal Quote
           </button>
           <button type="button" id="send-agreement-btn" class="ld-action-btn btn-agreement" data-email-type="agreement" data-email-label="Agreement" <?php echo $hasEmail ? '' : 'disabled title="No email on file"'; ?>>
-            <i class="ri-file-text-line"></i> Agreement
+            <i class="ri-file-text-line"></i> Send Agreement
           </button>
-          <button type="button" id="copy-agreement-link-btn" class="ld-action-btn" title="Public page: sign &amp; pay (Stripe)" style="background:#4f46e5;color:#fff;">
+          <!-- <button type="button" id="copy-agreement-link-btn" class="ld-action-btn" title="Public page: sign &amp; pay (Stripe)" style="background:#4f46e5;color:#fff;">
             <i class="ri-links-line"></i> Agreement link
-          </button>
+          </button> -->
           <a href="edit_lead.php?id=<?php echo urlencode((string)$leadId); ?>" class="ld-action-btn btn-edit">
             <i class="ri-edit-line"></i> Edit Lead
           </a>
         </div>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -536,6 +538,7 @@ $(function () {
         success: function (data) {
           if (data && data.success) {
             Swal.fire({ icon: 'success', title: emailLabel + ' sent', text: data.message || 'The ' + emailLabel + ' email has been queued.', timer: 2200, showConfirmButton: false });
+           
           } else {
             Swal.fire({ icon: 'error', title: 'Could not send ' + emailLabel, text: (data && data.message) || 'Please try again.' });
           }
@@ -546,6 +549,7 @@ $(function () {
         },
         complete: function () {
           $btn.html($btn.data('original-html')).prop('disabled', false);
+           window.location.reload();
         }
       });
     });
@@ -553,30 +557,30 @@ $(function () {
 
   $('#send-formal-quote-btn, #send-agreement-btn').on('click', function () { sendLeadEmail($(this)); });
 
-  $('#copy-agreement-link-btn').on('click', function () {
-    $.post('config/get_agreement_link_endpoint.php', { lead_id: LEAD_PAYLOAD.lead_id })
-      .done(function (data) {
-        if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { data = {}; } }
-        if (!data || !data.success) {
-          Swal.fire({ icon: 'error', title: 'Could not build link', text: (data && data.message) || 'Check SuiteCRM limo_agreement_config.php and lead access.' });
-          return;
-        }
-        var url = data.url;
-        function showUrl() {
-          Swal.fire({ title: 'Agreement link', html: 'Send this URL to your client:<br><textarea readonly style="width:100%;min-height:84px;margin-top:10px;font-size:12px;border-radius:8px;padding:8px;">' + $('<div>').text(url).html() + '</textarea>', icon: 'info' });
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(function () {
-            Swal.fire({ icon: 'success', title: 'Copied', text: 'Agreement link copied to clipboard.', timer: 2200, showConfirmButton: false });
-          }).catch(showUrl);
-        } else {
-          showUrl();
-        }
-      })
-      .fail(function () {
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Could not reach the server.' });
-      });
-  });
+  // $('#copy-agreement-link-btn').on('click', function () {
+  //   $.post('config/get_agreement_link_endpoint.php', { lead_id: LEAD_PAYLOAD.lead_id })
+  //     .done(function (data) {
+  //       if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { data = {}; } }
+  //       if (!data || !data.success) {
+  //         Swal.fire({ icon: 'error', title: 'Could not build link', text: (data && data.message) || 'Check SuiteCRM limo_agreement_config.php and lead access.' });
+  //         return;
+  //       }
+  //       var url = data.url;
+  //       function showUrl() {
+  //         Swal.fire({ title: 'Agreement link', html: 'Send this URL to your client:<br><textarea readonly style="width:100%;min-height:84px;margin-top:10px;font-size:12px;border-radius:8px;padding:8px;">' + $('<div>').text(url).html() + '</textarea>', icon: 'info' });
+  //       }
+  //       if (navigator.clipboard && navigator.clipboard.writeText) {
+  //         navigator.clipboard.writeText(url).then(function () {
+  //           Swal.fire({ icon: 'success', title: 'Copied', text: 'Agreement link copied to clipboard.', timer: 2200, showConfirmButton: false });
+  //         }).catch(showUrl);
+  //       } else {
+  //         showUrl();
+  //       }
+  //     })
+  //     .fail(function () {
+  //       Swal.fire({ icon: 'error', title: 'Error', text: 'Could not reach the server.' });
+  //     });
+  // });
 
   /* ── Email History ──────────────────────────────── */
   function escHtml(str) { return $('<span>').text(str || '').html(); }

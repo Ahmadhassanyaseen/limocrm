@@ -136,7 +136,7 @@ foreach ($allUsers as $u) {
           <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <i class="ri-team-line text-primary text-base"></i>
           </div>
-          <h1 class="page-title font-bold text-xl mb-0" style="color:var(--us-text)">Team Management</h1>
+          <h1 class="page-title font-bold text-xl mb-0" style="color:var(--us-text)">Users Management</h1>
         </div>
         <p class="text-xs mt-1 mb-0 ms-10" style="color:var(--us-muted)">Manage your team members, roles, and access.</p>
       </div>

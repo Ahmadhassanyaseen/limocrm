@@ -290,10 +290,14 @@ $(function () {
       '<span class="badge bg-secondary/10 text-secondary">' + esc(category) + '</span>' +
       '<span class="text-xs text-textmuted dark:text-textmuted/50"><i class="ri-calendar-line me-1"></i>Added ' + esc(dateAdded) + '</span>'
     );
+
     $('#vd-actions').html(
+      <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Vehicles', 'update') == 1): ?>
       '<a href="vehicle.php?id=' + encodeURIComponent(v.id) + '" class="ti-btn bg-primary text-white ti-btn-sm btn-wave">' +
         '<i class="ri-edit-line me-1 align-middle"></i>Edit Vehicle' +
       '</a>' +
+      <?php endif; ?>
+      
       '<a href="vehicles.php" class="ti-btn ti-btn-sm ti-btn-soft-secondary font-medium">' +
         '<i class="ri-arrow-left-line me-1"></i> Back to Fleet' +
       '</a>'

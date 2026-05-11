@@ -262,6 +262,7 @@
                                  
                                 </a>
                               </div>
+                              <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Leads', 'update') == 1): ?>
                               <div
                                 class="hs-tooltip ti-main-tooltip [--placement:top]"
                               >
@@ -274,6 +275,8 @@
                                 
                                 </a>
                               </div>
+                              <?php endif; ?>
+                              <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Leads', 'delete') == 1): ?>
                               <div
                                 class="hs-tooltip ti-main-tooltip [--placement:top]"
                               >
@@ -286,6 +289,7 @@
                                   
                                 </a>
                               </div>
+                              <?php endif; ?>
                             </div>
                           </td>
                         </tr>

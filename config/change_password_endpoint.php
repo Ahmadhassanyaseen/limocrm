@@ -21,8 +21,22 @@ if ($userId === '' || $current === '' || $next === '') {
     exit;
 }
 
+if (strlen($current) > 128) {
+    echo json_encode(['success' => false, 'message' => 'Current password value is too long']);
+    exit;
+}
+
 if (strlen($next) < 8) {
     echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters']);
+    exit;
+}
+if (strlen($next) > 128) {
+    echo json_encode(['success' => false, 'message' => 'Password must be at most 128 characters']);
+    exit;
+}
+// At least one letter and one digit (ASCII or Unicode letter)
+if (!preg_match('/^(?=.*[A-Za-z\p{L}])(?=.*\d).{8,128}$/u', $next)) {
+    echo json_encode(['success' => false, 'message' => 'Password must include at least one letter and one number']);
     exit;
 }
 

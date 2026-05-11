@@ -4,12 +4,129 @@
 <?php include_once "components/layout/sidebar.php"; ?>
 <?php include_once "config/api.php"; ?>
 <?php
+if (!function_exists('limo_dash_norm_status')) {
+    function limo_dash_norm_status($s): string
+    {
+        return strtolower(trim((string) $s));
+    }
+    function limo_dash_is_won($s): bool
+    {
+        $s = limo_dash_norm_status($s);
+
+        return in_array($s, ['converted', 'won', 'success'], true);
+    }
+    function limo_dash_is_lost($s): bool
+    {
+        $s = limo_dash_norm_status($s);
+
+        return in_array($s, ['dead', 'lost', 'closed', 'junk'], true);
+    }
+    function limo_dash_parse_ts($raw): ?int
+    {
+        $raw = trim((string) $raw);
+        if ($raw === '') {
+            return null;
+        }
+        $t = strtotime($raw);
+
+        return $t ? $t : null;
+    }
+    function limo_dash_initials(string $name): string
+    {
+        $name = trim($name);
+        if ($name === '') {
+            return '?';
+        }
+        $parts = preg_split('/\s+/', $name) ?: [];
+        $a = mb_substr($parts[0], 0, 1, 'UTF-8');
+        $b = count($parts) > 1 ? mb_substr($parts[count($parts) - 1], 0, 1, 'UTF-8') : '';
+
+        return strtoupper($a . $b);
+    }
+}
+
 $data['id'] = $_SESSION['user']['id'];
-$leads = fetchAllUserLeads($data);
+if ((int) ($_SESSION['user']['admin'] ?? 0) === 1) {
+    $leads = fetchAllLeads($data);
+} else {
+    $leads = fetchAllUserLeads($data);
+}
 
 if (!is_array($leads)) {
-  $leads = [];
+    $leads = [];
 }
+
+$dashYear = (int) date('Y');
+$monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+$createdByMonth = array_fill(1, 12, 0);
+$wonByMonth = array_fill(1, 12, 0);
+$openAddedByMonth = array_fill(1, 12, 0);
+
+foreach ($leads as $lead) {
+    $st = $lead['status'] ?? '';
+    $tEnter = limo_dash_parse_ts($lead['date_entered'] ?? '');
+    if ($tEnter && (int) date('Y', $tEnter) === $dashYear) {
+        $m = (int) date('n', $tEnter);
+        $createdByMonth[$m]++;
+        if (!limo_dash_is_won($st) && !limo_dash_is_lost($st)) {
+            $openAddedByMonth[$m]++;
+        }
+    }
+    if (limo_dash_is_won($st)) {
+        $tWin = limo_dash_parse_ts($lead['date_modified'] ?? '') ?: $tEnter;
+        if ($tWin && (int) date('Y', $tWin) === $dashYear) {
+            $wm = (int) date('n', $tWin);
+            $wonByMonth[$wm]++;
+        }
+    }
+}
+
+$limoSalesOverviewSeries = [
+    ['name' => 'Leads created', 'data' => []],
+    ['name' => 'Converted (won)', 'data' => []],
+    ['name' => 'Open pipeline (added)', 'data' => []],
+];
+for ($m = 1; $m <= 12; $m++) {
+    $limoSalesOverviewSeries[0]['data'][] = $createdByMonth[$m];
+    $limoSalesOverviewSeries[1]['data'][] = $wonByMonth[$m];
+    $limoSalesOverviewSeries[2]['data'][] = $openAddedByMonth[$m];
+}
+
+$limoSalesOverviewPayload = [
+    'categories' => $monthLabels,
+    'series' => $limoSalesOverviewSeries,
+    'year' => $dashYear,
+];
+
+$byRep = [];
+foreach ($leads as $lead) {
+    $aname = trim((string) ($lead['assigned_user_name'] ?? ''));
+    $aid = trim((string) ($lead['assigned_user_id'] ?? ''));
+    if ($aname === '' && $aid === '') {
+        $rkey = '__unassigned__';
+        $disp = 'Unassigned';
+    } else {
+        $rkey = $aid !== '' ? $aid : ('n:' . md5($aname));
+        $disp = $aname !== '' ? $aname : ('User ' . substr($aid, 0, 8));
+    }
+    if (!isset($byRep[$rkey])) {
+        $byRep[$rkey] = ['name' => $disp, 'total' => 0, 'closed' => 0];
+    }
+    $byRep[$rkey]['total']++;
+    if (limo_dash_is_won($lead['status'] ?? '')) {
+        $byRep[$rkey]['closed']++;
+    }
+}
+uasort($byRep, static function ($a, $b) {
+    return $b['total'] <=> $a['total'];
+});
+$dashSalesReps = array_values($byRep);
+$dashSalesReps = array_slice($dashSalesReps, 0, 15);
+$dashTeamLeads = array_sum(array_column($dashSalesReps, 'total'));
+$dashTeamClosed = array_sum(array_column($dashSalesReps, 'closed'));
+$dashTeamRate = $dashTeamLeads > 0 ? round(100 * $dashTeamClosed / $dashTeamLeads, 2) : 0.0;
+$dashIsAdmin = (int) ($_SESSION['user']['admin'] ?? 0) === 1;
+$dashSalesRepFacePool = [11, 12, 14, 15];
 
 $leadStats = [
   'total'     => count($leads),
@@ -301,102 +418,21 @@ $formatRevenue = function ($n) {
           <!-- End::row-1 -->
           <!-- Start::row-2 -->
           <div class="grid grid-cols-12 gap-x-6">
-            <!-- <div class="md:col-span-12 xxl:col-span-3 col-span-12">
-              <div
-                class="box overflow-hidden earnings-card box-bg-primary shadow-sm"
-              >
-                <div class="box-body p-0 text-white">
-                  <div class="p-4 absolute total-earnings-content w-full">
-                    <div class="flex gap-2 items-center">
-                      <div>
-                        <span class="mb-1 block">Total Revenue</span>
-                        <h4 class="mb-1 text-white">$578,784</h4>
-                        <div class="text-white text-[13px]">
-                          <span class="opacity-70"> Increased By </span>
-                          <span
-                            class="badge bg-primarytint1color align-middle opacity-90"
-                            >7.66%<i class="ti ti-arrow-narrow-up"></i
-                          ></span>
-                        </div>
-                      </div>
-                      <div
-                        class="avatar avatar-lg bg-white/10 svg-white ms-auto shadow-sm"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="32"
-                          height="32"
-                          fill="#000000"
-                          viewBox="0 0 256 256"
-                          >
-                          <path
-                            d="M184,89.57V84c0-25.08-37.83-44-88-44S8,58.92,8,84v40c0,20.89,26.25,37.49,64,42.46V172c0,25.08,37.83,44,88,44s88-18.92,88-44V132C248,111.3,222.58,94.68,184,89.57ZM232,132c0,13.22-30.79,28-72,28-3.73,0-7.43-.13-11.08-.37C170.49,151.77,184,139,184,124V105.74C213.87,110.19,232,122.27,232,132ZM72,150.25V126.46A183.74,183.74,0,0,0,96,128a183.74,183.74,0,0,0,24-1.54v23.79A163,163,0,0,1,96,152,163,163,0,0,1,72,150.25Zm96-40.32V124c0,8.39-12.41,17.4-32,22.87V123.5C148.91,120.37,159.84,115.71,168,109.93ZM96,56c41.21,0,72,14.78,72,28s-30.79,28-72,28S24,97.22,24,84,54.79,56,96,56ZM24,124V109.93c8.16,5.78,19.09,10.44,32,13.57v23.37C36.41,141.4,24,132.39,24,124Zm64,48v-4.17c2.63.1,5.29.17,8,.17,3.88,0,7.67-.13,11.39-.35A121.92,121.92,0,0,0,120,171.41v23.46C100.41,189.4,88,180.39,88,172Zm48,26.25V174.4a179.48,179.48,0,0,0,24,1.6,183.74,183.74,0,0,0,24-1.54v23.79a165.45,165.45,0,0,1-48,0Zm64-3.38V171.5c12.91-3.13,23.84-7.79,32-13.57V172C232,180.39,219.59,189.4,200,194.87Z"
-                          ></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div id="profit-report" style="min-height: 130px">
-                    
-                  </div>
-                  <div id="revenue-report" style="min-height: 130px">
-                   
-                  </div>
-                </div>
-              </div>
-              <div
-                class="box border border-primarytint2color border-opacity-25"
-              >
-                <div class="box-body">
-                  <div class="flex gap-2 items-center my-1">
-                    <div>
-                      <span class="mb-1 block">Total Profit</span>
-                      <h4 class="mb-1">$37,566</h4>
-                      <div
-                        class="text-textmuted dark:text-textmuted/50 text-[13px]"
-                      >
-                        <span class=""> Increased By </span>
-                        <span class="badge bg-primarytint3color align-middle"
-                          >5.66%<i class="ti ti-arrow-narrow-up"></i
-                        ></span>
-                      </div>
-                    </div>
-                    <div
-                      class="avatar avatar-lg bg-primarytint2color/10 svg-primarytint2color ms-auto shadow-sm"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="32"
-                        height="32"
-                        fill="#000000"
-                        viewBox="0 0 256 256"
-                      >
-                        <path
-                          d="M230.33,141.06a24.43,24.43,0,0,0-21.24-4.23l-41.84,9.62A28,28,0,0,0,140,112H89.94a31.82,31.82,0,0,0-22.63,9.37L44.69,144H16A16,16,0,0,0,0,160v40a16,16,0,0,0,16,16H120a7.93,7.93,0,0,0,1.94-.24l64-16a6.94,6.94,0,0,0,1.19-.4L226,182.82l.44-.2a24.6,24.6,0,0,0,3.93-41.56ZM16,160H40v40H16Zm203.43,8.21-38,16.18L119,200H56V155.31l22.63-22.62A15.86,15.86,0,0,1,89.94,128H140a12,12,0,0,1,0,24H112a8,8,0,0,0,0,16h32a8.32,8.32,0,0,0,1.79-.2l67-15.41.31-.08a8.6,8.6,0,0,1,6.3,15.9ZM164,96a36,36,0,0,0,5.9-.48,36,36,0,1,0,28.22-47A36,36,0,1,0,164,96Zm60-12a20,20,0,1,1-20-20A20,20,0,0,1,224,84ZM164,40a20,20,0,0,1,19.25,14.61,36,36,0,0,0-15,24.93A20.42,20.42,0,0,1,164,80a20,20,0,0,1,0-40Z"
-                        ></path>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-            <div class="md:col-span-12 xxl:col-span-6 col-span-12">
+            
+            <div class="<?php echo $dashIsAdmin ? 'col-span-12 md:col-span-12 xxl:col-span-6' : 'col-span-12'; ?>">
               <div class="box">
                 <div class="box-header justify-between">
                   <div class="box-title">Sales Overview</div>
-                  <div class="flex gap-2">
-                    <button class="ti-btn ti-btn-sm ti-btn-outline-light">
-                      Today
-                    </button>
-                    <button class="ti-btn ti-btn-sm ti-btn-outline-light">
-                      Weakly
-                    </button>
-                    <button class="ti-btn ti-btn-sm ti-btn-light">
-                      Yearly
-                    </button>
-                  </div>
+                  <span class="text-xs font-medium text-textmuted dark:text-textmuted/50 border border-defaultborder dark:border-defaultborder/10 rounded-full px-3 py-1">
+                    Jan–Dec <?php echo (int) $dashYear; ?>
+                  </span>
                 </div>
                 <div class="box-body">
+                  <p class="text-xs text-textmuted dark:text-textmuted/50 mb-3">
+                    Monthly lead counts for <?php echo (int) $dashYear; ?> from
+                    <?php echo (int) ($_SESSION['user']['admin'] ?? 0) === 1 ? 'all leads' : 'your visible leads'; ?>
+                    (<?php echo number_format(count($leads)); ?> total).
+                  </p>
                   <div
                     id="sales-overview-crm"
                     style="min-height: 285px"
@@ -404,41 +440,18 @@ $formatRevenue = function ($n) {
                     >
                   
                   </div>
+                  <script type="application/json" id="limo-dashboard-sales-json"><?php echo json_encode($limoSalesOverviewPayload, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE); ?></script>
                 </div>
               </div>
             </div>
-            <div class="md:col-span-12 xxl:col-span-6 col-span-12">
+            <?php if ($dashIsAdmin): ?>
+            <div class="col-span-12 md:col-span-12 xxl:col-span-6">
               <div class="box overflow-hidden">
                 <div class="box-header justify-between">
                   <div class="box-title">Sales Performance</div>
-                  <div class="ti-dropdown hs-dropdown">
-                    <button
-                      class="ti-btn ti-btn-light border btn-full ti-btn-sm"
-                      data-bs-toggle="dropdown"
-                    >
-                      Today<i class="ri-arrow-down-s-line"></i>
-                    </button>
-                    <ul
-                      class="ti-dropdown-menu hs-dropdown-menu hidden"
-                      role="menu"
-                    >
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Today</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Weekly</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Monthly</a
-                        >
-                      </li>
-                    </ul>
-                  </div>
+                  <span class="text-xs font-medium text-textmuted dark:text-textmuted/50 border border-defaultborder dark:border-defaultborder/10 rounded-full px-3 py-1">
+                    By assignee
+                  </span>
                 </div>
                 <div class="box-body p-0">
                   <div class="table-responsive">
@@ -455,1815 +468,61 @@ $formatRevenue = function ($n) {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>1</td>
+                        <?php if (count($dashSalesReps) === 0): ?>
+                        <tr class="border-b !border-defaultborder dark:!border-defaultborder/10">
+                          <td colspan="5" class="text-center text-textmuted dark:text-textmuted/50 py-8">
+                            No leads in view yet. Assign leads to teammates to see performance here.
+                          </td>
+                        </tr>
+                        <?php else: ?>
+                        <?php foreach ($dashSalesReps as $idx => $rep): ?>
+                        <?php
+                          $closed = (int) $rep['closed'];
+                          $total = (int) $rep['total'];
+                          $rate = $total > 0 ? round(100 * $closed / $total, 1) : 0.0;
+                          $trendUp = $dashTeamLeads === 0
+                            ? ($closed > 0)
+                            : ($rate + 0.001 >= $dashTeamRate);
+                          $dashFaceId = $dashSalesRepFacePool[abs(crc32((string) ($rep['name'] ?? '') . "\0" . (string) $idx)) % count($dashSalesRepFacePool)];
+                          ?>
+                        <tr class="border-b !border-defaultborder dark:!border-defaultborder/10">
+                          <td><?php echo $idx + 1; ?></td>
                           <td>
                             <div class="flex items-center">
                               <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/11.jpg"
-                                    alt=""
-                                  />
+                                <span class="avatar avatar-xs avatar-rounded overflow-hidden ring-1 ring-defaultborder dark:ring-defaultborder/20">
+                                  <img src="assets/images/faces/<?php echo (int) $dashFaceId; ?>.jpg" alt="" class="w-full h-full object-cover" width="32" height="32" />
                                 </span>
                               </div>
                               <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >John Joe</a
-                                >
+                                <span class="font-medium"><?php echo htmlspecialchars($rep['name'], ENT_QUOTES, 'UTF-8'); ?></span>
                               </div>
                             </div>
                           </td>
-                          <td>15</td>
-                          <td>100</td>
+                          <td><?php echo number_format($closed); ?></td>
+                          <td><?php echo number_format($total); ?></td>
                           <td>
-                            15.0<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
+                            <?php echo htmlspecialchars((string) $rate, ENT_QUOTES, 'UTF-8'); ?>
+                            <?php if ($trendUp): ?>
+                            <i class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg" title="At or above team win rate (<?php echo htmlspecialchars((string) $dashTeamRate, ENT_QUOTES, 'UTF-8'); ?>%)"></i>
+                            <?php else: ?>
+                            <i class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg" title="Below team win rate (<?php echo htmlspecialchars((string) $dashTeamRate, ENT_QUOTES, 'UTF-8'); ?>%)"></i>
+                            <?php endif; ?>
                           </td>
                         </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>2</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/12.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Jane Smith</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>20</td>
-                          <td>120</td>
-                          <td>
-                            16.7<i
-                              class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>3</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/15.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Michael Johnson</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>18</td>
-                          <td>110</td>
-                          <td>
-                            16.4<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>4</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/11.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Emily Davis</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>22</td>
-                          <td>130</td>
-                          <td>
-                            16.9<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>5</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/1.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Anna Garcia</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>17</td>
-                          <td>105</td>
-                          <td>
-                            16.2<i
-                              class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <th scope="row">6</th>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/4.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Kiara Nousin</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>20</td>
-                          <td>35</td>
-                          <td>
-                            57%<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- <div class="md:col-span-12 xxl:col-span-3 col-span-12">
-              <div class="box">
-                <div class="box-header justify-between">
-                  <div class="box-title">Profit By Sale</div>
-                  <div class="ti-dropdown hs-dropdown">
-                    <a
-                      href="javascript:void(0);"
-                      class="ti-btn ti-btn-sm ti-btn-light text-textmuted dark:text-textmuted/50 ti-dropdown-toggle hs-dropdown-toggle"
-                      data-bs-toggle="dropdown"
-                    >
-                      Sort By<i
-                        class="ri-arrow-down-s-line align-middle d-inline-block"
-                      ></i
-                    ></a>
-                    <ul
-                      class="ti-dropdown-menu hs-dropdown-menu hidden"
-                      role="menu"
-                    >
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >This Week</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Last Week</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >This Month</a
-                        >
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="box-body">
-                  <ul class="list-none mb-0">
-                    <li class="ti-list-group-item border-0 p-0 mb-5">
-                      <div class="flex justify-between items-top">
-                        <div class="flex">
-                          <span
-                            class="avatar avatar-rounded avatar-md bg-primary/10 !text-primary"
-                            ><i class="ri-wallet-line text-lg"></i></span>
-                          <div class="flex flex-col ms-2">
-                            <p class="font-medium mb-0">Total Sales</p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              10% Increases
-                            </p>
-                          </div>
-                        </div>
-                        <h6 class="font-medium mb-0">$12,345</h6>
-                      </div>
-                      <div
-                        class="progress progress-xs mt-2 mb-0"
-                        role="progressbar"
-                        aria-label="Basic example"
-                        aria-valuenow="80"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      >
-                        <div
-                          class="progress-bar progress-bar-striped progress-bar-animated"
-                          style="width: 80%"
-                        ></div>
-                      </div>
-                    </li>
-                    <li class="ti-list-group-item border-0 p-0 mb-5">
-                      <div class="flex justify-between items-top">
-                        <div class="flex">
-                          <span
-                            class="avatar avatar-md avatar-rounded bg-secondary/10 !text-secondary"
-                            ><i class="bx bx-money-withdraw text-lg"></i
-                          ></span>
-                          <div class="flex flex-col ms-2">
-                            <p class="font-medium mb-0">Total Profit</p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              12% Increases
-                            </p>
-                          </div>
-                        </div>
-                        <h6 class="font-medium mb-0">$9,345</h6>
-                      </div>
-                      <div
-                        class="progress progress-xs mt-2 mb-0"
-                        role="progressbar"
-                        aria-label="Basic example"
-                        aria-valuenow="75"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      >
-                        <div
-                          class="progress-bar progress-bar-striped progress-bar-animated bg-secondary"
-                          style="width: 75%"
-                        ></div>
-                      </div>
-                    </li>
-                    <li class="ti-list-group-item border-0 p-0 mb-5">
-                      <div class="flex justify-between items-top">
-                        <div class="flex">
-                          <span
-                            class="avatar avatar-md avatar-rounded bg-primarytint1color/10 !text-primarytint1color"
-                            ><i class="bx bx-money-withdraw text-lg"></i
-                          ></span>
-                          <div class="flex flex-col ms-2">
-                            <p class="font-medium mb-0">Total Revenue</p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              11% Decrease
-                            </p>
-                          </div>
-                        </div>
-                        <h6 class="font-medium mb-0">$9,345</h6>
-                      </div>
-                      <div
-                        class="progress progress-xs mt-2 mb-0"
-                        role="progressbar"
-                        aria-label="Basic example"
-                        aria-valuenow="78"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      >
-                        <div
-                          class="progress-bar progress-bar-striped progress-bar-animated bg-primarytint1color"
-                          style="width: 78%"
-                        ></div>
-                      </div>
-                    </li>
-                    <li class="ti-list-group-item border-0 p-0 mb-2">
-                      <div class="flex justify-between items-top">
-                        <div class="flex">
-                          <span
-                            class="avatar avatar-md avatar-rounded bg-primarytint2color/10 !text-primarytint2color"
-                            ><i class="bx bx-money-withdraw text-lg"></i
-                          ></span>
-                          <div class="flex flex-col ms-2">
-                            <p class="font-medium mb-0">Total loss</p>
-                            <p
-                              class="text-xs text-textmuted dark:text-textmuted/50 mb-0"
-                            >
-                              11% Decrease
-                            </p>
-                          </div>
-                        </div>
-                        <h6 class="font-medium mb-0">$11,345</h6>
-                      </div>
-                      <div
-                        class="progress progress-xs mt-2 mb-0"
-                        role="progressbar"
-                        aria-label="Basic example"
-                        aria-valuenow="68"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      >
-                        <div
-                          class="progress-bar progress-bar-striped progress-bar-animated bg-primarytint2color"
-                          style="width: 68%"
-                        ></div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div> -->
+            <?php endif; ?>
+            
           </div>
           <!-- End::row-2 -->
-          <!-- Start::row-3 -->
-          <!-- <div class="grid grid-cols-12 gap-x-6">
-            <div class="xxl:col-span-4 col-span-12">
-              <div class="box">
-                <div class="box-header justify-between">
-                  <div class="box-title">Tasks List</div>
-                  <div>
-                    <ul
-                      class="nav nav-tabs justify-end nav-tabs-header box-headertabs flex"
-                      role="tablist"
-                    >
-                      <li class="nav-item" role="presentation">
-                        <a class="nav-link active bg-light" data-hs-tab="#today"
-                          >Today</a
-                        >
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <a class="nav-link bg-light" data-hs-tab="#Upcoming"
-                          >Upcoming</a
-                        >
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="box-body todo-tab p-0">
-                  <div class="">
-                    <div class="border-0 p-5" id="today" role="tabpanel">
-                      <ul class="list-none task-list-tab mb-0">
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Review Marketing Campaign Strategy
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primary/10 text-primary px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-hourglass-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="top"
-                                          style="
-                                            position: fixed;
-                                            inset: auto auto 0px 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              530.833px,
-                                              472.5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Progress
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nemo enim ipsam voluptatem
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input
-                                type="checkbox"
-                                class="form-check-input"
-                                checked=""
-                              />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Update Client Database
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-success/10 text-success px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-check-fill"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="top"
-                                          style="
-                                            position: fixed;
-                                            inset: auto auto 0px 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              431.667px,
-                                              535px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Completed
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Eos dolor ea
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                     
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            611.667px,
-                                            535px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Prepare Monthly Sales Report
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint1color/10 px-1 py-[0.1rem] text-primarytint1color align-middle text-[11px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-error-warning-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="top"
-                                          style="
-                                            position: fixed;
-                                            inset: auto auto 0px 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              476.667px,
-                                              596.667px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Pending
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nonumy erat ipsum ut ipsum
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            584.167px,
-                                            596.667px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            611.667px,
-                                            596.667px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input
-                                type="checkbox"
-                                class="form-check-input"
-                                checked=""
-                              />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Schedule Team Meeting
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-success/10 text-success px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-check-fill"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="top"
-                                          style="
-                                            position: fixed;
-                                            inset: auto auto 0px 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              432.5px,
-                                              659.167px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Completed
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nemo enim ipsam voluptatem
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            584.167px,
-                                            659.167px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            611.667px,
-                                            659.167px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Update User Database
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primary/10 text-primary px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-hourglass-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="top"
-                                          style="
-                                            position: fixed;
-                                            inset: auto auto 0px 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              430px,
-                                              721.667px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Progress
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Eos dolor ea
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            584.167px,
-                                            721.667px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            611.667px,
-                                            721.667px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input
-                                type="checkbox"
-                                class="form-check-input"
-                                checked=""
-                              />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Respond to Customer Inquiries
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-success/10 text-success px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-check-fill"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="top"
-                                          style="
-                                            position: fixed;
-                                            inset: auto auto 0px 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              475.833px,
-                                              784.167px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Completed
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Sed labore ut sed
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            584.167px,
-                                            784.167px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="top"
-                                        style="
-                                          position: fixed;
-                                          inset: auto auto 0px 0px;
-                                          margin: 0px;
-                                          transform: translate3d(
-                                            611.667px,
-                                            784.167px,
-                                            0px
-                                          );
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                    <div
-                      class="border-0 hidden p-5"
-                      id="Upcoming"
-                      role="tabpanel"
-                    >
-                      <ul class="list-none task-list-tab mb-0">
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Conduct Product Demo Sessions
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint3color/10 !text-primarytint3color px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-time-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="bottom"
-                                          style="
-                                            position: fixed;
-                                            inset: 0px auto auto 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              0px,
-                                              5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Not Started
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nonumy erat ipsum ut ipsum
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Organize Training Session
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint3color/10 !text-primarytint3color px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-time-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="bottom"
-                                          style="
-                                            position: fixed;
-                                            inset: 0px auto auto 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              0px,
-                                              5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Not Started
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Consetetur et amet dolor
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Analyze Market Trends
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint3color/10 !text-primarytint3color px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-time-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="bottom"
-                                          style="
-                                            position: fixed;
-                                            inset: 0px auto auto 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              0px,
-                                              5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Not Started
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nonumy erat ipsum ut ipsum
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Coordinate with Logistics Department
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint3color/10 !text-primarytint3color px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-time-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="bottom"
-                                          style="
-                                            position: fixed;
-                                            inset: 0px auto auto 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              0px,
-                                              5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Not Started
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nonumy erat ipsum ut ipsum
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Meeting On Updation
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint3color/10 !text-primarytint3color px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-time-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="bottom"
-                                          style="
-                                            position: fixed;
-                                            inset: 0px auto auto 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              0px,
-                                              5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Not Started
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Nonumy erat ipsum ut ipsum
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div class="todolist flex">
-                            <div class="mb-3 form-check me-2">
-                              <input type="checkbox" class="form-check-input" />
-                            </div>
-                            <div class="flex-auto w-full">
-                              <div class="flex items-start justify-between">
-                                <div>
-                                  <span class="block font-medium"
-                                    >Plan Social Media Content Calendar
-                                    <div class="hs-tooltip ti-main-tooltip">
-                                      <span
-                                        class="bg-primarytint3color/10 !text-primarytint3color px-1 py-[0.1rem] align-middle text-[10px] leading-none rounded-full"
-                                      >
-                                        <i class="ri-time-line"></i>
-                                        <span
-                                          class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                          role="tooltip"
-                                          data-popper-reference-hidden=""
-                                          data-popper-escaped=""
-                                          data-popper-placement="bottom"
-                                          style="
-                                            position: fixed;
-                                            inset: 0px auto auto 0px;
-                                            margin: 0px;
-                                            transform: translate3d(
-                                              0px,
-                                              5px,
-                                              0px
-                                            );
-                                          "
-                                        >
-                                          Not Started
-                                        </span>
-                                      </span>
-                                    </div>
-                                  </span>
-                                  <p
-                                    class="text-textmuted dark:text-textmuted/50 mb-0 text-xs"
-                                  >
-                                    Accusam aliquyam ea sea
-                                  </p>
-                                </div>
-                                <div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-info/10 ti-btn-icon text-info"
-                                    >
-                                      <i class="ri-edit-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Edit
-                                      </span>
-                                    </a>
-                                  </div>
-                                  <div class="hs-tooltip ti-main-tooltip">
-                                    <a
-                                      href="javascript:void(0);"
-                                      class="ti-btn ti-btn-sm bg-danger/10 ti-btn-icon text-danger"
-                                    >
-                                      <i class="ri-delete-bin-line"></i>
-                                      <span
-                                        class="hs-tooltip-content ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm"
-                                        role="tooltip"
-                                        data-popper-reference-hidden=""
-                                        data-popper-escaped=""
-                                        data-popper-placement="bottom"
-                                        style="
-                                          position: fixed;
-                                          inset: 0px auto auto 0px;
-                                          margin: 0px;
-                                          transform: translate3d(0px, 5px, 0px);
-                                        "
-                                      >
-                                        Delete
-                                      </span>
-                                    </a>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="xxl:col-span-3 col-span-12">
-              <div class="box overflow-hidden">
-                <div class="box-header justify-between">
-                  <div class="box-title">Leads Overview</div>
-                  <div class="ti-dropdown hs-dropdown">
-                    <button
-                      class="ti-btn ti-btn-light border ti-btn-full ti-btn-sm"
-                      data-bs-toggle="dropdown"
-                    >
-                      Yearly<i class="ri-arrow-down-s-line"></i>
-                    </button>
-                    <ul
-                      class="ti-dropdown-menu hs-dropdown-menu hidden"
-                      role="menu"
-                    >
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Yearly</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Weekly</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Monthly</a
-                        >
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="box-body px-0 pb-2">
-                  <div id="Leads-overview" style="min-height: 350px">
-                   
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="md:col-span-12 xxl:col-span-5 col-span-12">
-              <div class="box overflow-hidden">
-                <div class="box-header justify-between">
-                  <div class="box-title">Sales Performance</div>
-                  <div class="ti-dropdown hs-dropdown">
-                    <button
-                      class="ti-btn ti-btn-light border btn-full ti-btn-sm"
-                      data-bs-toggle="dropdown"
-                    >
-                      Today<i class="ri-arrow-down-s-line"></i>
-                    </button>
-                    <ul
-                      class="ti-dropdown-menu hs-dropdown-menu hidden"
-                      role="menu"
-                    >
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Today</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Weekly</a
-                        >
-                      </li>
-                      <li>
-                        <a class="ti-dropdown-item" href="javascript:void(0);"
-                          >Monthly</a
-                        >
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="box-body p-0">
-                  <div class="table-responsive">
-                    <table class="ti-custom-table ti-custom-table-head">
-                      <thead>
-                        <tr
-                          class="border-b border-defaultborder dark:border-defaultborder/10"
-                        >
-                          <th scope="col">S.No.</th>
-                          <th scope="col">Representative</th>
-                          <th scope="col">Deals Closed</th>
-                          <th scope="col">Leads</th>
-                          <th scope="col">Rate (%)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>1</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/11.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >John Joe</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>15</td>
-                          <td>100</td>
-                          <td>
-                            15.0<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>2</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/12.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Jane Smith</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>20</td>
-                          <td>120</td>
-                          <td>
-                            16.7<i
-                              class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>3</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/15.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Michael Johnson</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>18</td>
-                          <td>110</td>
-                          <td>
-                            16.4<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>4</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/11.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Emily Davis</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>22</td>
-                          <td>130</td>
-                          <td>
-                            16.9<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <td>5</td>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/1.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Anna Garcia</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>17</td>
-                          <td>105</td>
-                          <td>
-                            16.2<i
-                              class="ri-arrow-down-s-fill ms-1 text-danger align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                        <tr
-                          class="border-b !border-defaultborder dark:!border-defaultborder/10"
-                        >
-                          <th scope="row">6</th>
-                          <td>
-                            <div class="flex items-center">
-                              <div class="me-2 leading-none">
-                                <span class="avatar avatar-xs">
-                                  <img
-                                    src="assets/images/faces/4.jpg"
-                                    alt=""
-                                  />
-                                </span>
-                              </div>
-                              <div>
-                                <a href="javascript:void(0)" class="font-medium"
-                                  >Kiara Nousin</a
-                                >
-                              </div>
-                            </div>
-                          </td>
-                          <td>20</td>
-                          <td>35</td>
-                          <td>
-                            57%<i
-                              class="ri-arrow-up-s-fill ms-1 text-success align-middle text-lg"
-                            ></i>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
-          <!-- End::row-3 -->
+         
           <!-- Start::row-4 -->
           <div class="grid grid-cols-12 gap-x-6">
             <div class="xl:col-span-12 col-span-12">
