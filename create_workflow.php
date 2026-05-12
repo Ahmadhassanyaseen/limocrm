@@ -329,21 +329,20 @@ function onConditionTypeChange(){
 
   if(type === "status_equals"){
     host.innerHTML = `
-      <div class="cw-cond-box">
+      <div class="cw-cond-box"> 
         <div class="cw-cond-icon">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
         <div class="cw-cond-label">Run when lead status matches:</div>
         <div class="cw-field" style="margin-bottom:0;">
           <select id="status_value" class="cw-select">
-            <option value="">Select status...</option>
+              <option value="">Select status...</option>
             <option value="Formal">Formal</option>
             <option value="Converted">Converted</option>
+            <option value="Agreement Sent">Agreement Sent</option>
             <option value="Dead">Dead</option>
             <option value="New">New</option>
             <option value="Assigned">Assigned</option>
-            <option value="In Process">In Process</option>
-            <option value="Recycled">Recycled</option>
           </select>
         </div>
         <div class="cw-hint">The workflow will trigger when a lead's status changes to the selected value.</div>
