@@ -384,7 +384,13 @@ $isEdit = !empty($vehicleId);
                     <option value="Stretch SUV Limo">Stretch SUV Limo</option>
                     <option value="Mini Bus">Mini Bus</option>
                     <option value="Motor Coach">Motor Coach</option>
+                    <option value="Party Bus">Party Bus</option>
+                    <option value="Limousine">Limousine</option>
+                    <option value="Sprinter">Sprinter</option>
                     <option value="Van">Van</option>
+                    <option value="Executive Bus">Executive Bus</option>
+                    <option value="Coach">Coach</option>
+                    <option value="Motorcoach">Motorcoach</option>
                   </select>
                   <div class="vf-error" id="err-category"><i class="ri-error-warning-line"></i> <span></span></div>
                 </div>
