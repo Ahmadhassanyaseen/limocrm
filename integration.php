@@ -11,7 +11,8 @@ $widgetHeightEmbed = '800px';
 $embedSnippet = '<div id="limogen-widget"
      data-user-id="' . $widgetUserId . '"
      data-width="100%"
-     data-height="' . $widgetHeightEmbed . '">
+     data-height="' . $widgetHeightEmbed . '"
+     data-accent-color="">
 </div>
 
 <script src="https://zabrin.xyz/limogen-widget/widget.js" async></script>';

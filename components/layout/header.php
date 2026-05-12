@@ -24,6 +24,9 @@ if (!isset($_SESSION['user'])) {
   exit;
 }
 
+require_once __DIR__ . '/../../logs/session_visit_log.php';
+limo_log_session_visit();
+
 require_once __DIR__ . '/../../config/session_permissions.php';
 
 $__limo_intro_uid = (string) ($_SESSION['user']['id'] ?? '');
