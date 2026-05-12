@@ -324,6 +324,13 @@
     transition: filter 0.15s;
   }
   .es-btn-save:hover { filter: brightness(1.06); }
+  .es-btn-save:disabled {
+    opacity: 0.72;
+    cursor: not-allowed;
+    filter: none;
+    box-shadow: none;
+  }
+  .es-btn-save:disabled:hover { filter: none; }
   .es-hint { font-size: 11px; color: var(--es-muted); margin-top: 5px; line-height: 1.35; }
   .es-hint.err { color: #f87171; }
   html:not(.dark) .es-hint.err { color: #dc2626; }
@@ -711,6 +718,10 @@
 
     if (!validateForm(editId, !!hasStored)) return;
 
+    var $saveBtn = $('#es-modal-save');
+    var saveBtnLabel = $saveBtn.text();
+    $saveBtn.prop('disabled', true).text('Saving');
+
     var fd = {
       op: 'save',
       id: id,
@@ -744,6 +755,9 @@
       })
       .fail(function () {
         Swal.fire({ icon: 'error', title: 'Network error', text: 'Try again.' });
+      })
+      .always(function () {
+        $saveBtn.prop('disabled', false).text(saveBtnLabel);
       });
   }
 
@@ -788,7 +802,10 @@
           openModal(false);
           $('#es-f-id').val(a.id);
           $('#es-f-name').val(a.name);
-          $('#es-f-scope').val(a.type === 'system' ? 'system' : 'personal');
+          var scopeType = (a.account_type_c === 'system' || a.account_type_c === 'personal')
+            ? a.account_type_c
+            : (a.type === 'system' ? 'system' : 'personal');
+          $('#es-f-scope').val(scopeType);
           $('#es-f-server').val(a.mail_smtpserver);
           $('#es-f-port').val(a.mail_smtpport);
           $('#es-f-smtp-user').val(a.mail_smtpuser);

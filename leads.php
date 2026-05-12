@@ -172,7 +172,7 @@
         <p class="text-xs text-textmuted dark:text-textmuted/50 mt-1 mb-0 ms-10">Track, filter, and convert your leads into customers.</p>
       </div>
       <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Leads', 'create') == 1): ?>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" id="add-lead-btn">
         <a href="add_lead.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> New Lead
         </a>
@@ -181,7 +181,7 @@
     </div>
 
     <!-- Stat Cards -->
-    <div class="grid xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 mb-6">
+    <div class="grid xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 mb-6" id="intro-leads-stats">
       <div class="ld-stat">
         <div class="ld-stat-glow" style="background: rgb(var(--primary-rgb));"></div>
         <div class="flex items-center justify-between gap-3">
@@ -278,7 +278,7 @@
         </button>
       </div>
       <!-- Table -->
-      <div class="overflow-auto">
+      <div class="overflow-auto" id="intro-leads-table">
         <?php include_once "components/tables/leads.php"; ?>
       </div>
     </div>

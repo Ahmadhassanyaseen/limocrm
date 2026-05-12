@@ -72,7 +72,7 @@
         <button type="button" class="et-action-btn" title="Refresh" onclick="loadTemplates()" style="width:36px;height:36px;font-size:16px;">
           <i class="ri-refresh-line"></i>
         </button>
-        <a href="email_template.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
+        <a href="email_template.php" id="add-email-template-btn" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> New Template
         </a>
       </div>
@@ -123,7 +123,7 @@
     </div>
 
     <!-- Table Card -->
-    <div class="et-table-card mb-6">
+    <div class="et-table-card mb-6" id="intro-email-table">
       <div class="et-toolbar">
         <div class="et-search-wrap">
           <i class="ri-search-line"></i>

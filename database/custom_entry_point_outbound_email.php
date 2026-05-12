@@ -6,6 +6,7 @@
  *
  * Prerequisites:
  * - Studio → Outbound Email Accounts → add TextField **owner_c** ("owner"),
+ *   and **account_type_c** (e.g. "Account type" — values: system | personal),
  *   then Quick Repair & Rebuild.
  *
  * Add to the switch($action):
@@ -29,6 +30,47 @@
  * Paste the functions below into CustomEntryPoint.php (after includes).
  * ============================================================
  */
+
+/**
+ * Custom entry points run without a normal CRM session. OutboundEmailAccounts save
+ * logic hooks (and core code) use global $current_user for type=user (personal)
+ * accounts — without this, personal scope saves fail while system often still works.
+ */
+function limo_oe_bootstrap_current_user($userId) {
+    global $current_user;
+
+    $userId = trim((string)$userId);
+    if ($userId === '') {
+        return false;
+    }
+
+    $u = BeanFactory::getBean('Users', $userId);
+    if (empty($u->id) || !empty($u->deleted)) {
+        return false;
+    }
+
+    $current_user = $u;
+
+    return true;
+}
+
+/**
+ * Normalizes custom account_type_c: system | personal.
+ * Accepts account_scope / account_type_c from API; defaults to system.
+ */
+function limo_oe_normalize_account_type_c(array $data) {
+    $explicit = strtolower(trim((string)($data['account_type_c'] ?? '')));
+    if ($explicit !== '' && in_array($explicit, ['system', 'personal'], true)) {
+        return $explicit;
+    }
+
+    $scope = strtolower(trim((string)($data['account_scope'] ?? 'system')));
+    if (in_array($scope, ['personal', 'user'], true)) {
+        return 'personal';
+    }
+
+    return 'system';
+}
 
 function limo_oe_resolve_owner(&$bean, string $fallbackUserId): string {
     if (!empty($bean->owner_c)) {
@@ -58,7 +100,7 @@ function fetch_outbound_email_accounts($data) {
     $uidEsc = $db->quote($userId);
     $sql = "SELECT oe.id, oe.name, oe.type, oe.user_id, oe.mail_smtpserver, oe.mail_smtpport,
                    oe.mail_smtpssl, oe.mail_smtpauth_req, oe.smtp_from_name, oe.smtp_from_addr,
-                   oe.date_modified, u.user_name
+                   oe.date_modified, u.user_name, oec.account_type_c
             FROM outbound_email oe
             INNER JOIN outbound_email_cstm oec ON oec.id_c = oe.id
             LEFT JOIN users u ON u.id = oe.user_id AND u.deleted = 0
@@ -70,8 +112,10 @@ function fetch_outbound_email_accounts($data) {
     if ($res) {
         while ($row = $db->fetchByAssoc($res)) {
             $type = strtolower((string)($row['type'] ?? ''));
+            $atc = strtolower(trim((string)($row['account_type_c'] ?? '')));
             $un = trim((string)($row['user_name'] ?? ''));
-            $row['assignee'] = ($type === 'system') ? 'System' : ($un !== '' ? $un : 'User');
+            $isSystem = ($atc === 'system') || ($atc === '' && $type === 'system');
+            $row['assignee'] = $isSystem ? 'System' : ($un !== '' ? $un : 'User');
             unset($row['user_name']);
             $rows[] = $row;
         }
@@ -81,7 +125,6 @@ function fetch_outbound_email_accounts($data) {
 }
 
 function fetch_outbound_email_account_detail($data) {
-    global $db;
     global $db;
     $userId = trim((string)($data['user_id'] ?? ''));
     $id = trim((string)($data['id'] ?? ''));
@@ -108,12 +151,17 @@ function fetch_outbound_email_account_detail($data) {
     }
 
     $type = strtolower((string)($bean->type ?? 'user'));
+    $atc = strtolower(trim((string)($bean->account_type_c ?? '')));
+    if ($atc === '') {
+        $atc = ($type === 'system') ? 'system' : 'personal';
+    }
     return [
         'success' => true,
         'account' => [
             'id' => $bean->id,
             'name' => (string)($bean->name ?? ''),
             'type' => $type,
+            'account_type_c' => $atc,
             'user_id' => (string)($bean->user_id ?? ''),
             'smtp_from_name' => (string)($bean->smtp_from_name ?? ''),
             'smtp_from_addr' => (string)($bean->smtp_from_addr ?? ''),
@@ -139,6 +187,10 @@ function save_outbound_email_account($data) {
         return ['success' => false, 'message' => 'Missing user_id'];
     }
 
+    if (!limo_oe_bootstrap_current_user($userId)) {
+        return ['success' => false, 'message' => 'Invalid or inactive user'];
+    }
+
     $id = trim((string)($data['id'] ?? ''));
     if ($id !== '') {
         $bean = BeanFactory::getBean('OutboundEmailAccounts', $id);
@@ -157,14 +209,16 @@ function save_outbound_email_account($data) {
         return ['success' => false, 'message' => 'Account name is required (max 255 characters).'];
     }
 
-    $scope = strtolower(trim((string)($data['account_scope'] ?? 'system')));
-    if ($scope === 'system') {
-        $bean->type = 'system';
-        $bean->user_id = $userId;
-    } else {
+    $accountTypeC = limo_oe_normalize_account_type_c($data);
+    $bean->account_type_c = $accountTypeC;
+
+    // Core OutboundEmail type: SuiteCRM uses system | user for mail behaviour.
+    if ($accountTypeC === 'personal') {
         $bean->type = 'user';
-        $bean->user_id = $userId;
+    } else {
+        $bean->type = 'system';
     }
+    $bean->user_id = $userId;
 
     $server = trim((string)($data['mail_smtpserver'] ?? ''));
     if ($server === '' || !preg_match('/^[A-Za-z0-9.\-_\[\]:]+$/', $server)) {

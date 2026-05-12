@@ -158,7 +158,7 @@
   }
 
 </style>
-<div class="table-responsive table-bordered-default leads-table-wrap has-scroll">
+<div class="table-responsive table-bordered-default leads-table-wrap has-scroll" id="intro-wizard-leads-report">
                     <table id="leads-table" class="ti-custom-table text-nowrap" style="width:100%">
                       <thead>
                         <tr

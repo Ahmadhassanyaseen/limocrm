@@ -11,78 +11,391 @@ if (empty($vehicleId)) {
 ?>
 
 <style>
+  /* === Modern Redesign Styles === */
+  .vd-hero {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-color) 0%, rgba(var(--primary-rgb), 0.8) 100%);
+    min-height: 280px;
+    display: flex;
+    align-items: flex-end;
+  }
+  .dark .vd-hero {
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.3) 0%, rgba(var(--primary-rgb), 0.15) 100%);
+  }
+  .vd-hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.25;
+  }
+  .dark .vd-hero-image { opacity: 0.15; }
+  .vd-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+  }
+  .vd-hero-content {
+    position: relative;
+    z-index: 10;
+    padding: 32px;
+    width: 100%;
+  }
+  .vd-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+  .vd-hero-badge.status-active { background: rgba(34,197,94,0.3); border-color: rgba(34,197,94,0.5); }
+  .vd-hero-badge.status-inactive { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.5); }
+  .vd-hero-badge.status-maintenance { background: rgba(251,191,36,0.3); border-color: rgba(251,191,36,0.5); }
+  .vd-hero-title {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 12px 0 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .vd-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+  }
+  .vd-hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .vd-action-bar {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Modern Card System */
   .vd-card {
     background: #fff;
-    border: 1px solid rgba(15,23,42,0.12);
     border-radius: 16px;
+    border: 1px solid rgba(15,23,42,0.08);
     overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .vd-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   }
   .dark .vd-card {
-    background: rgba(255,255,255,0.04);
-    border-color: rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .dark .vd-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
   }
   .vd-card-header {
-    background: rgba(15,23,42,0.02);
-    border-bottom: 1px solid rgba(15,23,42,0.12);
-  }
-  .dark .vd-card-header {
-    background: rgba(255,255,255,0.03);
-    border-bottom-color: rgba(255,255,255,0.10);
-  }
-  .vd-row {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(15,23,42,0.06);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(15,23,42,0.08);
   }
-  .dark .vd-row {
-    border-bottom-color: rgba(255,255,255,0.08);
+  .dark .vd-card-header {
+    border-bottom-color: rgba(255,255,255,0.06);
   }
-  .vd-row:last-child { border-bottom: none; }
-  .vd-row-label {
-    font-size: 12px;
-    color: rgba(15,23,42,0.55);
+  .vd-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
     display: flex;
     align-items: center;
-    gap: 8px;
-    white-space: nowrap;
+    gap: 10px;
+    margin: 0;
   }
-  .dark .vd-row-label { color: rgba(255,255,255,0.50); }
-  .vd-row-value {
-    font-size: 14px;
-    color: #0f172a;
-    font-weight: 500;
-    text-align: right;
-  }
-  .dark .vd-row-value { color: rgba(255,255,255,0.90); }
-  .vd-feature-tag {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 600;
-    background: rgba(var(--primary-rgb), 0.08);
-    color: rgb(var(--primary-rgb));
-    margin: 3px 4px 3px 0;
-  }
-  .vd-img-wrap {
-    aspect-ratio: 16/9;
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(15,23,42,0.04);
+  .dark .vd-card-title { color: rgba(255,255,255,0.95); }
+  .vd-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 18px;
+    background: rgba(var(--primary-rgb), 0.1);
+    color: rgb(var(--primary-rgb));
   }
-  .dark .vd-img-wrap { background: rgba(255,255,255,0.05); }
-  .vd-img-wrap img {
+  .vd-card-body {
+    padding: 20px;
+  }
+
+  /* Stat Cards */
+  .vd-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .vd-stat-card {
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.08) 0%, rgba(var(--primary-rgb), 0.03) 100%);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid rgba(var(--primary-rgb), 0.12);
+    transition: all 0.2s;
+  }
+  .dark .vd-stat-card {
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0.05) 100%);
+    border-color: rgba(var(--primary-rgb), 0.2);
+  }
+  .vd-stat-card:hover {
+    transform: scale(1.02);
+    border-color: rgba(var(--primary-rgb), 0.3);
+  }
+  .vd-stat-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  .vd-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+  }
+  .dark .vd-stat-value { color: rgba(255,255,255,0.95); }
+  .vd-stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(15,23,42,0.5);
+    margin-top: 4px;
+  }
+  .dark .vd-stat-label { color: rgba(255,255,255,0.45); }
+
+  /* Feature Tags */
+  .vd-feature-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .vd-feature-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    background: rgba(var(--primary-rgb), 0.08);
+    color: rgb(var(--primary-rgb));
+    border: 1px solid rgba(var(--primary-rgb), 0.15);
+    transition: all 0.2s;
+  }
+  .vd-feature-tag:hover {
+    background: rgba(var(--primary-rgb), 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Price Display */
+  .vd-price-hero {
+    background: linear-gradient(135deg, rgb(var(--primary-rgb)) 0%, rgba(var(--primary-rgb), 0.85) 100%);
+    border-radius: 16px;
+    padding: 24px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .vd-price-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+  .vd-price-value {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .vd-price-unit {
+    font-size: 16px;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  /* Info List */
+  .vd-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .vd-info-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 10px;
+    transition: background 0.15s;
+  }
+  .vd-info-item:hover {
+    background: rgba(15,23,42,0.03);
+  }
+  .dark .vd-info-item:hover {
+    background: rgba(255,255,255,0.04);
+  }
+  .vd-info-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(15,23,42,0.6);
+  }
+  .dark .vd-info-label { color: rgba(255,255,255,0.5); }
+  .vd-info-label i { font-size: 16px; }
+  .vd-info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .dark .vd-info-value { color: rgba(255,255,255,0.9); }
+
+  /* Progress Bars */
+  .vd-progress-item {
+    margin-bottom: 16px;
+  }
+  .vd-progress-item:last-child { margin-bottom: 0; }
+  .vd-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .vd-progress-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(15,23,42,0.7);
+  }
+  .dark .vd-progress-label { color: rgba(255,255,255,0.6); }
+  .vd-progress-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .dark .vd-progress-value { color: rgba(255,255,255,0.9); }
+  .vd-progress-bar {
+    height: 8px;
+    background: rgba(15,23,42,0.08);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  .dark .vd-progress-bar { background: rgba(255,255,255,0.1); }
+  .vd-progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, rgb(var(--primary-rgb)), rgba(var(--primary-rgb), 0.7));
+    transition: width 0.8s ease-out;
+  }
+
+  /* Image Gallery Row - Horizontal Scroll */
+  .vd-gallery-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .vd-gallery-row::-webkit-scrollbar {
+    height: 6px;
+  }
+  .vd-gallery-row::-webkit-scrollbar-track {
+    background: rgba(15,23,42,0.06);
+    border-radius: 9999px;
+  }
+  .dark .vd-gallery-row::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.08);
+  }
+  .vd-gallery-row::-webkit-scrollbar-thumb {
+    background: rgba(var(--primary-rgb), 0.3);
+    border-radius: 9999px;
+  }
+  .vd-gallery-row::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--primary-rgb), 0.5);
+  }
+  .vd-gallery-item-row {
+    flex: 0 0 280px;
+    height: 180px;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: rgba(15,23,42,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    scroll-snap-align: start;
+  }
+  .vd-gallery-item-row:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+  .dark .vd-gallery-item-row:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .vd-gallery-item-row img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+  .vd-gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .vd-gallery-item-row:hover .vd-gallery-overlay {
+    background: rgba(0,0,0,0.35);
+  }
+  .vd-gallery-overlay i {
+    color: #fff;
+    font-size: 28px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .vd-gallery-item-row:hover .vd-gallery-overlay i {
+    opacity: 1;
+  }
 
+  /* Empty State */
+  .vd-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: rgba(15,23,42,0.4);
+  }
+  .dark .vd-empty { color: rgba(255,255,255,0.35); }
+  .vd-empty i { font-size: 36px; margin-bottom: 12px; display: block; }
+  .vd-empty p { font-size: 13px; }
+
+  /* Skeleton Loading */
   .vd-skeleton {
     animation: vd-pulse 1.8s ease-in-out infinite;
     background: rgba(15,23,42,0.06);
@@ -93,132 +406,361 @@ if (empty($vehicleId)) {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
   }
+
+  /* Responsive Grid */
+  .vd-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .vd-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .vd-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .vd-grid .vd-full { grid-column: span 1; }
+  }
+  @media (min-width: 1280px) {
+    .vd-grid .vd-full-xl { grid-column: span 2; }
+  }
+
+  /* Description */
+  .vd-description {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(15,23,42,0.75);
+  }
+  .dark .vd-description { color: rgba(255,255,255,0.65); }
+
+  /* Quick Actions */
+  .vd-quick-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .vd-quick-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    background: rgba(15,23,42,0.05);
+    color: rgba(15,23,42,0.75);
+    border: 1px solid rgba(15,23,42,0.08);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .dark .vd-quick-btn {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .vd-quick-btn:hover {
+    background: rgba(var(--primary-rgb), 0.1);
+    color: rgb(var(--primary-rgb));
+    border-color: rgba(var(--primary-rgb), 0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Back Button */
+  .vd-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .vd-back-btn:hover {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    transform: translateX(-2px);
+  }
+  .dark .vd-back-btn {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .dark .vd-back-btn:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* Sticky Header on Mobile */
+  .vd-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 0;
+    background: transparent;
+    transition: background 0.3s;
+  }
+  .vd-sticky-header.scrolled {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+  }
+  .dark .vd-sticky-header.scrolled {
+    background: rgba(15,23,42,0.95);
+  }
+
+  /* ID Badge */
+  .vd-id-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: monospace;
+    background: rgba(15,23,42,0.06);
+    color: rgba(15,23,42,0.5);
+  }
+  .dark .vd-id-badge {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Scroll to Top */
+  .vd-scroll-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgb(var(--primary-rgb));
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    z-index: 99;
+  }
+  .vd-scroll-top.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  .vd-scroll-top:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.5);
+  }
 </style>
 
 <div class="main-content app-content">
   <div class="container-fluid">
 
-    <!-- Header skeleton (replaced after load) -->
-    <div class="mb-4" id="vd-header">
-      <div class="flex items-start justify-between gap-3 flex-wrap">
-        <div class="flex items-start gap-3">
-          <a href="vehicles.php" class="ti-btn ti-btn-icon ti-btn-soft-secondary !rounded-full mt-1" aria-label="Back to Fleet">
-            <i class="ri-arrow-left-line"></i>
-          </a>
-          <div>
-            <div class="text-sm text-textmuted dark:text-textmuted/50 font-medium">Fleet</div>
-            <h1 class="page-title font-semibold text-xl mb-0 text-defaulttextcolor dark:text-defaulttextcolor/90" id="vd-title">
-              <span class="vd-skeleton inline-block" style="width:220px;height:24px"></span>
-            </h1>
-            <div class="mt-1 flex items-center gap-2 flex-wrap" id="vd-badges"></div>
+    <!-- Back Navigation -->
+    <div class="mb-4">
+      <a href="vehicles.php" class="vd-back-btn">
+        <i class="ri-arrow-left-line"></i>
+        <span>Back to Fleet</span>
+      </a>
+    </div>
+
+    <!-- Hero Section (replaced after load) -->
+    <div class="vd-hero mb-4" id="vd-hero" style="display:none;">
+      <img class="vd-hero-image" id="vd-hero-img" src="" alt="">
+      <div class="vd-hero-overlay"></div>
+      <div class="vd-hero-content">
+        <div id="vd-badges"></div>
+        <h1 class="vd-hero-title" id="vd-title"></h1>
+        <div class="vd-hero-meta" id="vd-meta"></div>
+        <div class="vd-action-bar" id="vd-actions"></div>
+      </div>
+    </div>
+
+    <!-- Hero Skeleton -->
+    <div class="vd-hero mb-4" id="vd-hero-skeleton">
+      <div class="vd-hero-overlay" style="background: rgba(0,0,0,0.1);"></div>
+      <div class="vd-hero-content">
+        <div class="vd-skeleton" style="width:120px;height:28px;border-radius:9999px;margin-bottom:12px;"></div>
+        <div class="vd-skeleton" style="width:280px;height:36px;border-radius:12px;margin-bottom:16px;"></div>
+        <div class="vd-skeleton" style="width:200px;height:20px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="vd-grid" id="vd-body">
+
+      <!-- Price Card -->
+      <div class="vd-card vd-full">
+        <div class="vd-card-body" id="vd-pricing">
+          <div class="vd-price-hero">
+            <div class="vd-price-label">Hourly Rate</div>
+            <div class="vd-price-value" id="vd-price-display">$0.00<span class="vd-price-unit">/hr</span></div>
+          </div>
+          <div class="vd-info-list" id="vd-pricing-list">
+            <div class="vd-info-item">
+              <div class="vd-skeleton" style="width:140px;height:16px;"></div>
+              <div class="vd-skeleton" style="width:50px;height:16px;"></div>
+            </div>
+            <div class="vd-info-item">
+              <div class="vd-skeleton" style="width:160px;height:16px;"></div>
+              <div class="vd-skeleton" style="width:50px;height:16px;"></div>
+            </div>
           </div>
         </div>
-        <div class="btn-list flex flex-wrap items-center gap-2" id="vd-actions">
-          <a href="vehicles.php" class="ti-btn ti-btn-sm ti-btn-soft-secondary font-medium">
-            <i class="ri-arrow-left-line me-1"></i> Back to Fleet
-          </a>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="vd-card vd-full">
+        <div class="vd-card-header">
+          <h5 class="vd-card-title">
+            <span class="vd-card-icon"><i class="ri-user-settings-line"></i></span>
+            Capacity
+          </h5>
+        </div>
+        <div class="vd-card-body" id="vd-capacity">
+          <div class="vd-stat-grid">
+            <div class="vd-stat-card">
+              <div class="vd-stat-icon"><i class="ri-user-line" style="color:var(--primary-color)"></i></div>
+              <div class="vd-skeleton" style="width:60px;height:32px;margin:0 auto;"></div>
+              <div class="vd-stat-label">Passengers</div>
+            </div>
+            <div class="vd-stat-card">
+              <div class="vd-stat-icon"><i class="ri-briefcase-2-line" style="color:var(--primary-color)"></i></div>
+              <div class="vd-skeleton" style="width:60px;height:32px;margin:0 auto;"></div>
+              <div class="vd-stat-label">Bags</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fuel & Commission Card -->
+      <div class="vd-card vd-full">
+        <div class="vd-card-header">
+          <h5 class="vd-card-title">
+            <span class="vd-card-icon"><i class="ri-dashboard-2-line"></i></span>
+            Performance
+          </h5>
+        </div>
+        <div class="vd-card-body" id="vd-performance">
+          <div class="vd-progress-item">
+            <div class="vd-progress-header">
+              <span class="vd-progress-label"><i class="ri-gas-station-line" style="color:#f59e0b"></i> Fuel Level</span>
+              <span class="vd-progress-value" id="vd-fuel-value">0%</span>
+            </div>
+            <div class="vd-progress-bar">
+              <div class="vd-progress-fill" id="vd-fuel-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="vd-progress-item">
+            <div class="vd-progress-header">
+              <span class="vd-progress-label"><i class="ri-money-dollar-circle-line" style="color:#22c55e"></i> Driver Commission</span>
+              <span class="vd-progress-value" id="vd-comm-value">0%</span>
+            </div>
+            <div class="vd-progress-bar">
+              <div class="vd-progress-fill" id="vd-comm-bar" style="width:0%;background:linear-gradient(90deg,#22c55e,rgba(34,197,94,0.7))"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basic Info Card -->
+      <div class="vd-card vd-full">
+        <div class="vd-card-header">
+          <h5 class="vd-card-title">
+            <span class="vd-card-icon"><i class="ri-information-line"></i></span>
+            Vehicle Information
+          </h5>
+        </div>
+        <div class="vd-card-body" id="vd-basic-info">
+          <div class="vd-info-list">
+            <div class="vd-info-item">
+              <div class="vd-skeleton" style="width:120px;height:16px;"></div>
+              <div class="vd-skeleton" style="width:150px;height:16px;"></div>
+            </div>
+            <div class="vd-info-item">
+              <div class="vd-skeleton" style="width:140px;height:16px;"></div>
+              <div class="vd-skeleton" style="width:100px;height:16px;"></div>
+            </div>
+            <div class="vd-info-item">
+              <div class="vd-skeleton" style="width:130px;height:16px;"></div>
+              <div class="vd-skeleton" style="width:80px;height:16px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5" id="vd-features-desc-row"> -->
+      <!-- Features Card -->
+      <div class="vd-card">
+        <div class="vd-card-header">
+          <h5 class="vd-card-title">
+            <span class="vd-card-icon"><i class="ri-list-check-2"></i></span>
+            Features & Amenities
+          </h5>
+        </div>
+        <div class="vd-card-body" id="vd-features">
+          <div class="vd-empty">
+            <i class="ri-loader-4-line"></i>
+            <p>Loading features...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description Card -->
+      <div class="vd-card">
+        <div class="vd-card-header">
+          <h5 class="vd-card-title">
+            <span class="vd-card-icon"><i class="ri-file-text-line"></i></span>
+            Description
+          </h5>
+        </div>
+        <div class="vd-card-body" id="vd-description">
+          <div class="vd-skeleton" style="width:100%;height:16px;margin-bottom:10px;"></div>
+          <div class="vd-skeleton" style="width:95%;height:16px;margin-bottom:10px;"></div>
+          <div class="vd-skeleton" style="width:80%;height:16px;"></div>
+        </div>
+      </div>
+    <!-- </div> -->
+
+    </div>
+
+    <!-- Features & Description Row -->
+  
+
+    <!-- Image Gallery Row -->
+    <div class="vd-card mt-5" id="vd-images-row">
+      <div class="vd-card-header">
+        <h5 class="vd-card-title">
+          <span class="vd-card-icon"><i class="ri-image-2-line"></i></span>
+          Vehicle Images
+        </h5>
+      </div>
+      <div class="vd-card-body">
+        <div class="vd-gallery-row" id="vd-gallery-container">
+          <div class="vd-gallery-item-row"><div class="vd-skeleton"></div></div>
+          <div class="vd-gallery-item-row"><div class="vd-skeleton"></div></div>
+          <div class="vd-gallery-item-row"><div class="vd-skeleton"></div></div>
+          <div class="vd-gallery-item-row"><div class="vd-skeleton"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- Main content -->
-    <div class="grid grid-cols-12 gap-6 pb-12" id="vd-body">
-
-      <!-- Left column -->
-      <div class="col-span-12 xl:col-span-4">
-        <!-- Vehicle Image -->
-        <div class="vd-card mb-6 shadow-sm">
-          <div class="box-body p-6">
-            <div class="vd-img-wrap" id="vd-image-wrap">
-              <div class="text-center" id="vd-image-placeholder">
-                <i class="ri-car-fill text-4xl text-textmuted/30 mb-1 block"></i>
-                <span class="text-xs text-textmuted/40 uppercase tracking-widest font-semibold">No Image</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Basic Information -->
-        <div class="vd-card mb-6 shadow-sm">
-          <div class="vd-card-header px-6 py-4">
-            <h5 class="font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 flex items-center gap-2 mb-0">
-              <i class="ri-information-line text-primary"></i> Basic Information
-            </h5>
-          </div>
-          <div class="box-body p-6" id="vd-basic-info">
-            <div class="space-y-1">
-              <div class="vd-skeleton" style="height:18px;width:100%;margin-bottom:12px"></div>
-              <div class="vd-skeleton" style="height:18px;width:80%;margin-bottom:12px"></div>
-              <div class="vd-skeleton" style="height:18px;width:60%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Middle column -->
-      <div class="col-span-12 xl:col-span-4">
-        <!-- Pricing -->
-        <div class="vd-card mb-6 shadow-sm">
-          <div class="vd-card-header px-6 py-4">
-            <h5 class="font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 flex items-center gap-2 mb-0">
-              <i class="ri-money-dollar-circle-line text-primary"></i> Pricing
-            </h5>
-          </div>
-          <div class="box-body p-6" id="vd-pricing">
-            <div class="space-y-1">
-              <div class="vd-skeleton" style="height:54px;width:100%;margin-bottom:16px;border-radius:12px"></div>
-              <div class="vd-skeleton" style="height:18px;width:100%;margin-bottom:12px"></div>
-              <div class="vd-skeleton" style="height:18px;width:70%"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Capacity -->
-        <div class="vd-card mb-6 shadow-sm">
-          <div class="vd-card-header px-6 py-4">
-            <h5 class="font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 flex items-center gap-2 mb-0">
-              <i class="ri-group-line text-primary"></i> Capacity
-            </h5>
-          </div>
-          <div class="box-body p-6" id="vd-capacity">
-            <div class="vd-skeleton" style="height:18px;width:100%;margin-bottom:12px"></div>
-            <div class="vd-skeleton" style="height:18px;width:60%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right column -->
-      <div class="col-span-12 xl:col-span-4">
-        <!-- Features -->
-        <div class="vd-card mb-6 shadow-sm">
-          <div class="vd-card-header px-6 py-4">
-            <h5 class="font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 flex items-center gap-2 mb-0">
-              <i class="ri-list-check-2 text-primary"></i> Features
-            </h5>
-          </div>
-          <div class="box-body p-6" id="vd-features">
-            <div class="vd-skeleton" style="height:18px;width:100%;margin-bottom:12px"></div>
-            <div class="vd-skeleton" style="height:18px;width:50%"></div>
-          </div>
-        </div>
-
-        <!-- Description -->
-        <div class="vd-card mb-6 shadow-sm">
-          <div class="vd-card-header px-6 py-4">
-            <h5 class="font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 flex items-center gap-2 mb-0">
-              <i class="ri-file-text-line text-primary"></i> Description
-            </h5>
-          </div>
-          <div class="box-body p-6" id="vd-description">
-            <div class="vd-skeleton" style="height:18px;width:100%;margin-bottom:12px"></div>
-            <div class="vd-skeleton" style="height:18px;width:90%;margin-bottom:12px"></div>
-            <div class="vd-skeleton" style="height:18px;width:70%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
+
+<!-- Scroll to Top Button -->
+<button class="vd-scroll-top" id="vd-scroll-top" aria-label="Scroll to top">
+  <i class="ri-arrow-up-line"></i>
+</button>
 
 <?php include_once "components/layout/footer.php"; ?>
 
@@ -238,6 +780,22 @@ $(function () {
     const n = parseFloat(val) || 0;
     return '$' + n.toFixed(2);
   }
+
+  // Sticky header effect
+  $(window).on('scroll', function() {
+    if ($(this).scrollTop() > 100) {
+      $('.vd-sticky-header').addClass('scrolled');
+      $('#vd-scroll-top').addClass('visible');
+    } else {
+      $('.vd-sticky-header').removeClass('scrolled');
+      $('#vd-scroll-top').removeClass('visible');
+    }
+  });
+
+  // Scroll to top
+  $('#vd-scroll-top').on('click', function() {
+    $('html, body').animate({ scrollTop: 0 }, 300);
+  });
 
   $.ajax({
     url: 'https://zabrin.xyz/limogen/index.php?entryPoint=CustomEntryPoint',
@@ -261,132 +819,179 @@ $(function () {
   });
 
   function renderVehicleDetail(v) {
-    const name     = v.name || 'Untitled Vehicle';
-    const category = (v.vehicle_cetagory || 'General').replace(/_/g, ' ');
-    const status   = v.status || 'Active';
-    const rate     = parseFloat(v.rate_c) || 0;
-    const fuel     = parseFloat(v.fuel_percentage_c ?? v.fuel_c ?? 0) || 0;
-    const comm     = parseFloat(v.driver_commission_c ?? v.commission_c ?? 0) || 0;
+    const name      = v.name || 'Untitled Vehicle';
+    const category  = (v.vehicle_cetagory || 'General').replace(/_/g, ' ');
+    const status    = v.status || 'Active';
+    const rate      = parseFloat(v.rate_c) || 0;
+    const fuel      = parseFloat(v.fuel_percentage_c ?? v.fuel_c ?? 0) || 0;
+    const comm      = parseFloat(v.driver_commission_c ?? v.commission_c ?? 0) || 0;
     const passengers = v.passenger || 0;
-    const bags     = v.bags || 0;
-    const image    = v.image_c || v.images_c || '';
+    const bags      = v.bags || 0;
+    const rawImg   = v.image_c || v.images_c || '';
+    const imageUrls = String(rawImg).split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     const facilities = v.facilities || '';
-    const desc     = v.description || '';
+    const desc      = v.description || '';
     const dateAdded = v.date_entered
       ? new Date(v.date_entered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       : '---';
 
     const statusClasses = {
-      'Active': 'bg-success/10 text-success',
-      'Inactive': 'bg-danger/10 text-danger',
-      'Maintenance': 'bg-warning/10 text-warning'
+      'Active': 'status-active',
+      'Inactive': 'status-inactive',
+      'Maintenance': 'status-maintenance'
     };
-    const statusClass = statusClasses[status] || 'bg-secondary/10 text-secondary';
+    const statusClass = statusClasses[status] || '';
 
-    // Header
-    $('#vd-title').html(esc(name));
+    // Hero Section
+    $('#vd-hero-skeleton').hide();
+    $('#vd-hero').show();
+
+    if (imageUrls.length) {
+      $('#vd-hero-img').attr('src', imageUrls[0]).show();
+    }
+
     $('#vd-badges').html(
-      '<span class="badge ' + statusClass + '">' + esc(status) + '</span>' +
-      '<span class="badge bg-secondary/10 text-secondary">' + esc(category) + '</span>' +
-      '<span class="text-xs text-textmuted dark:text-textmuted/50"><i class="ri-calendar-line me-1"></i>Added ' + esc(dateAdded) + '</span>'
+      '<span class="vd-hero-badge ' + statusClass + '"><i class="ri-checkbox-circle-line"></i> ' + esc(status) + '</span>' +
+      '<span class="vd-hero-badge"><i class="ri-car-line"></i> ' + esc(category) + '</span>'
+    );
+
+    $('#vd-title').html(esc(name));
+
+    $('#vd-meta').html(
+      '<span class="vd-hero-meta-item"><i class="ri-calendar-line"></i> Added ' + esc(dateAdded) + '</span>' +
+      '<span class="vd-hero-meta-item vd-id-badge"><i class="ri-hashtag"></i> ' + esc(v.id) + '</span>'
     );
 
     $('#vd-actions').html(
       <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Vehicles', 'update') == 1): ?>
-      '<a href="vehicle.php?id=' + encodeURIComponent(v.id) + '" class="ti-btn bg-primary text-white ti-btn-sm btn-wave">' +
-        '<i class="ri-edit-line me-1 align-middle"></i>Edit Vehicle' +
+      '<a href="vehicle.php?id=' + encodeURIComponent(v.id) + '" class="vd-back-btn" style="background:var(--primary-color);border-color:var(--primary-color);">' +
+        '<i class="ri-edit-line"></i> Edit Vehicle' +
       '</a>' +
       <?php endif; ?>
-      
-      '<a href="vehicles.php" class="ti-btn ti-btn-sm ti-btn-soft-secondary font-medium">' +
-        '<i class="ri-arrow-left-line me-1"></i> Back to Fleet' +
+      '<a href="vehicles.php" class="vd-back-btn">' +
+        '<i class="ri-arrow-left-line"></i> Back to Fleet' +
       '</a>'
     );
 
-    // Image
-    if (image) {
-      $('#vd-image-wrap').html(
-        '<img src="' + esc(image) + '" alt="' + esc(name) + '" onerror="this.parentElement.innerHTML=document.getElementById(\'vd-image-placeholder\')?.outerHTML || \'\';">'
-      );
-    }
+    // Pricing Card
+    $('#vd-price-display').html(money(rate) + '<span class="vd-price-unit">/hr</span>');
 
-    // Basic Info
-    $('#vd-basic-info').html(
-      '<div class="vd-row">' +
-        '<span class="vd-row-label"><i class="ri-car-line"></i> Name</span>' +
-        '<span class="vd-row-value">' + esc(name) + '</span>' +
+    $('#vd-pricing-list').html(
+      '<div class="vd-info-item">' +
+        '<span class="vd-info-label"><i class="ri-gas-station-line" style="color:#f59e0b"></i> Fuel Surcharge</span>' +
+        '<span class="vd-info-value">' + (fuel > 0 ? fuel + '%' : '—') + '</span>' +
       '</div>' +
-      '<div class="vd-row">' +
-        '<span class="vd-row-label"><i class="ri-price-tag-3-line"></i> Category</span>' +
-        '<span class="vd-row-value">' + esc(category) + '</span>' +
-      '</div>' +
-      '<div class="vd-row">' +
-        '<span class="vd-row-label"><i class="ri-flag-line"></i> Status</span>' +
-        '<span class="vd-row-value"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ' + statusClass + '">' + esc(status) + '</span></span>' +
-      '</div>' +
-      '<div class="vd-row">' +
-        '<span class="vd-row-label"><i class="ri-calendar-line"></i> Date Added</span>' +
-        '<span class="vd-row-value">' + esc(dateAdded) + '</span>' +
-      '</div>' +
-      '<div class="vd-row">' +
-        '<span class="vd-row-label"><i class="ri-hashtag"></i> ID</span>' +
-        '<span class="vd-row-value text-xs text-textmuted dark:text-textmuted/50 font-mono">' + esc(v.id) + '</span>' +
+      '<div class="vd-info-item">' +
+        '<span class="vd-info-label"><i class="ri-steering-2-line" style="color:#8b5cf6"></i> Driver Commission</span>' +
+        '<span class="vd-info-value">' + (comm > 0 ? comm + '%' : '—') + '</span>' +
       '</div>'
     );
 
-    // Pricing
-    $('#vd-pricing').html(
-      '<div class="rounded-xl border border-defaultborder dark:border-defaultborder/10 bg-primary/5 dark:bg-primary/10 p-4 mb-4">' +
-        '<div class="text-xs text-textmuted dark:text-textmuted/50">Hourly Rate</div>' +
-        '<div class="text-2xl font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 mt-1">' + money(rate) + '<span class="text-sm font-normal text-textmuted dark:text-textmuted/50 ms-1">/ hour</span></div>' +
-      '</div>' +
-      '<div class="rounded-xl border border-defaultborder dark:border-defaultborder/10 divide-y divide-defaultborder dark:divide-defaultborder/10">' +
-        '<div class="px-4 py-3 flex items-center justify-between gap-3">' +
-          '<span class="text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 font-medium flex items-center gap-2"><i class="ri-gas-station-line text-warning"></i> Fuel Surcharge</span>' +
-          '<span class="text-sm font-semibold ' + (fuel > 0 ? 'text-defaulttextcolor dark:text-defaulttextcolor/90' : 'text-textmuted dark:text-textmuted/50') + '">' + (fuel > 0 ? fuel + '%' : '—') + '</span>' +
-        '</div>' +
-        '<div class="px-4 py-3 flex items-center justify-between gap-3">' +
-          '<span class="text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 font-medium flex items-center gap-2"><i class="ri-steering-2-line text-secondary"></i> Driver Commission</span>' +
-          '<span class="text-sm font-semibold ' + (comm > 0 ? 'text-defaulttextcolor dark:text-defaulttextcolor/90' : 'text-textmuted dark:text-textmuted/50') + '">' + (comm > 0 ? comm + '%' : '—') + '</span>' +
-        '</div>' +
-      '</div>'
-    );
-
-    // Capacity
+    // Capacity Card
     $('#vd-capacity').html(
-      '<div class="grid grid-cols-2 gap-4">' +
-        '<div class="rounded-xl border border-defaultborder dark:border-defaultborder/10 p-4 text-center">' +
-          '<i class="ri-user-line text-2xl text-primary mb-1 block"></i>' +
-          '<div class="text-2xl font-bold text-defaulttextcolor dark:text-defaulttextcolor/90">' + parseInt(passengers) + '</div>' +
-          '<div class="text-xs text-textmuted dark:text-textmuted/50 font-medium uppercase tracking-wider">Passengers</div>' +
+      '<div class="vd-stat-grid">' +
+        '<div class="vd-stat-card">' +
+          '<div class="vd-stat-icon"><i class="ri-user-line" style="color:var(--primary-color)"></i></div>' +
+          '<div class="vd-stat-value">' + parseInt(passengers) + '</div>' +
+          '<div class="vd-stat-label">Passengers</div>' +
         '</div>' +
-        '<div class="rounded-xl border border-defaultborder dark:border-defaultborder/10 p-4 text-center">' +
-          '<i class="ri-briefcase-line text-2xl text-primary mb-1 block"></i>' +
-          '<div class="text-2xl font-bold text-defaulttextcolor dark:text-defaulttextcolor/90">' + parseInt(bags) + '</div>' +
-          '<div class="text-xs text-textmuted dark:text-textmuted/50 font-medium uppercase tracking-wider">Bags</div>' +
+        '<div class="vd-stat-card">' +
+          '<div class="vd-stat-icon"><i class="ri-briefcase-2-line" style="color:var(--primary-color)"></i></div>' +
+          '<div class="vd-stat-value">' + parseInt(bags) + '</div>' +
+          '<div class="vd-stat-label">Bags</div>' +
         '</div>' +
       '</div>'
     );
 
-    // Features
+    // Performance Card
+    setTimeout(function() {
+      $('#vd-fuel-bar').css('width', fuel + '%');
+      $('#vd-fuel-value').text(fuel + '%');
+      $('#vd-comm-bar').css('width', comm + '%');
+      $('#vd-comm-value').text(comm + '%');
+    }, 300);
+
+    // Features Card
     if (facilities.trim()) {
       const tags = facilities.split(',').map(function (f) {
         f = f.trim();
-        return f ? '<span class="vd-feature-tag">' + esc(f) + '</span>' : '';
+        return f ? '<span class="vd-feature-tag"><i class="ri-check-line"></i> ' + esc(f) + '</span>' : '';
       }).join('');
-      $('#vd-features').html('<div class="flex flex-wrap">' + tags + '</div>');
+      $('#vd-features').html('<div class="vd-feature-grid">' + tags + '</div>');
     } else {
-      $('#vd-features').html('<p class="text-sm text-textmuted dark:text-textmuted/50 italic">No features listed.</p>');
+      $('#vd-features').html('<div class="vd-empty"><i class="ri-checkbox-circle-line"></i><p>No features listed.</p></div>');
     }
 
-    // Description
-    if (desc.trim()) {
-      $('#vd-description').html(
-        '<p class="text-sm text-defaulttextcolor dark:text-defaulttextcolor/90 whitespace-pre-line leading-relaxed">' + esc(desc) + '</p>'
-      );
+    // Images Gallery Row
+    if (imageUrls.length) {
+      let gallery = '';
+      imageUrls.forEach(function (u) {
+        gallery += '<div class="vd-gallery-item-row" onclick="openLightbox(\'' + esc(u) + '\')">' +
+          '<img src="' + esc(u) + '" alt="Vehicle" onerror="this.parentElement.style.display=\'none\'">' +
+          '<div class="vd-gallery-overlay"><i class="ri-zoom-in-line"></i></div>' +
+        '</div>';
+      });
+      $('#vd-gallery-container').html(gallery);
     } else {
-      $('#vd-description').html('<p class="text-sm text-textmuted dark:text-textmuted/50 italic">No description provided.</p>');
+      $('#vd-gallery-container').html('<div class="vd-empty"><i class="ri-image-add-line"></i><p>No images available.</p></div>');
+    }
+
+    // Basic Info Card
+    $('#vd-basic-info').html(
+      '<div class="vd-info-list">' +
+        '<div class="vd-info-item">' +
+          '<span class="vd-info-label"><i class="ri-car-line"></i> Name</span>' +
+          '<span class="vd-info-value">' + esc(name) + '</span>' +
+        '</div>' +
+        '<div class="vd-info-item">' +
+          '<span class="vd-info-label"><i class="ri-price-tag-3-line"></i> Category</span>' +
+          '<span class="vd-info-value">' + esc(category) + '</span>' +
+        '</div>' +
+        '<div class="vd-info-item">' +
+          '<span class="vd-info-label"><i class="ri-flag-line"></i> Status</span>' +
+          '<span class="vd-info-value"><span class="vd-feature-tag" style="padding:4px 12px;font-size:11px;">' + esc(status) + '</span></span>' +
+        '</div>' +
+        '<div class="vd-info-item">' +
+          '<span class="vd-info-label"><i class="ri-calendar-line"></i> Date Added</span>' +
+          '<span class="vd-info-value">' + esc(dateAdded) + '</span>' +
+        '</div>' +
+        '<div class="vd-info-item">' +
+          '<span class="vd-info-label"><i class="ri-honour-line"></i> ID</span>' +
+          '<span class="vd-info-value vd-id-badge">' + esc(v.id) + '</span>' +
+        '</div>' +
+      '</div>'
+    );
+
+    // Description Card
+    if (desc.trim()) {
+      $('#vd-description').html('<p class="vd-description">' + esc(desc) + '</p>');
+    } else {
+      $('#vd-description').html('<div class="vd-empty"><i class="ri-file-text-line"></i><p>No description provided.</p></div>');
     }
   }
+
+  // Simple lightbox
+  window.openLightbox = function(src) {
+    const overlay = $('<div>').css({
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.9)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      cursor: 'pointer'
+    }).on('click', function() { $(this).remove(); });
+
+    const img = $('<img>').css({
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      borderRadius: '12px',
+      objectFit: 'contain'
+    }).attr('src', src);
+
+    overlay.append(img);
+    $('body').append(overlay);
+  };
 });
 </script>

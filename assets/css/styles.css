@@ -31417,11 +31417,11 @@ readers do not read off random characters that represent icons */
 [data-menu-styles=light] .simplebar-scrollbar.simplebar-visible:before{
   opacity: 0.2 !important;
 }
-@media (min-width: 992px) {
+/* @media (min-width: 992px) {
   [data-nav-layout=vertical] footer{
     padding-inline-start: 15rem;
   }
-}
+} */
 [data-vertical-style=doublemenu] .app-sidebar .main-sidebar-header .header-logo .toggle-white:is(.dark *){
   display: block;
 }

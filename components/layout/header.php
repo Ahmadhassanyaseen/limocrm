@@ -25,6 +25,14 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../../config/session_permissions.php';
+
+$__limo_intro_uid = (string) ($_SESSION['user']['id'] ?? '');
+$__limo_intro_index = rtrim($APP_BASE, '/') . '/index.php';
+$__limo_intro_vehicles = rtrim($APP_BASE, '/') . '/vehicles.php';
+$__limo_intro_email_templates = rtrim($APP_BASE, '/') . '/email_templates.php';
+$__limo_intro_integration = rtrim($APP_BASE, '/') . '/integration.php';
+$__limo_intro_leads = rtrim($APP_BASE, '/') . '/leads.php';
+$__limo_intro_add_lead = rtrim($APP_BASE, '/') . '/add_lead.php';
 ?>
  <html
   lang="en"
@@ -786,6 +794,17 @@ require_once __DIR__ . '/../../config/session_permissions.php';
       }
     </style>
     <link rel="stylesheet" href="assets/css/custom.css">
+    <script>
+      window.LIMO_INTRO = window.LIMO_INTRO || {
+        userId: <?php echo json_encode($__limo_intro_uid, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>,
+        indexHref: <?php echo json_encode($__limo_intro_index, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>,
+        vehiclesHref: <?php echo json_encode($__limo_intro_vehicles, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>,
+        emailTemplatesHref: <?php echo json_encode($__limo_intro_email_templates, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>,
+        integrationHref: <?php echo json_encode($__limo_intro_integration, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>,
+        leadsHref: <?php echo json_encode($__limo_intro_leads, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>,
+        addLeadHref: <?php echo json_encode($__limo_intro_add_lead, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP); ?>
+      };
+    </script>
   </head>
   <body cz-shortcut-listen="true">
     <!-- ========== Switcher  ========== -->
@@ -1831,6 +1850,20 @@ require_once __DIR__ . '/../../config/session_permissions.php';
           <!-- End::header-content-left -->
           <!-- Start::header-content-right -->
           <ul class="header-content-right">
+            <!-- Start::header-element|intro tour -->
+            <!-- <li class="header-element hidden sm:block">
+              <button
+                type="button"
+                id="limo-header-intro-btn"
+                class="header-link border-0 bg-transparent !inline-flex items-center gap-1 dark:hover:text-white"
+                title="Resume or replay the dashboard intro tour"
+                aria-label="Intro tour"
+              >
+                <i class="ri-guide-line header-link-icon"></i>
+                <span class="text-xs font-semibold max-sm:hidden">Intro</span>
+              </button>
+            </li> -->
+            <!-- End::header-element|intro tour -->
             <!-- Start::header-element -->
             <li class="header-element md:!hidden block">
               <a
@@ -1845,208 +1878,7 @@ require_once __DIR__ . '/../../config/session_permissions.php';
                 <!-- End::header-link-icon -->
               </a>
             </li>
-            <!-- End::header-element -->
-            <!-- Start::header-element -->
-            <!-- <li
-              class="header-element country-selector hs-dropdown ti-dropdown hidden sm:block [--placement:bottom-right] rtl:[--placement:bottom-left]"
-              >
-              <div
-                class="ti-dropdown-divider divide-y divide-gray-200 dark:divide-white/10"
-              ></div>
-              Start::header-link|dropdown-toggle
-              <a
-                aria-label="anchor"
-                href="javascript:void(0);"
-                class="header-link hs-dropdown-toggle ti-dropdown-toggle"
-                data-bs-auto-close="outside"
-                data-bs-toggle="dropdown"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 header-link-icon"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"
-                  ></path>
-                </svg>
-              </a>
-              End::header-link|dropdown-toggle
-              <ul
-                class="main-header-dropdown hs-dropdown-menu ti-dropdown-menu min-w-[10rem] hidden"
-                data-popper-placement="none"
-                role="menu"
-              >
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/us_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        English
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/spain_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        español
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/french_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        français
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/uae_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        عربي
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/germany_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        Deutsch
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/china_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        中国人
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/italy_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        Italiano
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="ti-dropdown-item flex items-center"
-                    href="javascript:void(0);"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <span
-                          class="avatar avatar-rounded avatar-xs leading-none me-2"
-                        >
-                          <img
-                            src="assets/images/flags/russia_flag.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        Русский
-                      </div>
-                    </div>
-                  </a>
-                </li>
-              </ul>
-            </li> -->
-            <!-- End::header-element -->
-            <!-- Start::header-element -->
-            <!-- light and dark theme -->
+          
             <li
               class="header-element header-theme-mode hidden !items-center sm:block md:!px-[0.5rem] px-2"
               >
@@ -2093,409 +1925,9 @@ require_once __DIR__ . '/../../config/session_permissions.php';
                 </svg>
               </a>
             </li>
-            <!-- End light and dark theme -->
-            <!-- End::header-element -->
-            <!-- Start::header-element -->
-            <!-- <li
-              class="header-element cart-dropdown hs-dropdown ti-dropdown [--auto-close:inside]"
-              >
+           
+          <!-- <li class="header-element notifications-dropdown !hidden xl:!block hs-dropdown   ti-dropdown [--auto-close:inside]"              >
               
-              <a
-                aria-label="anchor"
-                href="javascript:void(0);"
-                class="header-link hs-dropdown-toggle ti-dropdown-toggle"
-                data-bs-auto-close="outside"
-                data-bs-toggle="dropdown"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 header-link-icon"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                  ></path>
-                </svg>
-                <span
-                  class="badge bg-secondary rounded-full header-icon-badge text-white"
-                  id="cart-icon-badge"
-                  >5</span
-                >
-              </a>
-             
-              <div
-                class="main-header-dropdown hs-dropdown-menu ti-dropdown-menu hidden"
-                data-popper-placement="none"
-                role="menu"
-              >
-                <div class="p-4">
-                  <div class="flex items-center justify-between">
-                    <p class="mb-0 text-[15px] font-medium">
-                      Cart Items<span
-                        class="badge bg-primarytint2color text-white ms-1 !py-[0.15rem] rounded-full"
-                        id="cart-data"
-                        >5</span
-                      >
-                    </p>
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-xs font-medium text-textmuted dark:text-textmuted/50"
-                        >Sub Total :
-                      </span>
-                      <h6 class="mb-0">$740</h6>
-                    </div>
-                  </div>
-                </div>
-                <hr class="dropdown-divider" />
-                <ul
-                  class="list-none mb-0"
-                  id="header-cart-items-scroll"
-                  data-simplebar="init"
-                >
-                  <div class="simplebar-wrapper" style="margin: 0px">
-                    <div class="simplebar-height-auto-observer-wrapper">
-                      <div class="simplebar-height-auto-observer"></div>
-                    </div>
-                    <div class="simplebar-mask">
-                      <div
-                        class="simplebar-offset"
-                        style="right: 0px; bottom: 0px"
-                      >
-                        <div
-                          class="simplebar-content-wrapper"
-                          tabindex="0"
-                          role="region"
-                          aria-label="scrollable content"
-                          style="height: auto; overflow: hidden"
-                        >
-                          <div class="simplebar-content" style="padding: 0px">
-                            <li class="ti-dropdown-item block">
-                              <div
-                                class="flex items-center cart-dropdown-item gap-4"
-                              >
-                                <div class="leading-none">
-                                  <span class="avatar avatar-xl bg-primary/10">
-                                    <img
-                                      src="assets/images/ecommerce/png/30.png"
-                                      alt="Wireless Headphones"
-                                    />
-                                  </span>
-                                </div>
-                                <div class="flex-auto">
-                                  <div
-                                    class="flex items-center justify-between mb-0"
-                                  >
-                                    <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.php"
-                                        >Wireless Headphones</a
-                                      >
-                                      <div class="truncate">
-                                        <p
-                                          class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
-                                        >
-                                          Wireless freedom with crystal-clear
-                                          sound and comfortable
-                                        </p>
-                                        <h6 class="font-medium mb-0 mt-1">
-                                          <span
-                                            class="text-success font-normal me-1 text-[11px] inline-block"
-                                            >(Qty : 1)</span
-                                          >$78
-                                        </h6>
-                                      </div>
-                                    </div>
-                                    <div class="text-end">
-                                      <a
-                                        href="javascript:void(0);"
-                                        class="header-cart-remove dropdown-item-close"
-                                        aria-label="anchor"
-                                        ><i class="ri-close-line"></i
-                                      ></a>
-                                      <h6 class="font-medium mb-0 mt-3">
-                                        <span
-                                          class="text-info op-4 font-normal me-1 text-[11px] inline-block"
-                                          >Total :</span
-                                        >$75
-                                      </h6>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                            <li class="ti-dropdown-item block">
-                              <div
-                                class="flex items-center cart-dropdown-item gap-4"
-                              >
-                                <div class="leading-none">
-                                  <span class="avatar avatar-xl bg-primary/10">
-                                    <img
-                                      src="assets/images/ecommerce/png/29.png"
-                                      alt="Ladies Hand Bag"
-                                    />
-                                  </span>
-                                </div>
-                                <div class="flex-auto">
-                                  <div
-                                    class="flex items-center justify-between mb-0"
-                                  >
-                                    <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.php">Ladies Hand Bag</a>
-                                      <div class="truncate">
-                                        <p
-                                          class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
-                                        >
-                                          Both fashion and functionality.
-                                        </p>
-                                        <h6 class="font-medium mb-0 mt-1">
-                                          <span
-                                            class="text-success font-normal me-1 text-[11px] inline-block"
-                                            >(Qty : 2)</span
-                                          >$15
-                                        </h6>
-                                      </div>
-                                    </div>
-                                    <div class="text-end">
-                                      <a
-                                        href="javascript:void(0);"
-                                        class="header-cart-remove dropdown-item-close"
-                                        aria-label="anchor"
-                                        ><i class="ri-close-line"></i
-                                      ></a>
-                                      <h6 class="font-medium mb-0 mt-3">
-                                        <span
-                                          class="text-info op-4 font-normal me-1 text-[11px] inline-block"
-                                          >Total :</span
-                                        >$30
-                                      </h6>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                            <li class="ti-dropdown-item block">
-                              <div
-                                class="flex items-center cart-dropdown-item gap-4"
-                              >
-                                <div class="leading-none">
-                                  <span class="avatar avatar-xl bg-primary/10">
-                                    <img
-                                      src="assets/images/ecommerce/png/32.png"
-                                      alt="Alarm Clock"
-                                    />
-                                  </span>
-                                </div>
-                                <div class="flex-auto">
-                                  <div
-                                    class="flex items-center justify-between mb-0"
-                                  >
-                                    <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.php">Alarm Clock</a>
-                                      <div class="truncate">
-                                        <p
-                                          class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
-                                        >
-                                          Add natural beauty to your space
-                                        </p>
-                                        <h6 class="font-medium mb-0 mt-1">
-                                          <span
-                                            class="text-success font-normal me-1 text-[11px] inline-block"
-                                            >(Qty : 1)</span
-                                          >$84
-                                        </h6>
-                                      </div>
-                                    </div>
-                                    <div class="text-end">
-                                      <a
-                                        href="javascript:void(0);"
-                                        class="header-cart-remove dropdown-item-close"
-                                        aria-label="anchor"
-                                        ><i class="ri-close-line"></i
-                                      ></a>
-                                      <h6 class="font-medium mb-0 mt-3">
-                                        <span
-                                          class="text-info op-4 font-normal me-1 text-[11px] inline-block"
-                                          >Total :</span
-                                        >$84
-                                      </h6>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                            <li class="ti-dropdown-item block">
-                              <div
-                                class="flex items-center cart-dropdown-item gap-4"
-                              >
-                                <div class="leading-none">
-                                  <span class="avatar avatar-xl bg-primary/10">
-                                    <img
-                                      src="assets/images/ecommerce/png/12.png"
-                                      alt="Kids' Party Wear Frock"
-                                    />
-                                  </span>
-                                </div>
-                                <div class="flex-auto">
-                                  <div
-                                    class="flex items-center justify-between mb-0"
-                                  >
-                                    <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.php"
-                                        >Kids' Party Wear Frock</a
-                                      >
-                                      <div class="truncate">
-                                        <p
-                                          class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
-                                        >
-                                          Crafted from soft, breathable fabric
-                                          and adorned with delightful
-                                        </p>
-                                        <h6 class="font-medium mb-0 mt-1">
-                                          <span
-                                            class="text-success font-normal me-1 text-[11px] inline-block"
-                                            >(Qty : 1)</span
-                                          >$37
-                                        </h6>
-                                      </div>
-                                    </div>
-                                    <div class="text-end">
-                                      <a
-                                        href="javascript:void(0);"
-                                        class="header-cart-remove dropdown-item-close"
-                                        aria-label="anchor"
-                                        ><i class="ri-close-line"></i
-                                      ></a>
-                                      <h6 class="font-medium mb-0 mt-3">
-                                        <span
-                                          class="text-info op-4 font-normal me-1 text-[11px] inline-block"
-                                          >Total :</span
-                                        >$37
-                                      </h6>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                            <li class="ti-dropdown-item block">
-                              <div
-                                class="flex items-center cart-dropdown-item gap-4"
-                              >
-                                <div class="leading-none">
-                                  <span class="avatar avatar-xl bg-primary/10">
-                                    <img
-                                      src="assets/images/ecommerce/png/16.png"
-                                      alt="Smart Watch"
-                                    />
-                                  </span>
-                                </div>
-                                <div class="flex-auto">
-                                  <div
-                                    class="flex items-center justify-between mb-0"
-                                  >
-                                    <div class="mb-0 text-[14px] font-medium">
-                                      <a href="cart.php"
-                                        >Advanced Smart Watch</a
-                                      >
-                                      <div class="truncate">
-                                        <p
-                                          class="mb-0 header-cart-text truncate text-[11px] text-textmuted dark:text-textmuted/50"
-                                        >
-                                          ultimate in wearable
-                                          technology,combining cutting-edge
-                                        </p>
-                                        <h6 class="font-medium mb-0 mt-1">
-                                          <span
-                                            class="text-success font-normal me-1 text-[11px] inline-block"
-                                            >(Qty : 2)</span
-                                          >$29
-                                        </h6>
-                                      </div>
-                                    </div>
-                                    <div class="text-end">
-                                      <a
-                                        href="javascript:void(0);"
-                                        class="header-cart-remove dropdown-item-close"
-                                        aria-label="anchor"
-                                        ><i class="ri-close-line"></i
-                                      ></a>
-                                      <h6 class="font-medium mb-0 mt-3">
-                                        <span
-                                          class="text-info op-4 font-normal me-1 text-[11px] inline-block"
-                                          >Total :</span
-                                        >$48
-                                      </h6>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      class="simplebar-placeholder"
-                      style="width: 0px; height: 0px"
-                    ></div>
-                  </div>
-                  <div
-                    class="simplebar-track simplebar-horizontal"
-                    style="visibility: hidden"
-                  >
-                    <div
-                      class="simplebar-scrollbar"
-                      style="width: 0px; display: none"
-                    ></div>
-                  </div>
-                  <div
-                    class="simplebar-track simplebar-vertical"
-                    style="visibility: hidden"
-                  >
-                    <div
-                      class="simplebar-scrollbar"
-                      style="height: 0px; display: none"
-                    ></div>
-                  </div>
-                </ul>
-                <div class="p-4 empty-header-item border-t grid items-center">
-                  <a
-                    href="checkout.php"
-                    class="ti-btn ti-btn-primary btn-wave text-center waves-effect waves-light"
-                    >Proceed to checkout</a
-                  >
-                </div>
-                <div class="p-[3rem] empty-item hidden">
-                  <div class="text-center">
-                    <span
-                      class="avatar avatar-xl avatar-rounded bg-primary/10 !text-primary"
-                    >
-                      <i class="ri-shopping-cart-2-line fs-2"></i>
-                    </span>
-                    <h6 class="font-medium mb-1 mt-3">Your Cart is Empty</h6>
-                    <span class="mb-3 font-normal text-[13px] block"
-                      >Add some items to make me happy :)</span
-                    >
-                    <a
-                      href="products.php"
-                      class="ti-btn bg-primarytint1color text-white btn-wave ti-btn-sm m-1 waves-effect waves-light"
-                      data-abc="true"
-                      >continue shopping <i class="bi bi-arrow-right ms-1"></i
-                    ></a>
-                  </div>
-                </div>
-              </div>
-              
-            </li> -->
-            <!-- End::header-element -->
-            <!-- Start::header-element -->
-           <li
-              class="header-element notifications-dropdown !hidden xl:!block hs-dropdown ti-dropdown [--auto-close:inside]"
-              >
-              <!-- Start::header-link|dropdown-toggle -->
               <a
                 aria-label="anchor"
                 href="javascript:void(0);"
@@ -2504,7 +1936,7 @@ require_once __DIR__ . '/../../config/session_permissions.php';
                 data-bs-auto-close="outside"
                 id="messageDropdown"
                 aria-expanded="false"
-              >
+               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="w-6 h-6 header-link-icon"
@@ -2523,8 +1955,7 @@ require_once __DIR__ . '/../../config/session_permissions.php';
                   class="header-icon-pulse bg-primarytint2color rounded pulse pulse-secondary"
                 ></span>
               </a>
-              <!-- End::header-link|dropdown-toggle -->
-              <!-- Start::main-header-dropdown -->
+             
               <div
                 class="main-header-dropdown hs-dropdown-menu ti-dropdown-menu hidden"
                 data-popper-placement="none"
@@ -2831,50 +2262,10 @@ require_once __DIR__ . '/../../config/session_permissions.php';
                   </div>
                 </div>
               </div>
-              <!-- End::main-header-dropdown -->
-            </li> 
+            
+          </li>  -->
             <!-- End::header-element -->
-            <!-- Start::header-element -->
-            <!-- <li class="header-element header-fullscreen">
-              Start::header-link
-              <a
-                onclick="openFullscreen();"
-                href="javascript:void(0);"
-                class="header-link"
-                aria-label="anchor"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 full-screen-open header-link-icon"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-                  ></path>
-                </svg>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 full-screen-close header-link-icon hidden"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-                  ></path>
-                </svg>
-              </a>
-              End::header-link
-            </li> -->
-            <!-- End::header-element -->
+         
             <!-- Start::header-element -->
             <li class="header-element ti-dropdown hs-dropdown">
               <!-- Start::header-link|dropdown-toggle -->
@@ -2946,13 +2337,27 @@ require_once __DIR__ . '/../../config/session_permissions.php';
                   >
                 </li>
                 <li
-                  class="border-t border-defaultborder dark:border-defaultborder/10 bg-light"
+                  class="border-t border-defaultborder dark:border-defaultborder/10 "
                 >
                   <a class="ti-dropdown-item flex items-center" href="https://shmai.com/contact"
                     ><i
                       class="ri-question-line p-1 rounded-full bg-primary/10 text-primary set me-2 text-[1rem]"
                     ></i
                     >Help</a
+                  >
+                </li>
+                <li
+                  class="border-t border-defaultborder dark:border-defaultborder/10 "
+                >
+                  <a class="ti-dropdown-item flex items-center" href="javascript:void(0);"  type="button"
+                id="limo-header-intro-btn"
+                title="Resume or replay the dashboard intro tour"
+                aria-label="Intro tour"
+                
+                    ><i
+                      class="ri-question-line p-1 rounded-full bg-primary/10 text-primary set me-2 text-[1rem]"
+                    ></i
+                    >Intro Tour</a
                   >
                 </li>
                 <li>

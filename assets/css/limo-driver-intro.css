@@ -1,0 +1,201 @@
+/* Header “Intro” control — theme pink */
+#limo-header-intro-btn {
+  color: #cf1c82 !important;
+}
+
+#limo-header-intro-btn:hover,
+#limo-header-intro-btn:focus-visible {
+  color: #b01671 !important;
+}
+
+.dark #limo-header-intro-btn {
+  color: #e84ca3 !important;
+}
+
+.dark #limo-header-intro-btn:hover,
+.dark #limo-header-intro-btn:focus-visible {
+  color: #f472b6 !important;
+}
+
+/* Limo CRM: Driver.js popover layout (theme overrides can misalign footer) */
+.driver-popover.limo-driver-popover {
+  z-index: 100000 !important;
+  max-width: min(420px, calc(100vw - 32px));
+}
+
+.driver-popover.limo-driver-popover,
+.driver-popover.limo-driver-popover .driver-popover-footer {
+  box-sizing: border-box;
+}
+
+.driver-popover.limo-driver-popover .driver-popover-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  width: 100%;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dark .driver-popover.limo-driver-popover .driver-popover-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.driver-popover.limo-driver-popover .driver-popover-progress-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #cf1c82;
+  line-height: 1.3;
+}
+
+.driver-popover.limo-driver-popover .driver-popover-navigation-btns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.driver-popover.limo-driver-popover .driver-popover-prev-btn,
+.driver-popover.limo-driver-popover .driver-popover-next-btn,
+.driver-popover.limo-driver-popover .driver-popover-close-btn {
+  flex-shrink: 0;
+}
+
+/* Theme primary (pink) — Next / Done / Finish */
+.driver-popover.limo-driver-popover .driver-popover-next-btn {
+  background: #cf1c82 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 8px 16px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-shadow: none !important;
+  box-shadow: 0 4px 14px rgba(207, 28, 130, 0.35);
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.driver-popover.limo-driver-popover
+  .driver-popover-next-btn:not(:disabled):hover,
+.driver-popover.limo-driver-popover
+  .driver-popover-next-btn:not(:disabled):focus-visible {
+  background: #b01671 !important;
+  box-shadow: 0 6px 18px rgba(207, 28, 130, 0.45);
+}
+
+.driver-popover.limo-driver-popover .driver-popover-next-btn:disabled,
+.driver-popover.limo-driver-popover
+  .driver-popover-next-btn.driver-popover-btn-disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* Back — outline pink */
+.driver-popover.limo-driver-popover .driver-popover-prev-btn {
+  background: transparent !important;
+  color: #cf1c82 !important;
+  border: 1px solid rgba(207, 28, 130, 0.5) !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+}
+
+.driver-popover.limo-driver-popover
+  .driver-popover-prev-btn:not(:disabled):hover,
+.driver-popover.limo-driver-popover
+  .driver-popover-prev-btn:not(:disabled):focus-visible {
+  background: rgba(207, 28, 130, 0.08) !important;
+}
+
+.dark
+  .driver-popover.limo-driver-popover
+  .driver-popover-prev-btn:not(:disabled):hover,
+.dark
+  .driver-popover.limo-driver-popover
+  .driver-popover-prev-btn:not(:disabled):focus-visible {
+  background: rgba(207, 28, 130, 0.18) !important;
+}
+
+/* Close */
+.driver-popover.limo-driver-popover .driver-popover-close-btn {
+  color: rgba(15, 23, 42, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.dark .driver-popover.limo-driver-popover .driver-popover-close-btn {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Floating “End tour” — only while intro runs (injected on body).
+   Driver.js uses .driver-active * { pointer-events: none } and only restores
+   .driver-popover / .driver-active-element — we must opt the FAB back in.
+   Popover uses z-index 1000000000 in driver.css; sit above overlay + popover. */
+.limo-intro-end-tour-fab {
+  position: fixed !important;
+  z-index: 1000000001 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
+
+  padding: 12px 22px !important;
+  margin: 0 !important;
+
+  pointer-events: auto !important;
+
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  font-family: inherit !important;
+
+  color: #fff !important;
+  background: #cf1c82 !important;
+  border: none !important;
+  border-radius: 999px !important;
+  box-shadow:
+    0 4px 20px rgba(207, 28, 130, 0.45),
+    0 2px 8px rgba(15, 23, 42, 0.12) !important;
+  cursor: pointer !important;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease !important;
+}
+
+.driver-active .limo-intro-end-tour-fab {
+  pointer-events: auto !important;
+}
+
+.limo-intro-end-tour-fab:hover,
+.limo-intro-end-tour-fab:focus-visible {
+  filter: brightness(1.06) !important;
+  box-shadow:
+    0 6px 26px rgba(207, 28, 130, 0.52),
+    0 2px 8px rgba(15, 23, 42, 0.14) !important;
+  outline: none !important;
+}
+
+.limo-intro-end-tour-fab:active {
+  transform: translateX(-50%) scale(0.98) !important;
+}
+
+.dark .limo-intro-end-tour-fab {
+  box-shadow:
+    0 4px 24px rgba(207, 28, 130, 0.35),
+    0 2px 10px rgba(0, 0, 0, 0.35) !important;
+}

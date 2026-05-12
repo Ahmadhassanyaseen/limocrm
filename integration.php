@@ -148,7 +148,7 @@ $embedSnippetEscaped = htmlspecialchars($embedSnippet, ENT_QUOTES, 'UTF-8');
     <div class="grid grid-cols-12 gap-6 pb-12">
 
       <!-- LEFT: Preview -->
-      <div class="xl:col-span-7 col-span-12">
+      <div class="xl:col-span-7 col-span-12" id="intro-widget-preview">
         <div class="ig-card mb-6">
           <div class="ig-card-header">
             <div class="flex items-center gap-3">
@@ -181,7 +181,7 @@ $embedSnippetEscaped = htmlspecialchars($embedSnippet, ENT_QUOTES, 'UTF-8');
       <div class="xl:col-span-5 col-span-12">
 
         <!-- Embed Code -->
-        <div class="ig-card mb-6">
+        <div class="ig-card mb-6" id="intro-widget-code">
           <div class="ig-card-header">
             <div class="flex items-center gap-3">
               <div class="ig-card-icon bg-info/10 text-info"><i class="ri-code-s-slash-line"></i></div>
@@ -254,7 +254,7 @@ $embedSnippetEscaped = htmlspecialchars($embedSnippet, ENT_QUOTES, 'UTF-8');
 
       <!-- Embedded Domains (Full Width) -->
       <div class="col-span-12">
-        <div class="ig-card">
+        <div class="ig-card" id="intro-widget-domains">
           <div class="ig-card-header">
             <div class="flex items-center justify-between flex-wrap gap-3">
               <div class="flex items-center gap-3">

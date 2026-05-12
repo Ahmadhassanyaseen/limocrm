@@ -190,6 +190,23 @@ $isEdit = !empty($vehicleId);
     background: rgba(255,255,255,0.03);
     border-color: rgba(255,255,255,0.10);
   }
+  /* Vehicle image sidebar card: opaque surfaces in dark mode (avoids “see-through” look) */
+  .dark .vf-page .vf-card-vehicle-image {
+    background: #101520;
+    border-color: rgba(255,255,255,0.12);
+  }
+  .dark .vf-page .vf-card-vehicle-image .vf-card-header {
+    background: #181d23;
+    border-bottom-color: rgba(255,255,255,0.10);
+  }
+  .dark .vf-page .vf-card-vehicle-image .vf-upload-zone {
+    background: #252d38;
+    border-color: rgba(255,255,255,0.14);
+  }
+  .dark .vf-page .vf-card-vehicle-image .vf-upload-zone:hover {
+    border-color: rgb(var(--primary-rgb));
+    background: #2c3644;
+  }
   .vf-upload-zone:hover {
     border-color: rgb(var(--primary-rgb));
     background: rgba(var(--primary-rgb), 0.03);
@@ -229,8 +246,79 @@ $isEdit = !empty($vehicleId);
     width: 0;
     transition: width 0.4s ease;
   }
-</style>
 
+  .vf-gallery-thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .vf-gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(15,23,42,0.06);
+    border: 1px solid rgba(15,23,42,0.08);
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .dark .vf-gallery-item {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.10);
+  }
+  .vf-gallery-item.is-previewing {
+    border-color: rgb(var(--primary-rgb));
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.45);
+  }
+  .dark .vf-gallery-item.is-previewing {
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.55);
+  }
+  .vf-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .vf-gallery-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.15s;
+  }
+  .vf-gallery-remove:hover { background: rgba(220,38,38,0.9); }
+  .vf-gallery-hint {
+    font-size: 11px;
+    color: var(--textmuted);
+    margin-top: 8px;
+    text-align: center;
+  }
+  .vf-upload-zone-disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
+  }
+  .vf-upload-zone-disabled:hover {
+    border-color: rgba(15,23,42,0.14);
+    background: rgba(15,23,42,0.03);
+  }
+  .dark .vf-upload-zone-disabled:hover {
+    border-color: rgba(255,255,255,0.10);
+    background: #252d38;
+  }
+</style>
 <div class="main-content app-content">
   <div class="container-fluid">
 
@@ -266,7 +354,7 @@ $isEdit = !empty($vehicleId);
           <input type="hidden" name="image_c" id="v-image-c">
 
           <!-- Card 1: Basic Information -->
-          <div class="vf-card mb-6">
+          <div class="vf-card mb-6" id="intro-vehicle-basic">
             <div class="vf-card-header flex items-center gap-3">
               <span class="vf-card-icon bg-primary/10 text-primary"><i class="ri-car-line"></i></span>
               <div>
@@ -333,7 +421,7 @@ $isEdit = !empty($vehicleId);
           </div>
 
           <!-- Card 2: Pricing -->
-          <div class="vf-card mb-6">
+          <div class="vf-card mb-6" id="intro-vehicle-pricing">
             <div class="vf-card-header flex items-center gap-3">
               <span class="vf-card-icon bg-success/10 text-success"><i class="ri-money-dollar-circle-line"></i></span>
               <div>
@@ -380,7 +468,7 @@ $isEdit = !empty($vehicleId);
           </div>
 
           <!-- Card 3: Details & Features -->
-          <div class="vf-card mb-6">
+          <div class="vf-card mb-6" id="intro-vehicle-details">
             <div class="vf-card-header flex items-center gap-3">
               <span class="vf-card-icon bg-warning/10 text-warning"><i class="ri-list-check-2"></i></span>
               <div>
@@ -410,7 +498,7 @@ $isEdit = !empty($vehicleId);
           </div>
 
           <!-- Submit -->
-          <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center justify-between gap-3 flex-wrap" id="intro-vehicle-save">
             <p class="text-xs text-textmuted dark:text-textmuted/50 mb-0"><span class="text-danger">*</span> Required fields</p>
             <div class="flex items-center gap-3">
               <a href="vehicles.php" class="ti-btn ti-btn-soft-secondary !rounded-xl px-6">Cancel</a>
@@ -426,39 +514,41 @@ $isEdit = !empty($vehicleId);
       <div class="xl:col-span-4 col-span-12">
 
         <!-- Image Upload -->
-        <div class="vf-card mb-6 sticky top-4">
+        <div class="vf-card vf-card-vehicle-image mb-6 sticky top-4" id="intro-vehicle-image">
           <div class="vf-card-header text-center">
-            <h5 class="font-semibold text-[15px] text-defaulttextcolor dark:text-defaulttextcolor/90 mb-0">Vehicle Image</h5>
+            <h5 class="font-semibold text-[15px] text-defaulttextcolor dark:text-defaulttextcolor/90 mb-0">Vehicle images</h5>
           </div>
           <div class="vf-card-body">
-            <div class="vf-upload-zone" id="upload-zone" onclick="document.getElementById('image-upload').click()">
+            <div class="vf-upload-zone" id="upload-zone" role="button" tabindex="0">
               <img id="image-preview" src="" class="hidden" onerror="this.classList.add('hidden'); document.getElementById('upload-placeholder').classList.remove('hidden')">
               <div id="upload-placeholder" class="text-center px-4">
                 <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
                   <i class="ri-image-add-line text-2xl text-primary"></i>
                 </div>
                 <p class="text-sm font-semibold text-defaulttextcolor dark:text-defaulttextcolor/90 mb-1">Click to upload</p>
-                <p class="text-[11px] text-textmuted dark:text-textmuted/50">JPG, PNG or WEBP (Max 2MB)</p>
+                <p class="text-[11px] text-textmuted dark:text-textmuted/50">Up to 3 images · JPG, PNG or WEBP (max 2MB each).</p>
               </div>
               <div class="vf-upload-overlay">
                 <span class="text-white text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                  <i class="ri-upload-2-line text-lg"></i> Change Photo
+                  <i class="ri-upload-2-line text-lg"></i> Add photos
                 </span>
               </div>
             </div>
+            <div class="vf-gallery-thumbs" id="vf-gallery-thumbs" aria-live="polite"></div>
+            <p class="vf-gallery-hint mb-0" id="vf-gallery-count"></p>
             <div class="vf-upload-progress" id="upload-progress">
               <div class="vf-upload-progress-bar" id="upload-progress-bar"></div>
             </div>
             <div class="vf-error mt-2" id="err-image"><i class="ri-error-warning-line"></i> <span></span></div>
-            <input type="file" id="image-upload" name="vehicle_image" class="hidden" accept="image/jpeg,image/png,image/webp">
-            <button type="button" class="ti-btn bg-primary/10 text-primary w-full !rounded-xl font-bold py-2.5 transition-all hover:bg-primary hover:text-white mt-4" onclick="document.getElementById('image-upload').click()">
-              <i class="ri-upload-cloud-line me-1"></i> Choose Image
+            <input type="file" id="image-upload" name="vehicle_image" class="hidden" accept="image/jpeg,image/png,image/webp" multiple>
+            <button type="button" class="ti-btn bg-primary/10 text-primary w-full !rounded-xl font-bold py-2.5 transition-all hover:bg-primary hover:text-white mt-4" id="vf-choose-images-btn">
+              <i class="ri-upload-cloud-line me-1"></i> Choose images
             </button>
           </div>
         </div>
 
         <!-- Live Summary -->
-        <div class="vf-card mb-6">
+        <div class="vf-card mb-6" id="intro-vehicle-live-preview">
           <div class="vf-card-header">
             <h5 class="font-semibold text-[15px] text-defaulttextcolor dark:text-defaulttextcolor/90 mb-0 flex items-center gap-2">
               <i class="ri-eye-line text-primary"></i> Live Preview
@@ -482,6 +572,10 @@ $isEdit = !empty($vehicleId);
               <span class="vf-summary-value" id="sum-capacity">0 pass · 0 bags</span>
             </div>
             <div class="vf-summary-row">
+              <span class="vf-summary-label">Photos</span>
+              <span class="vf-summary-value" id="sum-photos">—</span>
+            </div>
+            <div class="vf-summary-row">
               <span class="vf-summary-label">Hourly Rate</span>
               <span class="vf-summary-value text-primary" id="sum-rate">$0.00</span>
             </div>
@@ -502,15 +596,108 @@ $isEdit = !empty($vehicleId);
 </div>
 
 <?php include_once "components/layout/footer.php"; ?>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(function () {
+
+  /** URL currently shown in the large preview (synced to a thumbnail ring). */
+  var vfMainPreviewUrl = null;
+  var MAX_VEHICLE_IMAGES = 3;
 
   // ──────── Load existing data (edit mode) ────────
   <?php if ($isEdit): ?>
     loadVehicleData(<?php echo json_encode($vehicleId); ?>);
   <?php endif; ?>
+
+  function getVehicleImageUrls() {
+    return String($('#v-image-c').val() || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  function setVehicleImageUrls(urls) {
+    $('#v-image-c').val(urls.join(','));
+    refreshVehicleImagesUI();
+  }
+
+  function refreshVehicleImagesUI() {
+    const urls = getVehicleImageUrls();
+    if (!urls.length) {
+      vfMainPreviewUrl = null;
+      $('#image-preview').attr('src', '').addClass('hidden');
+      $('#upload-placeholder').removeClass('hidden');
+    } else {
+      if (!vfMainPreviewUrl || urls.indexOf(vfMainPreviewUrl) === -1) {
+        vfMainPreviewUrl = urls[0];
+      }
+      $('#image-preview').attr('src', vfMainPreviewUrl).removeClass('hidden');
+      $('#upload-placeholder').addClass('hidden');
+    }
+    $('#vf-gallery-count').text(
+      urls.length
+        ? (urls.length + '/' + MAX_VEHICLE_IMAGES + ' images · tap a thumbnail to preview · × removes')
+        : ''
+    );
+    const $g = $('#vf-gallery-thumbs').empty();
+    urls.forEach(function (url) {
+      const $remove = $('<button type="button" class="vf-gallery-remove" title="Remove">&times;</button>');
+      const $img = $('<img alt="">').attr('src', url);
+      const $item = $('<div class="vf-gallery-item"/>').append($img, $remove);
+      if (url === vfMainPreviewUrl) {
+        $item.addClass('is-previewing');
+      }
+      $g.append($item);
+    });
+    const photoN = urls.length;
+    $('#sum-photos').text(photoN ? String(photoN) : '—');
+    updateVehicleImageLimitUI();
+  }
+
+  function updateVehicleImageLimitUI() {
+    const n = getVehicleImageUrls().length;
+    const atMax = n >= MAX_VEHICLE_IMAGES;
+    $('#image-upload').prop('disabled', atMax);
+    $('#vf-choose-images-btn').prop('disabled', atMax).toggleClass('opacity-50 pointer-events-none', atMax);
+    $('#upload-zone').toggleClass('vf-upload-zone-disabled', atMax);
+  }
+
+  function openVehicleImagePicker(e) {
+    if (e) {
+      e.preventDefault();
+    }
+    if (getVehicleImageUrls().length >= MAX_VEHICLE_IMAGES) {
+      $('#err-image').addClass('show').find('span').text('Maximum of 3 images. Remove one to add another.');
+      return;
+    }
+    $('#err-image').removeClass('show');
+    document.getElementById('image-upload').click();
+  }
+
+  $('#upload-zone, #vf-choose-images-btn').on('click', openVehicleImagePicker);
+
+  updateVehicleImageLimitUI();
+
+  $('#vf-gallery-thumbs').on('click', '.vf-gallery-item', function (e) {
+    if ($(e.target).closest('.vf-gallery-remove').length) {
+      return;
+    }
+    const url = $(this).find('img').attr('src');
+    if (!url) {
+      return;
+    }
+    vfMainPreviewUrl = url;
+    $('#image-preview').attr('src', url).removeClass('hidden');
+    $('#upload-placeholder').addClass('hidden');
+    $('#vf-gallery-thumbs .vf-gallery-item').removeClass('is-previewing');
+    $(this).addClass('is-previewing');
+  });
+
+  $('#vf-gallery-thumbs').on('click', '.vf-gallery-remove', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const idx = $(this).closest('.vf-gallery-item').index();
+    const urls = getVehicleImageUrls();
+    urls.splice(idx, 1);
+    setVehicleImageUrls(urls);
+  });
 
   // ──────── Live summary binding ────────
   function updateSummary() {
@@ -529,6 +716,9 @@ $(function () {
     $('#sum-rate').text('$' + rate.toFixed(2));
     $('#sum-fuel').text(fuel + '%');
     $('#sum-commission').text(comm + '%');
+
+    const photoN = getVehicleImageUrls().length;
+    $('#sum-photos').text(photoN ? String(photoN) : '—');
 
     const statusColors = { Active: 'bg-success/10 text-success', Inactive: 'bg-danger/10 text-danger', Maintenance: 'bg-warning/10 text-warning' };
     $('#sum-status').html('<span class="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ' + (statusColors[status] || '') + '">' + (status || '—') + '</span>');
@@ -638,9 +828,15 @@ $(function () {
       valid = false;
     }
 
-    const hasImage = $('#v-image-c').val().trim() !== '';
+    const imgCount = getVehicleImageUrls().length;
+    if (imgCount > MAX_VEHICLE_IMAGES) {
+      $('#err-image').addClass('show').find('span').text('More than 3 images are not allowed.');
+      valid = false;
+    }
+
+    const hasImage = imgCount > 0;
     if (!hasImage) {
-      $('#err-image').addClass('show').find('span').text('Please upload a vehicle image.');
+      $('#err-image').addClass('show').find('span').text('Please upload at least one vehicle image.');
       valid = false;
     }
 
@@ -663,25 +859,44 @@ $(function () {
   $('#v-facilities').on('input', function () { if (this.value.trim()) { $(this).removeClass('is-invalid'); $('#err-facilities').removeClass('show'); } });
   $('#v-description').on('input', function () { if (this.value.trim().length >= 10) { $(this).removeClass('is-invalid'); $('#err-description').removeClass('show'); } });
 
-  // ──────── Image upload with validation ────────
+  // ──────── Image upload (multiple, comma-separated URLs in image_c, max 3) ────────
   const MAX_FILE_SIZE = 2 * 1024 * 1024;
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
   $('#image-upload').on('change', function () {
-    const file = this.files && this.files[0];
-    if (!file) return;
+    const input = this;
+    let files = input.files ? Array.from(input.files) : [];
+    if (!files.length) return;
 
-    $('#err-image').removeClass('show');
-
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      $('#err-image').addClass('show').find('span').text('Only JPG, PNG or WEBP files are allowed.');
-      this.value = '';
+    const currentCount = getVehicleImageUrls().length;
+    if (currentCount >= MAX_VEHICLE_IMAGES) {
+      $('#err-image').addClass('show').find('span').text('Maximum of 3 images. Remove one to add another.');
+      input.value = '';
       return;
     }
-    if (file.size > MAX_FILE_SIZE) {
-      $('#err-image').addClass('show').find('span').text('File size must be under 2MB (yours: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB).');
-      this.value = '';
-      return;
+
+    const slots = MAX_VEHICLE_IMAGES - currentCount;
+    if (files.length > slots) {
+      $('#err-image').addClass('show').find('span').text(
+        'Only ' + slots + ' more image(s) allowed (3 max). Uploading the first ' + slots + ' selected file(s).'
+      );
+      files = files.slice(0, slots);
+    } else {
+      $('#err-image').removeClass('show');
+    }
+
+    for (let fi = 0; fi < files.length; fi++) {
+      const file = files[fi];
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        $('#err-image').addClass('show').find('span').text('Only JPG, PNG or WEBP files are allowed.');
+        input.value = '';
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        $('#err-image').addClass('show').find('span').text('Each file must be under 2MB (yours: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB).');
+        input.value = '';
+        return;
+      }
     }
 
     const reader = new FileReader();
@@ -689,48 +904,104 @@ $(function () {
       $('#image-preview').attr('src', e.target.result).removeClass('hidden');
       $('#upload-placeholder').addClass('hidden');
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(files[0]);
 
-    const formData = new FormData();
-    formData.append('vehicle_image', file);
-    formData.append('action', 'upload_vehicle_image');
+    const total = files.length;
+    let uploadedOk = true;
 
-    $('#upload-progress').addClass('show');
-    $('#upload-progress-bar').css('width', '30%');
-
-    $.ajax({
-      url: 'https://zabrin.xyz/limogen/index.php?entryPoint=CustomEntryPoint',
-      type: 'POST',
-      data: formData,
-      processData: false,
-      contentType: false,
-      xhr: function () {
-        const xhr = new window.XMLHttpRequest();
-        xhr.upload.addEventListener('progress', function (e) {
-          if (e.lengthComputable) {
-            const pct = Math.round((e.loaded / e.total) * 100);
-            $('#upload-progress-bar').css('width', pct + '%');
-          }
-        });
-        return xhr;
-      },
-      success: function (resp) {
-        const data = typeof resp === 'string' ? JSON.parse(resp) : resp;
-        $('#upload-progress-bar').css('width', '100%');
-        setTimeout(function () { $('#upload-progress').removeClass('show'); $('#upload-progress-bar').css('width', '0'); }, 600);
-        if (data.success) {
-          $('#v-image-c').val(data.url);
-          $('#err-image').removeClass('show');
-        } else {
-          $('#err-image').addClass('show').find('span').text(data.message || 'Upload failed. Try again.');
-        }
-      },
-      error: function () {
+    function finishBatch() {
+      $('#upload-progress-bar').css('width', '100%');
+      setTimeout(function () {
         $('#upload-progress').removeClass('show');
         $('#upload-progress-bar').css('width', '0');
-        $('#err-image').addClass('show').find('span').text('Network error during upload.');
+      }, 450);
+      input.value = '';
+      $('#err-image').removeClass('show');
+      refreshVehicleImagesUI();
+    }
+
+    function uploadAt(index) {
+      if (!uploadedOk) return;
+      if (index >= total) {
+        finishBatch();
+        return;
       }
-    });
+
+      if (getVehicleImageUrls().length >= MAX_VEHICLE_IMAGES) {
+        finishBatch();
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('vehicle_image', files[index]);
+      formData.append('action', 'upload_vehicle_image');
+
+      const pct = Math.round(((index + 0.35) / total) * 100);
+      $('#upload-progress').addClass('show');
+      $('#upload-progress-bar').css('width', pct + '%');
+
+      $.ajax({
+        url: 'https://zabrin.xyz/limogen/index.php?entryPoint=CustomEntryPoint',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function () {
+          const xhr = new window.XMLHttpRequest();
+          xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable && total > 0) {
+              const filePct = e.loaded / e.total;
+              const overall = ((index + filePct) / total) * 100;
+              $('#upload-progress-bar').css('width', Math.min(99, Math.round(overall)) + '%');
+            }
+          });
+          return xhr;
+        },
+        success: function (resp) {
+          var data;
+          try {
+            data = typeof resp === 'string' ? JSON.parse(resp) : resp;
+          } catch (ex) {
+            uploadedOk = false;
+            $('#err-image').addClass('show').find('span').text('Invalid response from server.');
+            $('#upload-progress').removeClass('show');
+            $('#upload-progress-bar').css('width', '0');
+            input.value = '';
+            refreshVehicleImagesUI();
+            return;
+          }
+          if (data.success && data.url) {
+            const urls = getVehicleImageUrls();
+            if (urls.indexOf(data.url) === -1 && urls.length < MAX_VEHICLE_IMAGES) {
+              urls.push(data.url);
+            }
+            $('#v-image-c').val(urls.join(','));
+            $('#err-image').removeClass('show');
+          } else {
+            uploadedOk = false;
+            $('#err-image').addClass('show').find('span').text(data.message || 'Upload failed. Try again.');
+            $('#upload-progress').removeClass('show');
+            $('#upload-progress-bar').css('width', '0');
+            input.value = '';
+            refreshVehicleImagesUI();
+          }
+        },
+        error: function () {
+          uploadedOk = false;
+          $('#upload-progress').removeClass('show');
+          $('#upload-progress-bar').css('width', '0');
+          input.value = '';
+          $('#err-image').addClass('show').find('span').text('Network error during upload.');
+          refreshVehicleImagesUI();
+        },
+        complete: function () {
+          if (!uploadedOk) return;
+          uploadAt(index + 1);
+        }
+      });
+    }
+
+    uploadAt(0);
   });
 
   // ──────── Form submit ────────
@@ -800,12 +1071,10 @@ $(function () {
           $('#v-description').val(v.description);
           $('#desc-counter').text((v.description || '').length + ' / 2000');
 
-          const imageUrl = v.image_c || v.images_c || '';
-          if (imageUrl) {
-            $('#image-preview').attr('src', imageUrl).removeClass('hidden');
-            $('#upload-placeholder').addClass('hidden');
-            $('#v-image-c').val(imageUrl);
-          }
+          const rawImages = v.image_c || v.images_c || '';
+          const capped = String(rawImages).split(',').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, MAX_VEHICLE_IMAGES);
+          $('#v-image-c').val(capped.join(','));
+          refreshVehicleImagesUI();
 
           updateSummary();
         } else {

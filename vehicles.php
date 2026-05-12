@@ -286,7 +286,7 @@
           <i class="ri-refresh-line text-sm"></i> Refresh
         </button>
         <?php if($_SESSION['user']['admin'] == 1 || limo_user_module_access('Vehicles', 'create') == 1): ?>
-        <a href="vehicle.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
+        <a href="vehicle.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4" id="add-vehicle-btn">
           <i class="ri-add-line me-1 text-base"></i> Add Vehicle
         </a>
         <?php endif; ?>
@@ -294,7 +294,7 @@
     </div>
 
     <!-- Fleet Stats -->
-    <div class="grid xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-4 mb-6">
+    <div class="grid xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-4 mb-6" id="intro-fleet-stats">
       <div class="fl-stat-card">
         <div class="fl-stat-glow" style="background: rgb(var(--primary-rgb));"></div>
         <div class="flex items-center justify-between gap-3">
@@ -351,7 +351,7 @@
           <button class="fl-filter-btn" data-filter="Inactive" onclick="filterFleet('Inactive', this)"><span class="w-1.5 h-1.5 rounded-full bg-danger inline-block"></span> Inactive</button>
         </div>
       </div>
-      <div class="overflow-auto">
+      <div class="overflow-auto" id="intro-fleet-table">
         <table class="w-full text-nowrap">
           <thead>
             <tr>
@@ -517,7 +517,10 @@
                 Maintenance: 'fl-badge-maintenance'
             }[status] || 'fl-badge-active';
 
-            const thumbBg = vehicle.images_c
+            const imgField = (vehicle.image_c || vehicle.images_c || '').trim();
+            const thumbUrl = imgField ? imgField.split(',')[0].trim() : '';
+
+            const thumbBg = thumbUrl
                 ? ''
                 : 'bg-primary/8 text-primary';
 
@@ -525,9 +528,9 @@
                 <tr class="fl-animate-row" style="animation-delay: ${idx * 30}ms" data-vehicle-id="${vehicle.id}">
                   <td>
                     <div class="flex items-center gap-3">
-                      <div class="fl-vehicle-thumb ${thumbBg}" style="${vehicle.images_c ? 'background:var(--fl-surface-2)' : ''}">
-                        ${vehicle.images_c
-                            ? `<img src="${vehicle.images_c}" alt="" onerror="this.outerHTML='<i class=\\'ri-car-fill text-xl text-primary\\'></i>'">`
+                      <div class="fl-vehicle-thumb ${thumbBg}" style="${thumbUrl ? 'background:var(--fl-surface-2)' : ''}">
+                        ${thumbUrl
+                            ? `<img src="${thumbUrl}" alt="" onerror="this.outerHTML='<i class=\\'ri-car-fill text-xl text-primary\\'></i>'">`
                             : '<i class="ri-car-fill text-xl"></i>'}
                       </div>
                       <div>

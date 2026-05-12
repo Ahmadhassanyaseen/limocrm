@@ -194,7 +194,7 @@
         <div class="xl:col-span-8 col-span-12 space-y-6">
 
           <!-- Step 1: Lead Information -->
-          <div class="al-card">
+          <div class="al-card" id="intro-lead-information">
             <div class="al-card-header">
               <div class="flex items-center gap-3">
                 <span class="al-step-num">1</span>
@@ -238,7 +238,7 @@
           </div>
 
           <!-- Step 2: Trip Details -->
-          <div class="al-card">
+          <div class="al-card" id="intro-lead-trip-details">
             <div class="al-card-header">
               <div class="flex items-center gap-3">
                 <span class="al-step-num">2</span>
@@ -323,7 +323,7 @@
           </div>
 
           <!-- Step 3: Select Vehicle -->
-          <div class="al-card">
+          <div class="al-card" id="intro-lead-select-vehicle">
             <div class="al-card-header">
               <div class="flex items-center justify-between flex-wrap gap-3">
                 <div class="flex items-center gap-3">
@@ -362,7 +362,7 @@
 
         <!-- RIGHT COLUMN: Live Summary -->
         <div class="xl:col-span-4 col-span-12">
-          <div class="al-card" style="position:sticky;top:80px;">
+          <div class="al-card" style="position:sticky;top:80px;" id="intro-lead-live-summary">
             <div class="al-card-header">
               <div class="flex items-center gap-3">
                 <div class="al-card-icon bg-primary/10 text-primary"><i class="ri-file-list-3-line"></i></div>
@@ -471,7 +471,8 @@ $(document).ready(function () {
 
     vehicles.forEach(function (v) {
       var isSelected = selectedVehicle && selectedVehicle.id === v.id;
-      var imgSrc = v.image_c || v.images_c || '';
+      var rawImg = v.image_c || v.images_c || '';
+      var imgSrc = rawImg ? String(rawImg).split(',')[0].trim() : '';
       var imgHtml = imgSrc
         ? '<img class="al-veh-img" src="' + imgSrc + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
           '<div class="al-veh-img-placeholder" style="display:none;"><i class="ri-car-fill"></i></div>'
@@ -508,7 +509,8 @@ $(document).ready(function () {
     $('#err-vehicle').removeClass('show');
 
     var img = $('#al-sum-veh-img');
-    var vImgSrc = v.image_c || v.images_c || '';
+    var rawV = v.image_c || v.images_c || '';
+    var vImgSrc = rawV ? String(rawV).split(',')[0].trim() : '';
     if (vImgSrc) {
       img.attr('src', vImgSrc).show();
     } else {

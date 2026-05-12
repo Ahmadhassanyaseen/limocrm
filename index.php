@@ -201,6 +201,7 @@ $formatRevenue = function ($n) {
           </div>
           <!-- End::page-header -->
           <!-- Start::row-1 -->
+          <div id="intro-wizard-stats">
           <div
             class="grid xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-x-6"
             >
@@ -415,11 +416,12 @@ $formatRevenue = function ($n) {
               </div>
             </div>
           </div>
+          </div>
           <!-- End::row-1 -->
           <!-- Start::row-2 -->
           <div class="grid grid-cols-12 gap-x-6">
             
-            <div class="<?php echo $dashIsAdmin ? 'col-span-12 md:col-span-12 xxl:col-span-6' : 'col-span-12'; ?>">
+            <div id="intro-wizard-sales" class="<?php echo $dashIsAdmin ? 'col-span-12 md:col-span-12 xxl:col-span-6' : 'col-span-12'; ?>">
               <div class="box">
                 <div class="box-header justify-between">
                   <div class="box-title">Sales Overview</div>
@@ -651,5 +653,4 @@ $formatRevenue = function ($n) {
           <!-- End::row-4 -->
         </div>
       </div>
-    
       <?php include_once "components/layout/footer.php"; ?>
