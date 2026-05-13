@@ -5,10 +5,18 @@ include_once 'config/api.php';
 
 $userId = $_SESSION['user']['id'] ?? '';
 $data = ['id' => $userId];
-$rawLeads = fetchAllUserLeads($data);
+
+ if($_SESSION['user']['admin'] == 1){
+    $rawLeads = fetchAllLeads($data);
+  } else {
+    $rawLeads = fetchAllUserLeads($data);
+  }
 if (!is_array($rawLeads)) {
     $rawLeads = [];
 }
+
+// print_r($rawLeads);
+// exit;
 
 function agr_is_converted_status(?string $status): bool {
     $s = strtolower(trim((string)$status));

@@ -104,7 +104,7 @@ foreach ($allUsers as $u) {
   .um-label .um-req { color: #ef4444; font-size: 14px; line-height: 1; }
   .um-input-wrap { position: relative; }
   .um-input-wrap .um-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--us-muted); pointer-events: none; transition: color 0.2s; z-index: 1; }
-  .um-input { height: 42px; border-radius: 10px; border: 1px solid var(--us-border); background: var(--us-surface-2); color: var(--us-text); padding: 0 12px 0 38px; width: 100%; font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .um-input { height: 42px; border-radius: 10px; border: 1px solid var(--us-border); background: var(--us-surface-2); color: var(--us-text); padding: 0 12px 0 38px!important; width: 100%; font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
   .um-input:focus { border-color: rgb(var(--primary-rgb)); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08); }
   .um-input:focus ~ .um-icon, .um-input:focus + .um-icon { color: rgb(var(--primary-rgb)); }
   .um-input.is-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.08) !important; }

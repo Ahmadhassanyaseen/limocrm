@@ -59,7 +59,7 @@
 
     <!-- Page Header -->
     <div class="flex items-start justify-between flex-wrap gap-3 mb-6">
-      <div>
+        <div>
         <div class="flex items-center gap-2 mb-1">
           <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <i class="ri-git-merge-line text-primary text-base"></i>
@@ -67,11 +67,11 @@
           <h1 class="page-title font-bold text-xl mb-0" style="color:var(--wf-text)">Workflows</h1>
         </div>
         <p class="text-xs mt-1 mb-0 ms-10" style="color:var(--wf-muted)">Automate actions with condition-based email workflows.</p>
-      </div>
-      <div class="flex items-center gap-2">
+        </div>
+        <div class="flex items-center gap-2">
         <button type="button" class="wf-action-btn" title="Refresh" onclick="loadWorkflows()" style="width:36px;height:36px;font-size:16px;">
           <i class="ri-refresh-line"></i>
-        </button>
+          </button>
         <a href="create_workflow.php" class="ti-btn ti-btn-sm bg-primary text-white font-semibold shadow-sm hover:shadow-md transition-all !rounded-xl px-4">
           <i class="ri-add-line me-1 text-base"></i> New Workflow
         </a>
@@ -118,9 +118,9 @@
             <div class="wf-stat-label">On Create</div>
           </div>
           <div class="wf-stat-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;"><i class="ri-add-circle-line"></i></div>
+          </div>
         </div>
       </div>
-    </div>
 
     <!-- Table Card -->
     <div class="wf-table-card mb-6">
@@ -242,8 +242,8 @@ function renderTable(list) {
   if (!list.length) {
     $('#wf-rows').html('');
     $('#wf-empty').show();
-    return;
-  }
+      return;
+    }
   $('#wf-empty').hide();
   var html = '';
   list.forEach(function(w, idx) {
@@ -299,8 +299,8 @@ window.deleteWorkflow = function(id) {
         var d = typeof response === 'string' ? JSON.parse(response) : response;
         if (d.success) {
           Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Workflow removed.', timer: 1200, showConfirmButton: false });
-          loadWorkflows();
-        } else {
+      loadWorkflows();
+    } else {
           Swal.fire({ icon: 'error', title: 'Error', text: d.message || 'Failed to delete.' });
         }
       }

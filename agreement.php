@@ -388,7 +388,7 @@ $leadId = isset($_GET['lead_id']) ? trim((string)$_GET['lead_id']) : '';
   </div>
 
   <!-- 3. Payment -->
-  <div class="ag-card" id="pay-card" style="display:none;">
+  <!-- <div class="ag-card" id="pay-card" style="display:none;">
     <div class="ag-card-header">
       <div class="ag-card-header-icon" style="background:rgba(16,185,129,.08);color:#059669;">
         <i class="ri-bank-card-2-line"></i>
@@ -412,7 +412,67 @@ $leadId = isset($_GET['lead_id']) ? trim((string)$_GET['lead_id']) : '';
         </button>
       </div>
     </div>
+  </div> -->
+
+  <div class="ag-card-body">
+
+  <!-- Stripe -->
+  <div id="stripe-wrap" style="display:none;">
+    <div id="card-element"></div>
+
+    <div id="card-errors"
+         style="color:var(--ag-danger);font-size:13px;min-height:20px;margin:8px 0 4px;">
+    </div>
+
+    <div class="ag-stripe-badge">
+      <i class="ri-lock-2-line"></i>
+      Secured by Stripe
+    </div>
   </div>
+
+  <!-- PayPal -->
+  <div id="paypal-wrap" style="display:none;">
+    <div id="paypal-button-container"></div>
+
+    <div style="margin-top:12px;font-size:13px;color:var(--ag-muted);">
+      You will be redirected securely to PayPal to complete payment.
+    </div>
+  </div>
+
+  <!-- Offline -->
+  <div id="offline-wrap" style="display:none;">
+    <div style="
+      background: rgba(245,158,11,.08);
+      border:1px solid rgba(245,158,11,.18);
+      border-radius:14px;
+      padding:18px;
+      color:#92400e;
+      font-size:14px;
+      line-height:1.6;
+    ">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <i class="ri-information-line" style="font-size:20px;"></i>
+
+        <div>
+          <strong>Offline Payment Selected</strong><br>
+          Your agreement will be signed now. Payment will be collected later by the service provider.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit button -->
+  <div style="margin-top:20px;">
+    <button type="button"
+            class="ag-btn ag-btn-primary ag-btn-full"
+            id="btn-submit"
+            disabled>
+      <i class="ri-check-double-line"></i>
+      Confirm Agreement
+    </button>
+  </div>
+
+</div>
 
   <!-- Security footer -->
   <div class="ag-footer" id="ag-footer" style="display:none;">
@@ -428,6 +488,8 @@ $leadId = isset($_GET['lead_id']) ? trim((string)$_GET['lead_id']) : '';
 
 <?php if ($leadId !== ''): ?>
 <script>
+  var paymentMethod = '';
+var paymentKeys = null;
 (function () {
   var LEAD_ID = <?php echo json_encode($leadId); ?>;
 
@@ -523,21 +585,21 @@ $leadId = isset($_GET['lead_id']) ? trim((string)$_GET['lead_id']) : '';
 
     if (!data.success) { showErr(data.message || 'Unable to load this agreement.'); return; }
 
-    var stripePk = data.stripe_publishable_key || '';
-    if (!stripePk) {
-      showErr('Payment processing is not configured for this account. Please contact the service provider.');
-      return;
-    }
+    // var stripePk = data.stripe_publishable_key || '';
+    // if (!stripePk) {
+    //   showErr('Payment processing is not configured for this account. Please contact the service provider.');
+    //   return;
+    // }
 
-    stripe = Stripe(stripePk);
-    var elements = stripe.elements();
-    cardEl = elements.create('card', {
-      style: { base: { fontSize: '15px', fontFamily: "'Inter', sans-serif", color: '#0f172a', '::placeholder': { color: '#94a3b8' } } }
-    });
-    cardEl.mount('#card-element');
-    cardEl.on('change', function (e) {
-      document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
-    });
+    // stripe = Stripe(stripePk);
+    // var elements = stripe.elements();
+    // cardEl = elements.create('card', {
+    //   style: { base: { fontSize: '15px', fontFamily: "'Inter', sans-serif", color: '#0f172a', '::placeholder': { color: '#94a3b8' } } }
+    // });
+    // cardEl.mount('#card-element');
+    // cardEl.on('change', function (e) {
+    //   document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+    // });
 
     var L = data.lead || {};
     var name = ((L.first_name || '') + ' ' + (L.last_name || '')).trim();
@@ -566,103 +628,411 @@ $leadId = isset($_GET['lead_id']) ? trim((string)$_GET['lead_id']) : '';
 
     document.getElementById('lead-card').style.display = 'block';
     document.getElementById('sig-card').style.display = 'block';
-    document.getElementById('pay-card').style.display = 'block';
+    // document.getElementById('pay-card').style.display = 'block';
     document.getElementById('ag-footer').style.display = 'flex';
     document.getElementById('btn-submit').disabled = false;
     markStep(1);
+
+
+    paymentMethod = data.method || '';
+paymentKeys = data.keys || '';
+
+document.getElementById('btn-submit').disabled = false;
+
+//
+// STRIPE
+//
+if (paymentMethod === 'stripe') {
+
+  document.getElementById('stripe-wrap').style.display = 'block';
+
+  if (!paymentKeys) {
+    showErr('Stripe is not configured.');
+    return;
+  }
+
+  stripe = Stripe(paymentKeys);
+
+  var elements = stripe.elements();
+
+  cardEl = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '15px',
+        fontFamily: "'Inter', sans-serif",
+        color: '#0f172a',
+        '::placeholder': { color: '#94a3b8' }
+      }
+    }
+  });
+
+  cardEl.mount('#card-element');
+
+  cardEl.on('change', function (e) {
+    document.getElementById('card-errors').textContent =
+      e.error ? e.error.message : '';
+  });
+}
+
+//
+// PAYPAL
+//
+if (paymentMethod === 'paypal') {
+
+  document.getElementById('paypal-wrap').style.display = 'block';
+
+  if (!paymentKeys) {
+    showErr('PayPal is not configured.');
+    return;
+  }
+
+  var ppScript = document.createElement('script');
+
+  ppScript.src =
+    'https://www.paypal.com/sdk/js?client-id=' +
+    encodeURIComponent(paymentKeys) +
+    '&currency=USD';
+
+  ppScript.onload = function () {
+
+    paypal.Buttons({
+
+      createOrder: function (data, actions) {
+
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: parseFloat(L.total_price_c || 0).toFixed(2)
+            }
+          }]
+        });
+      },
+
+      onApprove: function (data, actions) {
+
+        return actions.order.capture().then(function (details) {
+
+          submitAgreement({
+            paypal_order_id: data.orderID,
+            paypal_payer_id: details.payer.payer_id
+          });
+
+        });
+      },
+
+      onError: function (err) {
+        console.error(err);
+        showErr('PayPal payment failed.');
+      }
+
+    }).render('#paypal-button-container');
+  };
+
+  document.body.appendChild(ppScript);
+}
+
+//
+// OFFLINE
+//
+if (paymentMethod === 'offline') {
+
+  document.getElementById('offline-wrap').style.display = 'block';
+}
   }).catch(function (err) {
     loadingCard.style.display = 'none';
     console.error('Error:', err);
     showErr('Network error — could not load agreement data.');
   });
 
-  document.getElementById('btn-submit').addEventListener('click', function () {
-    clearErr();
-    if (!hasInk) { showErr('Please add your signature before submitting.'); return; }
-    if (!stripe || !cardEl) { showErr('Payment system is not ready. Refresh the page.'); return; }
+  async function submitAgreement(extraData) {
 
-    var btn = this;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Processing...';
+  extraData = extraData || {};
+  let response = '';
+
+   response = await fetch('config/agreement_api.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    },
+
+    body: new URLSearchParams({
+      op: 'submit',
+      lead_id: LEAD_ID,
+      signature_png: canvas.toDataURL('image/png'),
+      payment_method: paymentMethod,
+
+      payment_method_id: extraData.payment_method_id || '',
+      paypal_order_id: extraData.paypal_order_id || '',
+      paypal_payer_id: extraData.paypal_payer_id || ''
+    })
+
+  }).then(async function (r) {
+
+    return await r.json();
+
+  }).then(function (out) {
+
+    if (!out.success) {
+      Swal.close();
+      showErr(out.message || 'Submission failed.');
+      return;
+    }
 
     Swal.fire({
-      title: 'Processing Payment',
-      html: '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0;">' +
-            '<div style="width:56px;height:56px;border:4px solid #e2e8f0;border-top-color:#4f46e5;border-radius:50%;animation:ag-spin .7s linear infinite;"></div>' +
-            '<p style="color:#475569;font-size:14px;margin:0;">Please wait while we securely process your payment and generate your agreement document...</p>' +
-            '<p style="color:#94a3b8;font-size:12px;margin:0;">Do not close or refresh this page.</p></div>',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showConfirmButton: false,
-      customClass: { popup: 'ag-swal-popup' }
+      icon: 'success',
+      title: paymentMethod === 'offline'
+        ? 'Agreement Submitted!'
+        : 'Payment Successful!',
+
+      html:
+        '<div style="text-align:center;">' +
+        '<p style="font-size:14px;color:#475569;">' +
+
+        (
+          paymentMethod === 'offline'
+          ? 'Your agreement has been signed successfully. The provider will contact you regarding payment.'
+          : 'Your agreement has been signed and payment processed successfully.'
+        ) +
+
+        '</p></div>',
+
+      confirmButtonColor: '#4f46e5'
     });
 
-    stripe.createPaymentMethod({ type: 'card', card: cardEl }).then(function (res) {
+  const leadCard = document.getElementById('lead-card');
+    const sigCard  = document.getElementById('sig-card');
+    const payCard  = document.getElementById('pay-card');
+
+    if (leadCard) {
+      leadCard.style.display = 'none';
+    }
+
+    if (sigCard) {
+      sigCard.style.display = 'none';
+    }
+
+    if (payCard) {
+      payCard.style.display = 'none';
+    }
+    // console.log(response);
+
+    okText.innerHTML =
+  '<strong>Thank you!</strong><br>' +
+
+  (
+    paymentMethod === 'offline'
+    ? 'Your agreement has been signed successfully. Payment will be collected later.'
+    : 'Your agreement has been signed and payment processed successfully.'
+  ) +
+
+  (
+    out.agreement_pdf_url
+    ? `
+      <div style="margin-top:16px;">
+        <a
+          href="${out.agreement_pdf_url}"
+          target="_blank"
+          style="
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            background:#4f46e5;
+            color:#fff;
+            padding:12px 18px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:600;
+            font-size:14px;
+          "
+        >
+          <i class="ri-file-download-line"></i>
+          View Agreement PDF
+        </a>
+      </div>
+    `
+    : ''
+  );
+  let agCardBody = document.querySelectorAll('.ag-card-body');
+  for (let i = 0; i < agCardBody.length; i++) {
+    if (agCardBody[i]) {
+      agCardBody[i].style.display = 'none';
+    }
+  }
+
+    okEl.classList.add('show');
+
+  }).catch(function (err) {
+  console.error('Error submitting agreement:', err);
+    Swal.close();
+
+    showErr('Something went wrong.');
+
+  });
+}
+
+  // document.getElementById('btn-submit').addEventListener('click', function () {
+  //   clearErr();
+  //   if (!hasInk) { showErr('Please add your signature before submitting.'); return; }
+  //   if (!stripe || !cardEl) { showErr('Payment system is not ready. Refresh the page.'); return; }
+
+  //   var btn = this;
+  //   btn.disabled = true;
+  //   btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Processing...';
+
+  //   Swal.fire({
+  //     title: 'Processing Payment',
+  //     html: '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0;">' +
+  //           '<div style="width:56px;height:56px;border:4px solid #e2e8f0;border-top-color:#4f46e5;border-radius:50%;animation:ag-spin .7s linear infinite;"></div>' +
+  //           '<p style="color:#475569;font-size:14px;margin:0;">Please wait while we securely process your payment and generate your agreement document...</p>' +
+  //           '<p style="color:#94a3b8;font-size:12px;margin:0;">Do not close or refresh this page.</p></div>',
+  //     allowOutsideClick: false,
+  //     allowEscapeKey: false,
+  //     showConfirmButton: false,
+  //     customClass: { popup: 'ag-swal-popup' }
+  //   });
+
+  //   stripe.createPaymentMethod({ type: 'card', card: cardEl }).then(function (res) {
+  //     if (res.error) {
+  //       Swal.close();
+  //       showErr(res.error.message);
+  //       btn.disabled = false;
+  //       btn.innerHTML = '<i class="ri-check-double-line"></i> Confirm & Pay';
+  //       return;
+  //     }
+
+  //     return fetch('config/agreement_api.php', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+  //       body: new URLSearchParams({
+  //         op: 'submit',
+  //         lead_id: LEAD_ID,
+  //         payment_method_id: res.paymentMethod.id,
+  //         signature_png: canvas.toDataURL('image/png')
+  //       })
+  //     }).then(function (r) {
+  //       return r.text().then(function (raw) {
+  //         try {
+  //           var j = raw.indexOf('{');
+  //           if (j > 0) raw = raw.substring(j);
+  //           return JSON.parse(raw);
+  //         } catch (e) { return { success: false, message: 'Invalid server response' }; }
+  //       });
+  //     }).then(function (out) {
+  //       if (!out.success) {
+  //         Swal.close();
+  //         showErr(out.message || 'Payment failed.');
+  //         btn.disabled = false;
+  //         btn.innerHTML = '<i class="ri-check-double-line"></i> Confirm & Pay';
+  //         return;
+  //       }
+
+  //       Swal.fire({
+  //         icon: 'success',
+  //         title: 'Payment Successful!',
+  //         html: '<div style="text-align:center;padding:4px 0;">' +
+  //               '<p style="color:#475569;font-size:14px;margin:0 0 8px;">Your agreement has been signed and payment processed successfully.</p>' +
+  //               (out.payment_intent_id ? '<p style="color:#94a3b8;font-size:12px;margin:0 0 8px;">Reference: ' + esc(out.payment_intent_id) + '</p>' : '') +
+  //               (out.agreement_pdf_url ? '<a href="' + esc(out.agreement_pdf_url) + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#4f46e5;color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;margin-top:4px;"><i class="ri-file-download-line"></i> Download Agreement PDF</a>' : '') +
+  //               '</div>',
+  //         confirmButtonText: 'Done',
+  //         confirmButtonColor: '#4f46e5',
+  //         allowOutsideClick: false
+  //       });
+
+  //       document.getElementById('lead-card').style.display = 'none';
+  //       document.getElementById('sig-card').style.display = 'none';
+  //       document.getElementById('pay-card').style.display = 'none';
+  //       document.getElementById('ag-footer').style.display = 'none';
+
+  //       okText.innerHTML = '<strong style="font-size:16px;">Thank you!</strong><br>' +
+  //         'Your agreement has been signed and payment processed successfully.' +
+  //         (out.payment_intent_id ? '<br><span style="font-size:12px;opacity:.7;">Reference: ' + esc(out.payment_intent_id) + '</span>' : '') +
+  //         (out.agreement_pdf_url ? '<br><a href="' + esc(out.agreement_pdf_url) + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#4f46e5;font-weight:600;font-size:14px;margin-top:8px;"><i class="ri-file-download-line"></i> Download Agreement PDF</a>' : '');
+  //       okEl.classList.add('show');
+  //     });
+  //   }).catch(function () {
+  //     Swal.close();
+  //     showErr('Something went wrong. Please try again.');
+  //     btn.disabled = false;
+  //     btn.innerHTML = '<i class="ri-check-double-line"></i> Confirm & Pay';
+  //   });
+  // });
+  document.getElementById('btn-submit')
+.addEventListener('click', function () {
+
+  this.disabled = true;
+  this.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Processing...';
+  clearErr();
+
+  if (!hasInk) {
+    showErr('Please add your signature before submitting.');
+    return;
+  }
+
+  //
+  // OFFLINE
+  //
+  if (paymentMethod === 'offline') {
+
+    submitAgreement({});
+    return;
+  }
+
+  //
+  // STRIPE
+  //
+  if (paymentMethod === 'stripe') {
+
+    if (!stripe || !cardEl) {
+      showErr('Stripe is not ready.');
+      return;
+    }
+
+    var btn = this;
+
+    btn.disabled = true;
+
+    btn.innerHTML =
+      '<i class="ri-loader-4-line ri-spin"></i> Processing...';
+
+    stripe.createPaymentMethod({
+      type: 'card',
+      card: cardEl
+
+    }).then(function (res) {
+
       if (res.error) {
-        Swal.close();
+
         showErr(res.error.message);
+
         btn.disabled = false;
-        btn.innerHTML = '<i class="ri-check-double-line"></i> Confirm & Pay';
+
+        btn.innerHTML =
+          '<i class="ri-check-double-line"></i> Confirm Agreement';
+
         return;
       }
 
-      return fetch('config/agreement_api.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-        body: new URLSearchParams({
-          op: 'submit',
-          lead_id: LEAD_ID,
-          payment_method_id: res.paymentMethod.id,
-          signature_png: canvas.toDataURL('image/png')
-        })
-      }).then(function (r) {
-        return r.text().then(function (raw) {
-          try {
-            var j = raw.indexOf('{');
-            if (j > 0) raw = raw.substring(j);
-            return JSON.parse(raw);
-          } catch (e) { return { success: false, message: 'Invalid server response' }; }
-        });
-      }).then(function (out) {
-        if (!out.success) {
-          Swal.close();
-          showErr(out.message || 'Payment failed.');
-          btn.disabled = false;
-          btn.innerHTML = '<i class="ri-check-double-line"></i> Confirm & Pay';
-          return;
-        }
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Payment Successful!',
-          html: '<div style="text-align:center;padding:4px 0;">' +
-                '<p style="color:#475569;font-size:14px;margin:0 0 8px;">Your agreement has been signed and payment processed successfully.</p>' +
-                (out.payment_intent_id ? '<p style="color:#94a3b8;font-size:12px;margin:0 0 8px;">Reference: ' + esc(out.payment_intent_id) + '</p>' : '') +
-                (out.agreement_pdf_url ? '<a href="' + esc(out.agreement_pdf_url) + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#4f46e5;color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;margin-top:4px;"><i class="ri-file-download-line"></i> Download Agreement PDF</a>' : '') +
-                '</div>',
-          confirmButtonText: 'Done',
-          confirmButtonColor: '#4f46e5',
-          allowOutsideClick: false
-        });
-
-        document.getElementById('lead-card').style.display = 'none';
-        document.getElementById('sig-card').style.display = 'none';
-        document.getElementById('pay-card').style.display = 'none';
-        document.getElementById('ag-footer').style.display = 'none';
-
-        okText.innerHTML = '<strong style="font-size:16px;">Thank you!</strong><br>' +
-          'Your agreement has been signed and payment processed successfully.' +
-          (out.payment_intent_id ? '<br><span style="font-size:12px;opacity:.7;">Reference: ' + esc(out.payment_intent_id) + '</span>' : '') +
-          (out.agreement_pdf_url ? '<br><a href="' + esc(out.agreement_pdf_url) + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#4f46e5;font-weight:600;font-size:14px;margin-top:8px;"><i class="ri-file-download-line"></i> Download Agreement PDF</a>' : '');
-        okEl.classList.add('show');
+      submitAgreement({
+        payment_method_id: res.paymentMethod.id
       });
-    }).catch(function () {
-      Swal.close();
-      showErr('Something went wrong. Please try again.');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ri-check-double-line"></i> Confirm & Pay';
+
     });
-  });
+
+    return;
+  }
+
+  //
+  // PAYPAL
+  //
+  if (paymentMethod === 'paypal') {
+
+    showErr('Please complete payment using PayPal buttons.');
+
+    return;
+  }
+
+});
 })();
 </script>
 <?php endif; ?>

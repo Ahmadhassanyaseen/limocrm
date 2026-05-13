@@ -1,5 +1,39 @@
 <?php include_once 'components/layout/header.php'; ?>
 <?php include_once 'components/layout/sidebar.php'; ?>
+<?php
+require_once __DIR__ . '/config/api.php';
+$esTeamData = ['id' => $_SESSION['user']['id'] ?? ''];
+$esTeamMembers = fetchAllTeamMembers($esTeamData);
+if (!is_array($esTeamMembers)) {
+    $esTeamMembers = [];
+}
+$esAssignableUsers = [];
+$esSeenAssign = [];
+$sessId = (string) ($_SESSION['user']['id'] ?? '');
+if ($sessId !== '') {
+    $esLabel = trim((string) ($_SESSION['user']['first_name'] ?? '') . ' ' . (string) ($_SESSION['user']['last_name'] ?? ''));
+    $esUname = (string) ($_SESSION['user']['user_name'] ?? '');
+    $esAssignableUsers[] = [
+        'id' => $sessId,
+        'label' => trim($esLabel . ($esUname !== '' ? ' (' . $esUname . ')' : '')),
+    ];
+    $esSeenAssign[$sessId] = true;
+}
+foreach ($esTeamMembers as $m) {
+    $mid = (string) ($m['id'] ?? '');
+    if ($mid === '' || !empty($esSeenAssign[$mid])) {
+        continue;
+    }
+    $esSeenAssign[$mid] = true;
+    $esFn = trim((string) ($m['first_name'] ?? ''));
+    $esLn = trim((string) ($m['last_name'] ?? ''));
+    $esUname = (string) ($m['user_name'] ?? '');
+    $esAssignableUsers[] = [
+        'id' => $mid,
+        'label' => trim($esFn . ' ' . $esLn) . ($esUname !== '' ? ' (' . $esUname . ')' : ''),
+    ];
+}
+?>
 
 <style>
   .es-page {
@@ -189,7 +223,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    z-index: 1200;
+    z-index: 999;
     background: rgba(0, 0, 0, 0.55);
     align-items: center;
     justify-content: center;
@@ -338,7 +372,7 @@
 
   .es-details { margin-top: 14px; color: var(--es-muted); }
   .es-details summary { cursor: pointer; font-weight: 700; color: var(--es-heading); font-size: 13px; }
-  .es-details > div { margin-top: 12px; }
+  .es-details > div { margin-top: 12px; } 
 </style>
 
 <div class="main-content app-content px-5 ">
@@ -347,7 +381,7 @@
     <div class="es-head">
       <div class="es-head-text">
         <h1 class="es-title"><i class="ri-mail-settings-line"></i> Email Settings</h1>
-        <p class="es-subtitle">Configure outbound SMTP accounts for system and campaign email. Accounts are stored in SuiteCRM and scoped to your user.</p>
+        <p class="es-subtitle">Configure outbound SMTP accounts. Data is stored in SuiteCRM table <code class="text-xs">limo_outbound_email_accounts</code> (personal accounts can be assigned to a user).</p>
       </div>
       <div class="es-toolbar" style="margin:0;align-self:flex-end;">
         <button type="button" class="es-btn-primary" id="es-add-btn"><i class="ri-add-line"></i> Add Account</button>
@@ -387,11 +421,25 @@
       <input class="es-input" id="es-f-name" maxlength="255" autocomplete="off">
       <div class="es-hint err" id="es-f-name-e" style="display:none;"></div>
 
-      <label class="es-label" for="es-f-scope">User</label>
+      <label class="es-label" for="es-f-scope">Account type</label>
       <select class="es-select" id="es-f-scope">
         <option value="system">System</option>
         <option value="personal">Personal</option>
       </select>
+
+      <div id="es-assign-row" style="display:none;margin-top:12px;" aria-hidden="true">
+        <label class="es-label" for="es-f-assigned">Assigned user <span class="text-danger">*</span></label>
+        <select class="es-select" id="es-f-assigned">
+          <option value="">Select user…</option>
+          <?php foreach ($esAssignableUsers as $eu): ?>
+            <option value="<?php echo htmlspecialchars($eu['id'], ENT_QUOTES, 'UTF-8'); ?>">
+              <?php echo htmlspecialchars($eu['label'], ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+        <div class="es-hint err" id="es-f-assigned-e" style="display:none;"></div>
+        <p class="es-hint mb-0">Shown only when Account type is Personal — a user is required. Hidden for System.</p>
+      </div>
 
       <div class="es-row-2" style="margin-top:12px;">
         <div>
@@ -504,12 +552,51 @@
     return '<span class="es-badge-none">Off</span>';
   }
 
+  /** Parse jQuery JSON (or string) and normalize SuiteCRM success flags (bool vs "true"/"false" strings). */
+  function parseAjaxJson(res) {
+    if (res === null || res === undefined) {
+      return { success: false, message: 'Empty response from server.' };
+    }
+    if (typeof res === 'string') {
+      try {
+        res = JSON.parse(res);
+      } catch (e) {
+        return { success: false, message: (res || '').trim().slice(0, 400) || 'Could not read server response.' };
+      }
+    }
+    if (typeof res !== 'object') {
+      return { success: false, message: 'Unexpected response from server.' };
+    }
+    return res;
+  }
+
+  function isApiSuccess(res) {
+    var s = res.success;
+    if (s === true || s === 1) return true;
+    if (s === false || s === 0) return false;
+    if (typeof s === 'string') {
+      var t = s.toLowerCase();
+      if (t === 'true' || t === '1') return true;
+      if (t === 'false' || t === '0' || t === '') return false;
+    }
+    return !!s;
+  }
+
+  function apiMessage(res) {
+    var m = res.message;
+    if (m != null && String(m) !== '') return String(m);
+    if (res.msg != null && String(res.msg) !== '') return String(res.msg);
+    if (res.error != null && String(res.error) !== '') return String(res.error);
+    return '';
+  }
+
   function loadAccounts() {
-    $.post(END, { op: 'list' })
-      .done(function (res) {
-        if (typeof res === 'string') { try { res = JSON.parse(res); } catch (e) { res = {}; } }
-        if (!res.success) {
-          $('#es-tbody').html('<tr><td colspan="6" class="es-empty">' + esc(res.message || 'Could not load accounts.') + '</td></tr>');
+    $.post(END, { op: 'list' }, function (res) {
+        res = parseAjaxJson(res);
+        if (!isApiSuccess(res)) {
+          var listErr = apiMessage(res) || 'Could not load accounts.';
+          $('#es-tbody').html('<tr><td colspan="6" class="es-empty">' + esc(listErr) + '</td></tr>');
+          Swal.fire({ icon: 'error', title: 'Could not load accounts', text: listErr });
           return;
         }
         var rows = res.accounts || [];
@@ -532,9 +619,10 @@
           html += '</td></tr>';
         });
         $('#es-tbody').html(html);
-      })
+      }, 'json')
       .fail(function () {
         $('#es-tbody').html('<tr><td colspan="6" class="es-empty">Network error.</td></tr>');
+        Swal.fire({ icon: 'error', title: 'Network error', text: 'Could not load outbound accounts. Try again.' });
       });
   }
 
@@ -571,8 +659,21 @@
     'es-f-fa': 'es-f-fa-e',
     'es-f-rn': 'es-f-rn-e',
     'es-f-ra': 'es-f-ra-e',
-    'es-f-sig': 'es-f-sig-e'
+    'es-f-sig': 'es-f-sig-e',
+    'es-f-assigned': 'es-f-assigned-e'
   };
+
+  function syncAssignRowVisibility() {
+    var personal = $('#es-f-scope').val() === 'personal';
+    $('#es-assign-row').css('display', personal ? 'block' : 'none').attr('aria-hidden', personal ? 'false' : 'true');
+    $('#es-f-assigned').prop('required', personal);
+    if (!personal) {
+      $('#es-f-assigned').val('');
+      $('#es-f-assigned option[data-es-temp="1"]').remove();
+      $('#es-f-assigned-e').hide().text('');
+      $('#es-f-assigned').removeClass('err');
+    }
+  }
 
   function openModal(isNew) {
     clearErrs();
@@ -596,6 +697,9 @@
       $('#es-f-sig').val('');
       $('#es-f-smtp-pass').attr('placeholder', 'Password');
       $('#es-f-smtp-pass-h').text('');
+      $('#es-f-assigned').val('');
+      $('#es-f-assigned option[data-es-temp="1"]').remove();
+      syncAssignRowVisibility();
     }
   }
 
@@ -620,6 +724,13 @@
     if (!RE_ACC_NAME.test(name)) {
       showErr('es-f-name-e', 'es-f-name', 'Use letters, numbers, spaces, and common punctuation only.');
       return false;
+    }
+
+    if ($('#es-f-scope').val() === 'personal') {
+      if (!$('#es-f-assigned').val().trim()) {
+        showErr('es-f-assigned-e', 'es-f-assigned', 'Personal accounts must have an assigned user.');
+        return false;
+      }
     }
 
     var host = $('#es-f-server').val().trim();
@@ -668,7 +779,7 @@
       return false;
     }
     if (auth && editId && pw.trim() === '' && !hasStoredPass) {
-      showErr('es-f-smtp-pass-e', 'es-f-smtp-pass', 'Enter the SMTP password, or turn authentication off until one is saved in SuiteCRM.');
+      showErr('es-f-smtp-pass-e', 'es-f-smtp-pass', 'Enter the SMTP password, or turn authentication off until one is saved.');
       return false;
     }
 
@@ -726,7 +837,7 @@
       op: 'save',
       id: id,
       name: $('#es-f-name').val().trim(),
-      account_scope: $('#es-f-scope').val(),
+      account_type: $('#es-f-scope').val().trim(),
       mail_smtpserver: $('#es-f-server').val().trim(),
       mail_smtpport: $('#es-f-port').val().trim(),
       mail_smtpuser: $('#es-f-smtp-user').val().trim(),
@@ -739,20 +850,20 @@
       reply_to_addr: $('#es-f-ra').val().trim(),
       signature: $('#es-f-sig').val(),
       mail_sendtype: $('#es-f-sendtype').val(),
-      mail_smtptype: $('#es-f-smtptype').val()
+      mail_smtptype: $('#es-f-smtptype').val(),
+      assigned_user_id: $('#es-f-scope').val() === 'personal' ? $('#es-f-assigned').val().trim() : ''
     };
 
-    $.post(END, fd)
-      .done(function (res) {
-        if (typeof res === 'string') { try { res = JSON.parse(res); } catch (e) { res = {}; } }
-        if (res.success) {
+    $.post(END, fd, function (res) {
+        res = parseAjaxJson(res);
+        if (isApiSuccess(res)) {
           closeModal();
-          Swal.fire({ icon: 'success', title: 'Saved', text: res.message || 'Account saved.', timer: 1800, showConfirmButton: false });
+          Swal.fire({ icon: 'success', title: 'Saved', text: apiMessage(res) || 'Account saved.', timer: 2200, showConfirmButton: true });
           loadAccounts();
         } else {
-          Swal.fire({ icon: 'error', title: 'Could not save', text: res.message || 'Try again.' });
+          Swal.fire({ icon: 'error', title: 'Could not save', text: apiMessage(res) || 'Try again.' });
         }
-      })
+      }, 'json')
       .fail(function () {
         Swal.fire({ icon: 'error', title: 'Network error', text: 'Try again.' });
       })
@@ -763,6 +874,8 @@
 
   $(function () {
     loadAccounts();
+
+    $('#es-f-scope').on('change', syncAssignRowVisibility);
 
     $('#es-add-btn').on('click', function () {
       openModal(true);
@@ -791,21 +904,29 @@
 
     $(document).on('click', '.es-edit', function () {
       var rid = $(this).data('id');
-      $.post(END, { op: 'detail', id: rid })
-        .done(function (res) {
-          if (typeof res === 'string') { try { res = JSON.parse(res); } catch (e) { res = {}; } }
-          if (!res.success || !res.account) {
-            Swal.fire({ icon: 'error', text: res.message || 'Unable to load account.' });
+      $.post(END, { op: 'detail', id: rid }, function (res) {
+          res = parseAjaxJson(res);
+          if (!isApiSuccess(res) || !res.account) {
+            Swal.fire({ icon: 'error', title: 'Could not open account', text: apiMessage(res) || 'Unable to load account.' });
             return;
           }
           var a = res.account;
           openModal(false);
+          $('#es-f-assigned option[data-es-temp="1"]').remove();
           $('#es-f-id').val(a.id);
           $('#es-f-name').val(a.name);
           var scopeType = (a.account_type_c === 'system' || a.account_type_c === 'personal')
             ? a.account_type_c
             : (a.type === 'system' ? 'system' : 'personal');
           $('#es-f-scope').val(scopeType);
+          var aid = String(a.assigned_user_id || '').trim();
+          $('#es-f-assigned').val(aid);
+          if (aid && $('#es-f-assigned').val() !== aid) {
+            $('#es-f-assigned').append(
+              $('<option></option>').val(aid).text('User (not in list)').attr('data-es-temp', '1')
+            );
+            $('#es-f-assigned').val(aid);
+          }
           $('#es-f-server').val(a.mail_smtpserver);
           $('#es-f-port').val(a.mail_smtpport);
           $('#es-f-smtp-user').val(a.mail_smtpuser);
@@ -821,20 +942,23 @@
           var hp = a.mail_smtp_has_pass ? 1 : 0;
           $('#es-f-smtp-pass-h').removeClass('err').data('haspass', hp)
             .text(hp ? 'A password is stored. Leave blank to keep it.' : 'No password stored yet.');
+          syncAssignRowVisibility();
+        }, 'json')
+        .fail(function () {
+          Swal.fire({ icon: 'error', title: 'Network error', text: 'Could not load account. Try again.' });
         });
     });
 
     $(document).on('click', '.es-test', function () {
       var rid = $(this).data('id');
-      $.post(END, { op: 'test', id: rid })
-        .done(function (res) {
-          if (typeof res === 'string') { try { res = JSON.parse(res); } catch (e) { res = {}; } }
-          if (res.success) {
-            Swal.fire({ icon: 'success', title: 'Connection OK', text: res.message });
+      $.post(END, { op: 'test', id: rid }, function (res) {
+          res = parseAjaxJson(res);
+          if (isApiSuccess(res)) {
+            Swal.fire({ icon: 'success', title: 'Connection OK', text: apiMessage(res) || 'SMTP connection succeeded.' });
           } else {
-            Swal.fire({ icon: 'error', title: 'Test failed', text: res.message || 'Could not connect.' });
+            Swal.fire({ icon: 'error', title: 'Test failed', text: apiMessage(res) || 'Could not connect.' });
           }
-        })
+        }, 'json')
         .fail(function () {
           Swal.fire({ icon: 'error', title: 'Network error', text: 'Try again.' });
         });
@@ -846,7 +970,7 @@
       Swal.fire({
         icon: 'warning',
         title: 'Delete this account?',
-        text: 'The outbound email account will be removed from SuiteCRM. This cannot be undone.',
+        text: 'This outbound email account will be deleted. This cannot be undone.',
         showCancelButton: true,
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel',
@@ -854,16 +978,15 @@
         focusCancel: true
       }).then(function (result) {
         if (!result.isConfirmed) return;
-        $.post(END, { op: 'delete', id: rid })
-          .done(function (res) {
-            if (typeof res === 'string') { try { res = JSON.parse(res); } catch (e) { res = {}; } }
-            if (res.success) {
-              Swal.fire({ icon: 'success', title: 'Deleted', text: res.message || 'Account removed.', timer: 1800, showConfirmButton: false });
+        $.post(END, { op: 'delete', id: rid }, function (res) {
+            res = parseAjaxJson(res);
+            if (isApiSuccess(res)) {
+              Swal.fire({ icon: 'success', title: 'Deleted', text: apiMessage(res) || 'Account removed.', timer: 2200, showConfirmButton: true });
               loadAccounts();
             } else {
-              Swal.fire({ icon: 'error', title: 'Could not delete', text: res.message || 'Try again.' });
+              Swal.fire({ icon: 'error', title: 'Could not delete', text: apiMessage(res) || 'Try again.' });
             }
-          })
+          }, 'json')
           .fail(function () {
             Swal.fire({ icon: 'error', title: 'Network error', text: 'Try again.' });
           });

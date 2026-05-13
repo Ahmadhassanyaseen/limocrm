@@ -308,6 +308,10 @@ function fetchUserStripeKeys($data) {
     $data["action"] = "fetch_user_stripe_keys";
     return curlRequest($data);
 }
+function fetchPaymentMethods($data) {
+    $data["action"] = "fetch_payment_methods";
+    return curlRequest($data);
+}
 
 function saveUserStripeKeys($data) {
     $data["action"] = "save_user_stripe_keys";
@@ -316,6 +320,21 @@ function saveUserStripeKeys($data) {
 
 function deleteUserStripeKeys($data) {
     $data["action"] = "delete_user_stripe_keys";
+    return curlRequest($data);
+}
+
+function saveUserPaymentPreference($data) {
+    $data["action"] = "save_user_payment_preference";
+    return curlRequest($data);
+}
+
+function saveUserPaypalKeys($data) {
+    $data["action"] = "save_user_paypal_keys";
+    return curlRequest($data);
+}
+
+function deleteUserPaypalKeys($data) {
+    $data["action"] = "delete_user_paypal_keys";
     return curlRequest($data);
 }
 
