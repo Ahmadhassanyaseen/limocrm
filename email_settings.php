@@ -381,7 +381,7 @@ foreach ($esTeamMembers as $m) {
     <div class="es-head">
       <div class="es-head-text">
         <h1 class="es-title"><i class="ri-mail-settings-line"></i> Email Settings</h1>
-        <p class="es-subtitle">Configure outbound SMTP accounts. Data is stored in SuiteCRM table <code class="text-xs">limo_outbound_email_accounts</code> (personal accounts can be assigned to a user).</p>
+        <p class="es-subtitle">Configure outbound SMTP accounts.</p>
       </div>
       <div class="es-toolbar" style="margin:0;align-self:flex-end;">
         <button type="button" class="es-btn-primary" id="es-add-btn"><i class="ri-add-line"></i> Add Account</button>

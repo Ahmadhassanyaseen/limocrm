@@ -4,12 +4,7 @@
  *  DEPLOY ON SUITECRM: add to CustomEntryPoint.php (limogen)
  * ============================================================
  *
- * NOTE — New deployments: use custom table **limo_outbound_email_accounts**
- * (see `database/limo_outbound_email_accounts.sql` and
- * `database/custom_entry_point_limo_outbound_email_accounts.php`) instead of
- * outbound_email + custom fields. Same API action names; replaces this file.
- *
- * Prerequisites (legacy outbound_email path only):
+ * Prerequisites:
  * - Studio → Outbound Email Accounts → add TextField **owner_c** ("owner"),
  *   and **account_type_c** (e.g. "Account type" — values: system | personal),
  *   then Quick Repair & Rebuild.

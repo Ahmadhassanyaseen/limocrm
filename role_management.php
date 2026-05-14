@@ -16,7 +16,7 @@
 
   .rm-table-card { background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: 16px; overflow: hidden; }
   .rm-toolbar { padding: 16px 20px; border-bottom: 1px solid var(--rm-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .rm-search { height: 38px; border-radius: 10px; border: 1px solid var(--rm-border); background: var(--rm-surface-2); color: var(--rm-text); padding: 0 12px 0 36px; font-size: 13px; outline: none; width: min(320px, 100%); transition: border-color 0.2s, box-shadow 0.2s; }
+  .rm-search { height: 38px; border-radius: 10px; border: 1px solid var(--rm-border); background: var(--rm-surface-2); color: var(--rm-text); padding: 0 12px 0 36px!important; font-size: 13px; outline: none; width: min(320px, 100%); transition: border-color 0.2s, box-shadow 0.2s; }
   .rm-search:focus { border-color: rgb(var(--primary-rgb)); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12); }
   .rm-search-wrap { position: relative; }
   .rm-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--rm-muted); pointer-events: none; }
@@ -59,7 +59,7 @@
   .rm-label .rm-req { color: #ef4444; font-size: 14px; line-height: 1; }
   .rm-input-wrap { position: relative; }
   .rm-input-wrap .rm-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--rm-muted); pointer-events: none; transition: color 0.2s; z-index: 1; }
-  .rm-input { height: 42px; border-radius: 10px; border: 1px solid var(--rm-border); background: var(--rm-surface-2); color: var(--rm-text); padding: 0 12px 0 38px; width: 100%; font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .rm-input { height: 42px; border-radius: 10px; border: 1px solid var(--rm-border); background: var(--rm-surface-2); color: var(--rm-text); padding: 0 12px 0 38px!important; width: 100%; font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
   .rm-input:focus { border-color: rgb(var(--primary-rgb)); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08); }
   .rm-input.is-invalid { border-color: #ef4444 !important; }
   textarea.rm-input { height: auto; padding: 10px 12px 10px 38px; resize: none; }
@@ -278,6 +278,8 @@ $(document).ready(function() {
 function fetchRoles() {
   var fd = new FormData();
   fd.append('action', 'fetch_roles');
+  fd.append('user_id', '<?php echo $_SESSION['user']['id']; ?>');
+
 
   $('#roles-table-body').html('<tr><td colspan="5" class="rm-empty"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Loading roles...</td></tr>');
 

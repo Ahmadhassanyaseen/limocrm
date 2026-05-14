@@ -15,7 +15,7 @@
 
   .ct-table-card { background: var(--ct-surface); border: 1px solid var(--ct-border); border-radius: 16px; overflow: hidden; }
   .ct-toolbar { padding: 16px 20px; border-bottom: 1px solid var(--ct-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .ct-search { height: 38px; border-radius: 10px; border: 1px solid var(--ct-border); background: var(--ct-surface-2); color: var(--ct-text); padding: 0 12px 0 36px; font-size: 13px; outline: none; width: min(320px, 100%); transition: border-color 0.2s, box-shadow 0.2s; }
+  .ct-search { height: 38px; border-radius: 10px; border: 1px solid var(--ct-border); background: var(--ct-surface-2); color: var(--ct-text); padding: 0 12px 0 36px!important; font-size: 13px; outline: none; width: min(320px, 100%); transition: border-color 0.2s, box-shadow 0.2s; }
   .ct-search:focus { border-color: rgb(var(--primary-rgb)); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12); }
   .ct-search-wrap { position: relative; }
   .ct-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--ct-muted); pointer-events: none; }

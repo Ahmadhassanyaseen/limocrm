@@ -13,7 +13,9 @@
     --cw-text:rgba(255,255,255,.92);--cw-muted:rgba(255,255,255,.50);
   }
 
-  .cw-wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px;}
+  .cw-wrap{
+    /* max-width:900px;margin:0 auto; */
+    padding:0px 16px 60px;}
 
   /* header */
   .cw-header{

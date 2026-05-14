@@ -72,6 +72,7 @@ function userLogin($data){
     return curlRequest($data);
 }
 function fetchRoles(){
+    $data["user_id"] =  $_SESSION['user']['id'];
     $data["action"] = "fetch_roles";
     return curlRequest($data);
 }
@@ -112,7 +113,9 @@ function deleteTask($data){
     return curlRequest($data);
 }
 function fetchVehicles($data){
+     $data['is_admin']=  $_SESSION['user']['admin'] == 1 ? '1' : '0';
     $data["action"] = "fetch_vehicles";
+
     return curlRequest($data);
 }
 function saveVehicle($data){
@@ -278,6 +281,17 @@ function deleteContactRecord($data) {
 
 function fetchEmbeddedDomains($data) {
     $data["action"] = "fetch_embedded_domains";
+    return curlRequest($data);
+}
+
+/** Per-user booking widget accent color + Google font family (SuiteCRM limo_widget_theme). */
+function fetchWidgetTheme($data) {
+    $data["action"] = "fetch_widget_theme";
+    return curlRequest($data);
+}
+
+function saveWidgetTheme($data) {
+    $data["action"] = "save_widget_theme";
     return curlRequest($data);
 }
 

@@ -138,7 +138,7 @@ if ($agrJson === false) {
     border: 1px solid var(--agr-border);
     background: var(--agr-surface-2);
     color: var(--agr-text);
-    padding: 0 12px 0 36px;
+    padding: 0 12px 0 36px!important;
     font-size: 13px;
     outline: none;
     width: min(320px, 100%);
@@ -324,7 +324,7 @@ if ($agrJson === false) {
           <h1 class="page-title font-bold text-xl mb-0 text-defaulttextcolor dark:text-defaulttextcolor/90">Agreements</h1>
         </div>
         <p class="text-xs text-textmuted dark:text-textmuted/50 mt-1 mb-0 ms-10">
-          Converted leads you own (<code class="text-[10px]">owner_c</code>) with agreement PDF and signature date when available.
+          Converted leads you own with agreement PDF and signature date when available.
         </p>
       </div>
       <div class="flex items-center gap-2">
@@ -410,16 +410,7 @@ if ($agrJson === false) {
       </div>
     </div>
 
-    <details class="agr-info-card">
-      <summary>Setup &amp; client signing</summary>
-      <p class="text-xs text-textmuted dark:text-textmuted/50 mt-3 mb-2 max-w-2xl">
-        Use <strong>Agreement link</strong> on a lead record to copy the public URL. Clients sign and pay without logging in.
-      </p>
-      <ul class="list-disc ms-5 text-sm text-textmuted space-y-1">
-        <li>Run <code class="text-xs">database/limo_stripe_agreement.sql</code> on the SuiteCRM database (and add <code class="text-xs">stripe_customer_id_c</code> in Studio if needed).</li>
-        <li>Create <code class="text-xs">custom/limo_agreement_config.php</code> on the SuiteCRM server (see <code class="text-xs">database/limo_agreement_config.sample.php</code>).</li>
-      </ul>
-    </details>
+    
 
   </div>
 </div>
