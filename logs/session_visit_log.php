@@ -2,6 +2,8 @@
 
 /**
  * Append one line per authenticated page hit (when layout header is loaded).
+ * For user test_limo_crm after welcome-link OTP login, adds supabase_lead_id, lead_name, lead_email
+ * when $_SESSION['welcome_lead_context'] is present.
  * Output: logs/session_logs/visits_YYYY-MM-DD.log
  */
 function limo_log_session_visit(): void
@@ -27,6 +29,9 @@ function limo_log_session_visit(): void
         $userLabel = trim((string) ($_SESSION['user']['email'] ?? ''));
     }
 
+    $userNameNorm = trim((string) ($_SESSION['user']['user_name'] ?? ''));
+    $welcomeLead = $_SESSION['welcome_lead_context'] ?? null;
+
     $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
     $uri = (string) ($_SERVER['REQUEST_URI'] ?? ($_SERVER['SCRIPT_NAME'] ?? ''));
     $uri = str_replace(["\r", "\n", "\0"], '', $uri);
@@ -39,9 +44,35 @@ function limo_log_session_visit(): void
         $ip = trim(explode(',', $ip, 2)[0]);
     }
 
+    $sanitize = static function (string $v): string {
+        $v = str_replace(["\r", "\n", "\t"], ' ', trim($v));
+        if (strpos($v, '=') !== false) {
+            $v = str_replace('=', ':', $v);
+        }
+
+        return $v;
+    };
+
+    $leadSuffix = '';
+    if ($userNameNorm === 'test_limo_crm' && is_array($welcomeLead)) {
+        $slid = $sanitize((string) ($welcomeLead['supabase_lead_id'] ?? ''));
+        $lname = $sanitize((string) ($welcomeLead['lead_name'] ?? ''));
+        $lemail = $sanitize((string) ($welcomeLead['lead_email'] ?? ''));
+        if ($slid !== '') {
+            $leadSuffix .= ' supabase_lead_id=' . $slid;
+        }
+        if ($lname !== '') {
+            $leadSuffix .= ' lead_name=' . $lname;
+        }
+        if ($lemail !== '') {
+            $leadSuffix .= ' lead_email=' . $lemail;
+        }
+    }
+
     $line = '[' . date('Y-m-d H:i:s') . ']'
         . ' user_id=' . $userId
         . ' user=' . str_replace(["\t", "\n", "\r"], ' ', $userLabel)
+        . $leadSuffix
         . ' method=' . $method
         . ' uri=' . $uri
         . ' ip=' . $ip

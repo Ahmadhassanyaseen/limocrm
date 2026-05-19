@@ -627,6 +627,31 @@ $wf_google_font_url = 'https://fonts.googleapis.com/css2?family=' . $wf_google_f
             color: var(--text-muted);
         }
 
+        .card-features-toggle {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: none;
+            font: inherit;
+            font-size: inherit;
+            font-weight: 600;
+            color: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-radius: 6px;
+        }
+
+        .card-features-toggle:hover {
+            color: var(--primary);
+        }
+
+        .card-features-toggle:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
         .card-cta {
             margin-top: auto;
             width: 100%;
@@ -1276,8 +1301,9 @@ $wf_google_font_url = 'https://fonts.googleapis.com/css2?family=' . $wf_google_f
                                             if ($f !== '') $facilitiesClean[] = $f;
                                         }
                                     }
-                                    $featuredFacilities = array_slice($facilitiesClean, 0, 4);
-                                    $extraCount = max(0, count($facilitiesClean) - count($featuredFacilities));
+                                    $visibleFacilities = array_slice($facilitiesClean, 0, 4);
+                                    $extraFacilities = array_slice($facilitiesClean, 4);
+                                    $extraCount = count($extraFacilities);
                                     ?>
                                     <article class="card"
                                              data-category="<?php echo htmlspecialchars($category, ENT_QUOTES); ?>"
@@ -1332,16 +1358,29 @@ $wf_google_font_url = 'https://fonts.googleapis.com/css2?family=' . $wf_google_f
                                                 </li>
                                             </ul>
 
-                                            <?php if (!empty($featuredFacilities)): ?>
+                                            <?php if (!empty($facilitiesClean)): ?>
                                                 <ul class="card-features">
-                                                    <?php foreach ($featuredFacilities as $f): ?>
+                                                    <?php foreach ($visibleFacilities as $f): ?>
                                                         <li>
                                                             <i class="ri-check-line"></i>
                                                             <?php echo htmlspecialchars($f); ?>
                                                         </li>
                                                     <?php endforeach; ?>
+                                                    <?php foreach ($extraFacilities as $f): ?>
+                                                        <li class="card-feature-extra" hidden>
+                                                            <i class="ri-check-line"></i>
+                                                            <?php echo htmlspecialchars($f); ?>
+                                                        </li>
+                                                    <?php endforeach; ?>
                                                     <?php if ($extraCount > 0): ?>
-                                                        <li class="more">+<?php echo $extraCount; ?> more</li>
+                                                        <li class="more">
+                                                            <button type="button"
+                                                                    class="card-features-toggle"
+                                                                    aria-expanded="false"
+                                                                    data-extra-count="<?php echo (int) $extraCount; ?>">
+                                                                +<?php echo (int) $extraCount; ?> more
+                                                            </button>
+                                                        </li>
                                                     <?php endif; ?>
                                                 </ul>
                                             <?php endif; ?>
@@ -1507,6 +1546,27 @@ $wf_google_font_url = 'https://fonts.googleapis.com/css2?family=' . $wf_google_f
 
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', filterVehicles);
+        });
+
+        document.addEventListener('click', function (e) {
+            var toggle = e.target.closest('.card-features-toggle');
+            if (!toggle) return;
+            var ul = toggle.closest('.card-features');
+            if (!ul) return;
+            e.preventDefault();
+            var extras = ul.querySelectorAll('.card-feature-extra');
+            var count = parseInt(toggle.getAttribute('data-extra-count'), 10);
+            if (!count) count = extras.length;
+            var expanded = toggle.getAttribute('aria-expanded') === 'true';
+            if (!expanded) {
+                extras.forEach(function (li) { li.hidden = false; });
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.textContent = 'Show less';
+            } else {
+                extras.forEach(function (li) { li.hidden = true; });
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.textContent = '+' + count + ' more';
+            }
         });
     });
 </script>
