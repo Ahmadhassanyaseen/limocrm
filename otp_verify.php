@@ -8,10 +8,11 @@ require_once __DIR__ . '/config/otp_mail_server.php';
 require_once __DIR__ . '/config/api.php';
 
 // ===============================
-// CONFIG — same bootstrap user as prior welcome flow (login.php: user_name + password1)
+// CONFIG — same bootstrap user as login_explore.php (config/demo_credentials.php)
 // ===============================
-$AUTO_LOGIN_USER = 'test_limo_crm';
-$AUTO_LOGIN_PASS = 'test@1234';
+$demoCreds = require __DIR__ . '/config/demo_credentials.php';
+$AUTO_LOGIN_USER = $demoCreds[0]['user_name'] ?? 'test_limo_crm';
+$AUTO_LOGIN_PASS = $demoCreds[0]['password'] ?? 'test@1234';
 
 /**
  * @internal Auth-shell markup aligned with login.php (this file only).

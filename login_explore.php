@@ -1,3 +1,36 @@
+<?php
+$demoAccounts = require __DIR__ . '/config/demo_credentials.php';
+?>
+
+<?php
+$sendId = trim($_GET['send_id'] ?? $_GET['id'] ?? '');
+$logFile = __DIR__ . '/logs/crm_click.log';
+$mailServer = 'https://mail-server-plum.vercel.app';
+
+function crmClickLog(string $file, string $id): void
+{
+    $line = date('Y-m-d H:i:s') . ' ' . $id . PHP_EOL;
+    file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
+}
+
+if ($sendId !== '') {
+    $trackUrl = $mailServer . '/v2/t/crm-click?send_id=' . urlencode($sendId);
+
+$ch = curl_init($trackUrl);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT => 15,
+]);
+curl_exec($ch);
+curl_close($ch);
+
+crmClickLog($logFile, $sendId);
+
+
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="en" class="crm-login-page">
   <head>
@@ -5,7 +38,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="color-scheme" content="light dark" />
-    <title>Sign in | LimoCRM</title>
+    <title>Explore LimoCRM | Demo sign-in</title>
 
     <link rel="icon" href="assets/images/brand-logos/favicon.ico" type="image/x-icon" />
     <link href="assets/css/styles.css" rel="stylesheet" />
@@ -105,7 +138,7 @@
 
       .crm-login-form-inner {
         width: 100%;
-        max-width: 400px;
+        /* max-width: 400px; */
         margin: 0 auto;
       }
 
@@ -167,6 +200,7 @@
         border-radius: var(--crm-radius-lg);
         padding: clamp(1.5rem, 4vw, 2rem);
         box-shadow: var(--crm-shadow);
+        flex: 1;
       }
 
       .crm-field {
@@ -475,6 +509,152 @@
       #password-strength-container {
         margin-top: 0.5rem;
       }
+
+      .crm-demo-panel {
+        flex: 1;
+        margin-top: 1.25rem;
+        border: 1px dashed rgba(var(--crm-primary-rgb), 0.35);
+        border-radius: var(--crm-radius-lg);
+        padding: 1.25rem 1.5rem;
+        background: rgba(var(--crm-primary-rgb), 0.04);
+      }
+
+      .crm-demo-panel-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .crm-demo-panel-head i {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(var(--crm-primary-rgb), 0.12);
+        color: var(--crm-primary);
+        font-size: 1.125rem;
+      }
+
+      .crm-demo-panel-title {
+        margin: 0 0 0.25rem;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--crm-text);
+      }
+
+      .crm-demo-panel-sub {
+        margin: 0;
+        font-size: 0.8125rem;
+        color: var(--crm-text-muted);
+        line-height: 1.45;
+      }
+
+      .crm-demo-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .crm-demo-card {
+        border: 1px solid var(--crm-border);
+        border-radius: var(--crm-radius-md);
+        padding: 1rem 1.125rem;
+        background: var(--crm-surface);
+      }
+
+      .crm-demo-card-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .crm-demo-card-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--crm-text);
+      }
+
+      .crm-demo-badge {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        background: rgba(var(--crm-primary-rgb), 0.1);
+        color: var(--crm-primary);
+      }
+
+      .crm-demo-creds {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0 0 0.875rem;
+        font-size: 0.8125rem;
+      }
+
+      .crm-demo-creds dt {
+        margin: 0;
+        font-weight: 600;
+        color: var(--crm-text-muted);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .crm-demo-creds dd {
+        margin: 0;
+        font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
+        font-size: 0.875rem;
+        color: var(--crm-text);
+        word-break: break-all;
+      }
+
+      .crm-demo-desc {
+        margin: 0 0 0.75rem;
+        font-size: 0.75rem;
+        color: var(--crm-text-muted);
+      }
+
+      .crm-demo-fill {
+        width: 100%;
+        height: 40px;
+        border: 1px solid var(--crm-border);
+        border-radius: var(--crm-radius-md);
+        font-family: inherit;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--crm-primary);
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
+      .crm-demo-fill:hover {
+        background: rgba(var(--crm-primary-rgb), 0.08);
+        border-color: rgba(var(--crm-primary-rgb), 0.35);
+      }
+
+      .crm-demo-fill:focus-visible {
+        outline: 2px solid var(--crm-primary);
+        outline-offset: 2px;
+      }
+
+      .crm-login-card-wrapper {
+            display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+      }
+       
     </style>
   </head>
   <body class="crm-login">
@@ -486,11 +666,14 @@
             <img src="assets/images/brand-logos/desktop-white.png" class="logo-dark" alt="LimoCRM" onerror="this.style.display='none'" />
           </div>
 
-          <p class="crm-login-eyebrow">Secure access</p>
-          <h1 id="login-heading" class="crm-login-title">Welcome back</h1>
+          <p class="crm-login-eyebrow">Try the product</p>
+          <h1 id="login-heading" class="crm-login-title">Explore LimoCRM</h1>
           <p class="crm-login-sub">
-            Sign in to pick up where you left off—leads, fleet, agreements, and your team in one workspace.
+            Use the demo account below to sign in and browse leads, fleet, agreements, and more—no setup required.
           </p>
+          <div class="crm-login-card-wrapper">
+
+          
 
           <div class="crm-login-card">
             <form id="signinForm" novalidate>
@@ -551,9 +734,54 @@
             </form>
           </div>
 
+          <section class="crm-demo-panel" aria-labelledby="demo-creds-heading">
+            <div class="crm-demo-panel-head">
+              <i class="ri-test-tube-line" aria-hidden="true"></i>
+              <div>
+                <h2 id="demo-creds-heading" class="crm-demo-panel-title">Test user credentials</h2>
+                <p class="crm-demo-panel-sub">
+                  For evaluation only. Click <strong>Use these credentials</strong> to fill the form.
+                </p>
+              </div>
+            </div>
+            <ul class="crm-demo-list">
+              <?php foreach ($demoAccounts as $account): ?>
+                <li class="crm-demo-card">
+                  <div class="crm-demo-card-top">
+                    <span class="crm-demo-card-label"><?php echo htmlspecialchars($account['label'] ?? 'Demo', ENT_QUOTES, 'UTF-8'); ?></span>
+                    <?php if (!empty($account['role'])): ?>
+                      <span class="crm-demo-badge"><?php echo htmlspecialchars($account['role'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <?php endif; ?>
+                  </div>
+                  <?php if (!empty($account['description'])): ?>
+                    <p class="crm-demo-desc"><?php echo htmlspecialchars($account['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+                  <?php endif; ?>
+                  <dl class="crm-demo-creds">
+                    <div>
+                      <dt>Username</dt>
+                      <dd><?php echo htmlspecialchars($account['user_name'], ENT_QUOTES, 'UTF-8'); ?></dd>
+                    </div>
+                    <div>
+                      <dt>Password</dt>
+                      <dd><?php echo htmlspecialchars($account['password'], ENT_QUOTES, 'UTF-8'); ?></dd>
+                    </div>
+                  </dl>
+                  <button
+                    type="button"
+                    class="crm-demo-fill"
+                    data-username="<?php echo htmlspecialchars($account['user_name'], ENT_QUOTES, 'UTF-8'); ?>"
+                    data-password="<?php echo htmlspecialchars($account['password'], ENT_QUOTES, 'UTF-8'); ?>"
+                  >
+                    Use these credentials
+                  </button>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </section>
+          </div>
+
           <p class="crm-login-foot">
-            Want to try the demo? <a href="login_explore.php">Explore with test credentials</a>
-            · Need an account? Ask your LimoCRM administrator.
+            Have your own account? <a href="login.php">Staff sign-in</a>
           </p>
         </div>
       </main>
@@ -594,6 +822,14 @@
 
     <script>
       $(document).ready(function () {
+        $(".crm-demo-fill").on("click", function () {
+          var u = $(this).data("username") || "";
+          var p = $(this).data("password") || "";
+          $("#username").val(u).removeClass("border-red-500");
+          $("#signin-password").val(p).removeClass("border-red-500");
+          $("#username").trigger("focus");
+        });
+
         $("#signinForm").on("submit", function (e) {
           e.preventDefault();
 
