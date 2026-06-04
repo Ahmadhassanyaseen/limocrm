@@ -1,3 +1,83 @@
 .text-center{
     text-align: center;
 }
+
+ /* The floating button container - fixed position bottom right */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 1000;
+      transition: all 0.25s ease-in-out;
+    }
+
+    /* WhatsApp button styling - modern look with shadow and hover effect */
+    .whatsapp-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background-color: #25D366;
+      border-radius: 50%;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      /* center the icon */
+    }
+
+    /* hover effect: slight lift and deeper shadow */
+    .whatsapp-btn:hover {
+      transform: scale(1.07);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+      background-color: #20b859;
+    }
+
+    /* optional active (click) effect */
+    .whatsapp-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* WhatsApp SVG icon – clean and sharp */
+    .whatsapp-icon {
+      width: 34px;
+      height: 34px;
+      fill: white;
+      display: block;
+    }
+
+    /* Optional small pulse animation to draw attention (gentle) 
+       can be removed if not needed, but adds a nice subtle touch */
+    @keyframes soft-pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 12px rgba(37, 211, 102, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+      }
+    }
+
+    /* Uncomment below if you want a subtle pulse on load/attention */
+    .whatsapp-float .whatsapp-btn {
+      animation: soft-pulse 1.5s infinite;
+      animation-delay: 0.5s;
+    }
+
+    /* For small screens, keep button slightly smaller or same (touch friendly) */
+    @media (max-width: 480px) {
+      .whatsapp-btn {
+        width: 54px;
+        height: 54px;
+      }
+      .whatsapp-icon {
+        width: 30px;
+        height: 30px;
+      }
+      .whatsapp-float {
+        bottom: 18px;
+        right: 18px;
+      }
+    }
