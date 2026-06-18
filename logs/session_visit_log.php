@@ -4,8 +4,19 @@
  * Append one line per authenticated page hit (when layout header is loaded).
  * For user test_limo_crm after welcome-link OTP login, adds supabase_lead_id, lead_name, lead_email
  * when $_SESSION['welcome_lead_context'] is present.
+ * For explore-link auto-login, adds send_id when $_SESSION['explore_send_id'] is present.
  * Output: logs/session_logs/visits_YYYY-MM-DD.log
  */
+function limo_client_ip(): string
+{
+    $ip = (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ($_SERVER['REMOTE_ADDR'] ?? ''));
+    if (strpos($ip, ',') !== false) {
+        $ip = trim(explode(',', $ip, 2)[0]);
+    }
+
+    return $ip;
+}
+
 function limo_log_session_visit(): void
 {
     if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -39,10 +50,7 @@ function limo_log_session_visit(): void
         $uri = substr($uri, 0, 2048) . '…';
     }
 
-    $ip = (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ($_SERVER['REMOTE_ADDR'] ?? ''));
-    if (strpos($ip, ',') !== false) {
-        $ip = trim(explode(',', $ip, 2)[0]);
-    }
+    $ip = limo_client_ip();
 
     $sanitize = static function (string $v): string {
         $v = str_replace(["\r", "\n", "\t"], ' ', trim($v));
@@ -67,6 +75,11 @@ function limo_log_session_visit(): void
         if ($lemail !== '') {
             $leadSuffix .= ' lead_email=' . $lemail;
         }
+    }
+
+    $exploreSendId = trim((string) ($_SESSION['explore_send_id'] ?? ''));
+    if ($userNameNorm === 'test_limo_crm' && $exploreSendId !== '') {
+        $leadSuffix .= ' send_id=' . $sanitize($exploreSendId);
     }
 
     $line = '[' . date('Y-m-d H:i:s') . ']'

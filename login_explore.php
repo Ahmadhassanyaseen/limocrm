@@ -1,34 +1,101 @@
 <?php
-$demoAccounts = require __DIR__ . '/config/demo_credentials.php';
-?>
+declare(strict_types=1);
 
-<?php
-$sendId = trim($_GET['send_id'] ?? $_GET['id'] ?? '');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/config/api.php';
+require_once __DIR__ . '/logs/session_visit_log.php';
+
+$demoAccounts = require __DIR__ . '/config/demo_credentials.php';
+
 $logFile = __DIR__ . '/logs/crm_click.log';
 $mailServer = 'https://mail-server-plum.vercel.app';
+$exploreAutoLoginError = '';
 
-function crmClickLog(string $file, string $id): void
+function explore_sanitize_send_id(string $raw): string
 {
-    $line = date('Y-m-d H:i:s') . ' ' . $id . PHP_EOL;
-    file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
+    $id = trim($raw);
+    if ($id === '') {
+        return '';
+    }
+    if (strlen($id) > 128) {
+        $id = substr($id, 0, 128);
+    }
+
+    return preg_replace('/[^a-zA-Z0-9_\-]/', '', $id) ?? '';
 }
+
+function crmClickLog(string $file, string $sendId, string $userId = ''): void
+{
+    $logDir = dirname($file);
+    if (!is_dir($logDir) && !@mkdir($logDir, 0755, true) && !is_dir($logDir)) {
+        return;
+    }
+
+    $line = '[' . date('Y-m-d H:i:s') . ']'
+        . ' ip=' . limo_client_ip()
+        . ' send_id=' . $sendId;
+    if ($userId !== '') {
+        $line .= ' user_id=' . $userId;
+    }
+    $line .= PHP_EOL;
+
+    @file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
+}
+
+$sendId = explore_sanitize_send_id((string) ($_GET['send_id'] ?? $_GET['id'] ?? ''));
 
 if ($sendId !== '') {
     $trackUrl = $mailServer . '/v2/t/crm-click?send_id=' . urlencode($sendId);
 
-$ch = curl_init($trackUrl);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT => 15,
-]);
-curl_exec($ch);
-curl_close($ch);
+    $ch = curl_init($trackUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+    ]);
+    curl_exec($ch);
+    curl_close($ch);
 
-crmClickLog($logFile, $sendId);
+    crmClickLog($logFile, $sendId);
 
+    $_SESSION['explore_send_id'] = $sendId;
 
+    $alreadyLoggedIn = trim((string) ($_SESSION['user']['id'] ?? '')) !== '';
+
+    if ($alreadyLoggedIn) {
+        limo_log_session_visit();
+        header('Location: index.php');
+        exit;
+    }
+
+    $demoUser = $demoAccounts[0]['user_name'] ?? 'test_limo_crm';
+    $demoPass = $demoAccounts[0]['password'] ?? 'test@1234';
+
+    $response = userLogin([
+        'user_name' => $demoUser,
+        'password1' => $demoPass,
+    ]);
+
+    $loggedIn = (($response['status'] ?? '') === 'success')
+        || (!empty($response['success']) && $response['success'] === true);
+
+    if ($loggedIn) {
+        $_SESSION['user'] = $response['user'];
+        $crmUserId = trim((string) ($_SESSION['user']['id'] ?? ''));
+        if ($crmUserId !== '') {
+            crmClickLog($logFile, $sendId, $crmUserId);
+        }
+        limo_log_session_visit();
+        header('Location: index.php');
+        exit;
+    }
+
+    $exploreAutoLoginError = is_array($response) && !empty($response['message'])
+        ? (string) $response['message']
+        : 'Could not sign you in automatically. Use the demo credentials below.';
 }
-
 
 ?>
 <!DOCTYPE html>
@@ -822,6 +889,15 @@ crmClickLog($logFile, $sendId);
 
     <script>
       $(document).ready(function () {
+        <?php if ($exploreAutoLoginError !== ''): ?>
+        Swal.fire({
+          icon: "error",
+          title: "Couldn’t sign you in",
+          text: <?php echo json_encode($exploreAutoLoginError, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+          confirmButtonColor: "#cf1c82",
+        });
+        <?php endif; ?>
+
         $(".crm-demo-fill").on("click", function () {
           var u = $(this).data("username") || "";
           var p = $(this).data("password") || "";
