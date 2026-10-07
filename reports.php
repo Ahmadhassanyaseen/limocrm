@@ -838,9 +838,9 @@ function setTrendRange(range, btn) {
       datasets: [{
         label: 'Revenue',
         data: initialSlice.values,
-        backgroundColor: 'rgba(207,28,130,0.55)',
-        hoverBackgroundColor: 'rgba(207,28,130,0.8)',
-        borderColor: 'rgba(207,28,130,1)',
+        backgroundColor: 'rgba(29,78,216,0.55)',
+        hoverBackgroundColor: 'rgba(29,78,216,0.8)',
+        borderColor: 'rgba(29,78,216,1)',
         borderWidth: 1,
         borderRadius: 6,
         borderSkipped: false,

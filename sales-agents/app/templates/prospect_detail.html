@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>{{ prospect.company }}</h1>
+<p class="sub">{{ prospect.city }} {{ prospect.region }} {{ prospect.country }} · score {{ prospect.icp_score|int }} · {{ prospect.stage }} · {{ prospect.source }}</p>
+<div id="status"></div>
+<div class="row" style="margin-bottom:16px">
+  <button class="btn" data-action="enrich" data-id="{{ prospect.id }}">Enrich website</button>
+  <button class="btn secondary" data-action="draft" data-id="{{ prospect.id }}">Draft outreach</button>
+  {% if prospect.website %}<a class="btn secondary" href="{{ prospect.website }}" target="_blank" rel="noopener">Website</a>{% endif %}
+</div>
+<div class="two">
+  <div class="card">
+    <h3>Stage</h3>
+    <form method="post" action="/api/prospects/{{ prospect.id }}/stage" onsubmit="event.preventDefault(); postForm(this.action, {stage: this.stage.value}).then(()=>location.reload())">
+      <select name="stage">
+        {% for s in ['new','researched','queued','contacted','talking','demo','won','lost'] %}
+        <option value="{{ s }}" {{ 'selected' if prospect.stage == s else '' }}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn" style="margin-top:10px" type="submit">Save stage</button>
+    </form>
+    <p class="sub">{{ prospect.icp_notes }}</p>
+    <p class="sub">{{ prospect.next_action }}</p>
+  </div>
+  <div class="card">
+    <h3>Contacts</h3>
+    {% for c in contacts %}
+      <p>
+        <strong>{{ c.name or '—' }}</strong> {{ c.role }}<br>
+        {{ c.email }} {{ c.phone }}<br>
+        {% if suppressed[c.id] %}<span class="pill">suppressed</span>{% endif %}
+        {% if c.linkedin_url %}<a href="{{ c.linkedin_url }}">LinkedIn</a>{% endif %}
+        {% if c.instagram_url %}<a href="{{ c.instagram_url }}">IG</a>{% endif %}
+        {% if c.facebook_url %}<a href="{{ c.facebook_url }}">FB</a>{% endif %}
+        {% if c.x_url %}<a href="{{ c.x_url }}">X</a>{% endif %}
+      </p>
+      <details>
+        <summary>Record SMS / WhatsApp consent</summary>
+        <form class="consent-form" data-id="{{ c.id }}">
+          <label>Channel</label>
+          <select name="channel"><option value="sms">SMS</option><option value="whatsapp">WhatsApp</option></select>
+          <label>What they said (required)</label>
+          <textarea name="text" placeholder="e.g. Reply on email: TEXT me the demo link at this number"></textarea>
+          <button class="btn" type="submit">Save consent</button>
+        </form>
+        <form class="sms-form" data-id="{{ c.id }}">
+          <label>Draft after consent</label>
+          <select name="channel"><option value="sms">SMS</option><option value="whatsapp">WhatsApp</option></select>
+          <textarea name="body">Here's the LimoGen explore workspace: {{ request.base_url }}</textarea>
+          <button class="btn secondary" type="submit">Queue draft for approval</button>
+        </form>
+      </details>
+    {% else %}
+      <p>No contacts yet. Enrich the website or add them in the CSV.</p>
+    {% endfor %}
+    {% if consents %}
+      <h4>Consents on file</h4>
+      {% for g in consents %}
+        <p class="sub">{{ g.channel }} · {{ g.granted_at }} · {{ g.text }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h3>Messages</h3>
+  <table>
+    <thead><tr><th>When</th><th>Ch</th><th>Dir</th><th>Status</th><th>Step</th><th>Preview</th></tr></thead>
+    <tbody>
+    {% for m in messages %}
+      <tr>
+        <td>{{ m.created_at }}</td>
+        <td>{{ m.channel }}</td>
+        <td>{{ m.direction }}</td>
+        <td>{{ m.status }}</td>
+        <td>{{ m.sequence_step }}</td>
+        <td>{{ (m.subject ~ ' — ' if m.subject else '') ~ (m.body[:80] if m.body else '') }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No messages.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+document.querySelectorAll(".consent-form").forEach((form) => {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await postForm("/api/consent/" + form.dataset.id, {
+      channel: form.channel.value,
+      text: form.text.value,
+      source: "operator",
+    });
+    location.reload();
+  });
+});
+document.querySelectorAll(".sms-form").forEach((form) => {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      await postForm("/api/sms/draft/" + form.dataset.id, {
+        channel: form.channel.value,
+        body: form.body.value,
+      });
+      location.href = "/approvals";
+    } catch (err) {
+      flash(document.getElementById("status"), err.message, true);
+    }
+  });
+});
+</script>
+{% endblock %}

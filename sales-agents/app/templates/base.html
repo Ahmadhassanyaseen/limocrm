@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or brand }} — sales agents</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark"></span> {{ brand }}</div>
+    <nav class="nav">
+      {% for href, label in nav %}
+      <a href="{{ href }}" class="{{ 'active' if request.url.path == href or (href != '/' and request.url.path.startswith(href)) else '' }}">
+        <span>{{ label }}</span>
+        {% if label == 'Approvals' and pending_count %}<span class="badge">{{ pending_count }}</span>{% endif %}
+        {% if label == 'Inbox' and unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}
+      </a>
+      {% endfor %}
+    </nav>
+  </aside>
+  <main class="main">
+    {% block body %}{% endblock %}
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

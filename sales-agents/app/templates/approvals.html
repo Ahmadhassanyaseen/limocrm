@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Approvals</h1>
+<p class="sub">First emails send when you approve (if SMTP/Resend is set). Social copy moves to Today for you to send from the real account. SMS/WhatsApp send only with consent + credentials.</p>
+<div id="status"></div>
+{% for card in cards %}
+  {% set ap = card.approval %}
+  {% set m = card.message %}
+  <div class="card" style="margin-bottom:16px">
+    <div class="channel">{{ ap.kind }} · {{ m.channel }} · step {{ m.sequence_step }}</div>
+    <h3>{{ card.prospect.company if card.prospect else 'Prospect' }} — {{ card.contact.name if card.contact else '' }} {{ card.contact.email if card.contact else '' }}</h3>
+    {% if m.channel == 'email' %}
+      <label>Subject</label>
+      <input id="subject-{{ ap.id }}" value="{{ m.subject }}">
+    {% endif %}
+    <label>Body</label>
+    <textarea id="body-{{ ap.id }}">{{ m.body }}</textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" data-action="approve" data-id="{{ ap.id }}">Approve</button>
+      <button class="btn danger" data-action="reject" data-id="{{ ap.id }}">Reject</button>
+      {% if card.contact and card.contact.linkedin_url %}<a href="{{ card.contact.linkedin_url }}" target="_blank" rel="noopener">Open LinkedIn</a>{% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="card">Nothing waiting. Draft outreach from a prospect to fill this queue.</div>
+{% endfor %}
+{% endblock %}

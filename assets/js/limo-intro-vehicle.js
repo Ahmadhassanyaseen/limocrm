@@ -227,7 +227,7 @@
 
     stepLabel = document.createElement('div');
     stepLabel.style.cssText =
-      'font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#cf1c82;margin-bottom:8px;';
+      'font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#1d4ed8;margin-bottom:8px;';
     panel.appendChild(stepLabel);
 
     var h = document.createElement('h3');
@@ -261,7 +261,7 @@
     btnPrimary.type = 'button';
     btnPrimary.style.cssText =
       'margin-left:auto;border:none;border-radius:12px;padding:10px 20px;font-weight:600;font-size:0.9rem;cursor:pointer;' +
-      'background:#cf1c82;color:#fff;box-shadow:0 4px 14px rgba(207,28,130,0.35);';
+      'background:linear-gradient(90deg,#1d4ed8 0%,#38bdf8 100%);color:#fff;box-shadow:0 4px 14px rgba(29,78,216,0.35);';
     btnPrimary.addEventListener('click', nextOrFinish);
 
     row.appendChild(btnSkip);

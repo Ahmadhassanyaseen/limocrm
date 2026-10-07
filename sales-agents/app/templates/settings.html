@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Settings</h1>
+<p class="sub">Secrets live in <code>sales-agents/.env</code>. This page only shows what is configured.</p>
+<div class="card">
+  <div class="kvs">
+    <div>From</div><div>{{ sender_name }} &lt;{{ sender_email }}&gt;</div>
+    <div>Mailing address</div><div>{{ mailing_address }}</div>
+    <div>Explore demo</div><div>{{ explore }}</div>
+    <div>Active sequences</div><div>{{ sequences }}</div>
+  </div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h3>Integrations</h3>
+  <table>
+    {% for name, on in flags.items() %}
+    <tr><td>{{ name }}</td><td>{% if on %}<span class="pill high">on</span>{% else %}<span class="pill">off</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="card" style="margin-top:16px">
+  <h3>Brand rules</h3>
+  <div class="msg">{{ kb.brand_rules }}</div>
+  <p class="sub">{{ kb.pains|length }} pains indexed. Do not claim: {{ kb.do_not_claim|join('; ') }}</p>
+</div>
+{% endblock %}

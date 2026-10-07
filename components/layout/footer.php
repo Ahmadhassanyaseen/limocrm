@@ -114,11 +114,11 @@
             type="button"
             class="pcr-last-color"
             aria-label="use previous color"
-            style="--pcr-color: rgba(92, 103, 247, 1)"
+            style="--pcr-color: rgba(29, 78, 216, 1)"
           ></button>
           <div
             class="pcr-current-color"
-            style="--pcr-color: rgba(92, 103, 247, 1)"
+            style="--pcr-color: rgba(29, 78, 216, 1)"
           ></div>
         </div>
 
@@ -128,7 +128,7 @@
             style="
               left: calc(62.753% - 9px);
               top: calc(3.13725% - 9px);
-              background: rgb(92, 103, 247);
+              background: rgb(29, 78, 216);
             "
           ></div>
           <div
@@ -258,11 +258,11 @@
             type="button"
             class="pcr-last-color"
             aria-label="use previous color"
-            style="--pcr-color: rgba(92, 103, 247, 1)"
+            style="--pcr-color: rgba(29, 78, 216, 1)"
           ></button>
           <div
             class="pcr-current-color"
-            style="--pcr-color: rgba(92, 103, 247, 1)"
+            style="--pcr-color: rgba(29, 78, 216, 1)"
           ></div>
         </div>
 
@@ -272,7 +272,7 @@
             style="
               left: calc(62.753% - 9px);
               top: calc(3.13725% - 9px);
-              background: rgb(92, 103, 247);
+              background: rgb(29, 78, 216);
             "
           ></div>
           <div

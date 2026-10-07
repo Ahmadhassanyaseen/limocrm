@@ -25,9 +25,11 @@
 
     <style>
       :root {
-        --crm-primary: #cf1c82;
-        --crm-primary-hover: #b01670;
-        --crm-primary-rgb: 207, 28, 130;
+        --crm-primary: #1d4ed8;
+        --crm-primary-hover: #1e40af;
+        --crm-primary-rgb: 29, 78, 216;
+        --crm-primary-gradient: linear-gradient(90deg, #1d4ed8 0%, #38bdf8 100%);
+        --crm-primary-gradient-hover: linear-gradient(90deg, #1e40af 0%, #0ea5e9 100%);
         --crm-surface: #ffffff;
         --crm-surface-elevated: rgba(255, 255, 255, 0.72);
         --crm-text: #0f172a;
@@ -285,14 +287,14 @@
         font-size: 0.9375rem;
         font-weight: 600;
         color: #fff;
-        background: var(--crm-primary);
+        background: var(--crm-primary-gradient);
         cursor: pointer;
         transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
         box-shadow: 0 4px 14px rgba(var(--crm-primary-rgb), 0.35);
       }
 
       .crm-submit:hover:not(:disabled) {
-        background: var(--crm-primary-hover);
+        background: var(--crm-primary-gradient-hover);
         transform: translateY(-1px);
         box-shadow: 0 8px 22px rgba(var(--crm-primary-rgb), 0.4);
       }
@@ -355,7 +357,7 @@
         justify-content: space-between;
         padding: clamp(2rem, 5vw, 3.5rem);
         overflow: hidden;
-        background: linear-gradient(155deg, #0b1220 0%, #111827 42%, #1a0a14 100%);
+        background: linear-gradient(155deg, #0b1220 0%, #111827 42%, #0a1628 100%);
       }
 
       @media (min-width: 1024px) {
@@ -624,7 +626,7 @@
               icon: "warning",
               title: "Almost there",
               text: "Please enter both your username and password.",
-              confirmButtonColor: "#cf1c82",
+              confirmButtonColor: "#1d4ed8",
             });
             (username === "" ? usernameInput : passwordInput).trigger("focus");
             return;
@@ -659,7 +661,7 @@
                     icon: "error",
                     title: "Couldn’t sign you in",
                     text: res.message || "Check your username and password and try again.",
-                    confirmButtonColor: "#cf1c82",
+                    confirmButtonColor: "#1d4ed8",
                   });
                 }
               } catch (err) {
@@ -668,7 +670,7 @@
                   icon: "error",
                   title: "Unexpected response",
                   text: "Please try again or contact support if this keeps happening.",
-                  confirmButtonColor: "#cf1c82",
+                  confirmButtonColor: "#1d4ed8",
                 });
               }
             },
@@ -678,7 +680,7 @@
                 icon: "error",
                 title: "Connection issue",
                 text: "We couldn’t reach the server. Check your connection and try again.",
-                confirmButtonColor: "#cf1c82",
+                confirmButtonColor: "#1d4ed8",
               });
             },
           });

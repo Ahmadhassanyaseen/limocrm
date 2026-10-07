@@ -1,0 +1,45 @@
+{
+  "baseUrl": "http://localhost/limocrm",
+  "viewport": { "width": 1440, "height": 900 },
+  "login": {
+    "url": "/login_explore.php",
+    "user": "test_limo_crm",
+    "pass": "test@1234",
+    "useFormLogin": true,
+    "formUrl": "/login.php"
+  },
+  "publicPages": [
+    { "file": "login-explore.png", "path": "/login_explore.php", "fullPage": false },
+    { "file": "widget.png", "path": "/instantQuoteForm.php", "fullPage": false }
+  ],
+  "authenticatedPages": [
+    { "file": "dashboard.png", "path": "/index.php" },
+    { "file": "reports.png", "path": "/reports.php" },
+    { "file": "leads.png", "path": "/leads.php" },
+    { "file": "lead-detail.png", "path": "/leads.php", "note": "Fallback; replace with lead.php?id=UUID if available" },
+    { "file": "add-lead.png", "path": "/add_lead.php" },
+    { "file": "contacts.png", "path": "/contacts.php" },
+    { "file": "notes.png", "path": "/notes.php" },
+    { "file": "tasks.png", "path": "/task.php" },
+    { "file": "vehicles.png", "path": "/vehicles.php" },
+    { "file": "vehicle-detail.png", "path": "/vehicles.php", "note": "Fallback; replace with vehicle_detail.php?id= if available" },
+    { "file": "pricing.png", "path": "/pricing.php" },
+    { "file": "agreements.png", "path": "/agreements.php" },
+    { "file": "payment-methods.png", "path": "/payment_methods.php" },
+    { "file": "transactions.png", "path": "/transactions.php" },
+    { "file": "email-settings.png", "path": "/email_settings.php" },
+    { "file": "email-templates.png", "path": "/email_templates.php" },
+    { "file": "email-analytics.png", "path": "/email_analytics.php" },
+    { "file": "integrations.png", "path": "/integration.php" },
+    { "file": "workflows.png", "path": "/workflows.php" },
+    { "file": "users.png", "path": "/users.php" },
+    { "file": "roles.png", "path": "/role_management.php" },
+    { "file": "settings.png", "path": "/settings.php" }
+  ],
+  "imageMap": {
+    "email-detail.png": "email-analytics.png",
+    "profile.png": "settings.png",
+    "welcome-otp.png": "login-explore.png",
+    "agreement-public.png": "agreements.png"
+  }
+}

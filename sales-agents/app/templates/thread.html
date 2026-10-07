@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>{{ thread.channel }} · {{ thread.contact.name or thread.contact.email }}</h1>
+<p class="sub">{{ prospect.company if prospect else '' }}</p>
+{% for m in messages %}
+  <div class="card {{ 'in' if m.direction == 'inbound' else 'out' }}" style="margin-bottom:12px">
+    <div class="channel">{{ m.direction }} · {{ m.status }} {% if m.classification %}· {{ m.classification }}{% endif %}</div>
+    {% if m.subject %}<strong>{{ m.subject }}</strong>{% endif %}
+    <div class="msg">{{ m.body }}</div>
+  </div>
+{% endfor %}
+<form onsubmit="event.preventDefault(); postForm('/api/inbox/{{ thread.id }}/reply-draft').then(()=>location.href='/approvals')">
+  <button class="btn" type="submit">Draft closer reply</button>
+</form>
+{% endblock %}

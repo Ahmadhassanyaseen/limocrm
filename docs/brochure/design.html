@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LimoCRM — Product Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" crossorigin="anonymous" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --pink:        #1d4ed8;
+      --pink-dark:   #1e40af;
+      --pink-rgb:    29, 78, 216;
+      --pink-light:  #38bdf8;
+      --pink-gradient: linear-gradient(90deg, #1d4ed8 0%, #38bdf8 100%);
+      --ink:         #0d1117;
+      --ink-soft:    #3d4552;
+      --muted:       #6b7589;
+      --rule:        rgba(13,17,23,.1);
+      --bg:          #f9fafb;
+      --card:        #ffffff;
+      --radius-sm:   8px;
+      --radius:      14px;
+      --radius-lg:   22px;
+      --font-display:"Syne", system-ui, sans-serif;
+      --font-body:   "DM Sans", system-ui, -apple-system, sans-serif;
+      --shadow-card: 0 2px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+      --shadow-lift: 0 8px 32px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .75rem 2rem;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    .nav__brand {
+      font-family: var(--font-display);
+      font-size: 1.25rem; font-weight: 800;
+      color: var(--pink); text-decoration: none;
+      letter-spacing: -.02em;
+    }
+    .nav__cta {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .5rem 1.1rem;
+      background: var(--pink-gradient); color: #fff;
+      border: none; border-radius: 999px;
+      font-family: var(--font-body); font-size: .875rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .nav__cta:hover { background: var(--pink-dark); }
+
+    /* ── COVER ──────────────────────────────────────────────── */
+    .cover {
+      position: relative; overflow: hidden;
+      background: linear-gradient(148deg, #0d1117 0%, #1c0a14 55%, #2a0823 100%);
+      color: #fff;
+      padding: 5rem 2rem 4rem;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+      page-break-after: always; break-after: page;
+    }
+
+    /* decorative blobs */
+    .cover::before, .cover::after {
+      content: "";
+      position: absolute; border-radius: 50%;
+      pointer-events: none;
+    }
+    .cover::before {
+      width: 640px; height: 640px;
+      top: -200px; right: -180px;
+      background: radial-gradient(circle, rgba(29,78,216,.28) 0%, transparent 70%);
+    }
+    .cover::after {
+      width: 480px; height: 480px;
+      bottom: -160px; left: -120px;
+      background: radial-gradient(circle, rgba(29,78,216,.18) 0%, transparent 70%);
+    }
+
+    .cover__eyebrow {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .3rem .9rem;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      font-size: .75rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 1.75rem;
+    }
+    .cover__eyebrow i { color: var(--pink); font-size: .9rem; }
+
+    .cover__headline {
+      position: relative; z-index: 1;
+      font-family: var(--font-display);
+      font-size: clamp(2.25rem, 5vw, 3.75rem);
+      font-weight: 800; line-height: 1.1;
+      letter-spacing: -.03em;
+      margin: 0 0 .5rem;
+      max-width: 16ch;
+    }
+    .cover__headline em {
+      font-style: normal;
+      background: var(--pink-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cover__sub {
+      position: relative; z-index: 1;
+      font-size: 1.0625rem; color: rgba(255,255,255,.65);
+      max-width: 44ch; margin: .75rem auto 2.5rem;
+      line-height: 1.6;
+    }
+
+    /* journey pill bar */
+    .cover__journey {
+      position: relative; z-index: 1;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: .4rem .3rem;
+      margin-bottom: 3rem;
+    }
+    .cover__journey .step {
+      padding: .35rem .9rem;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      font-size: .8rem; font-weight: 600;
+      color: rgba(255,255,255,.85);
+    }
+    .cover__journey .arrow {
+      color: var(--pink); font-weight: 700; font-size: 1rem;
+    }
+
+    /* module count chips */
+    .cover__chips {
+      position: relative; z-index: 1;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem;
+    }
+    .chip {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .55rem 1rem;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-sm);
+      font-size: .8125rem; font-weight: 600;
+      color: rgba(255,255,255,.8);
+    }
+    .chip i { color: var(--pink); font-size: 1.05rem; }
+
+    /* ── TABLE OF CONTENTS ──────────────────────────────────── */
+    .toc-page {
+      padding: 3.5rem 2rem 3rem;
+      max-width: 960px; margin: 0 auto;
+      page-break-after: always; break-after: page;
+    }
+    .toc-page__header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      border-bottom: 2px solid var(--ink); padding-bottom: .75rem;
+      margin-bottom: 2rem;
+    }
+    .toc-page__title {
+      font-family: var(--font-display);
+      font-size: 1.75rem; font-weight: 800;
+      letter-spacing: -.03em; margin: 0;
+    }
+    .toc-page__brand {
+      font-family: var(--font-display);
+      font-size: 1rem; font-weight: 700;
+      color: var(--pink); letter-spacing: -.02em;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .toc-section {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.4rem;
+      box-shadow: var(--shadow-card);
+    }
+    .toc-section__header {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: .9rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .toc-section__num {
+      font-family: var(--font-display);
+      font-size: 1.5rem; font-weight: 800;
+      color: var(--pink); line-height: 1;
+    }
+    .toc-section__title {
+      font-family: var(--font-display);
+      font-size: .9375rem; font-weight: 700;
+      letter-spacing: -.01em; margin: 0;
+      line-height: 1.2;
+    }
+    .toc-section__sub {
+      font-size: .75rem; color: var(--muted);
+      margin: .15rem 0 0;
+    }
+    .toc-modules {
+      display: flex; flex-direction: column; gap: .4rem;
+    }
+    .toc-module {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .8125rem; color: var(--ink-soft);
+      text-decoration: none;
+      padding: .2rem 0;
+    }
+    .toc-module i {
+      font-size: .95rem; color: var(--pink);
+      flex-shrink: 0; width: 1.1rem;
+    }
+
+    /* ── SECTION DIVIDER ────────────────────────────────────── */
+    .section-wrap {
+      max-width: 1000px; margin: 0 auto;
+      padding: 0 1.75rem 2.5rem;
+    }
+
+    .section-banner {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin: 3rem 0 1.75rem;
+      background: linear-gradient(135deg, var(--ink) 0%, #1c0a14 100%);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 2rem;
+      color: #fff;
+      position: relative; overflow: hidden;
+      page-break-after: avoid;
+    }
+    .section-banner::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 90% 50%, rgba(29,78,216,.35) 0%, transparent 55%);
+    }
+    .section-banner__num {
+      position: relative; z-index: 1;
+      font-family: var(--font-display);
+      font-size: 3rem; font-weight: 800;
+      opacity: .2; line-height: 1;
+      letter-spacing: -.04em;
+    }
+    .section-banner__body { position: relative; z-index: 1; }
+    .section-banner__title {
+      font-family: var(--font-display);
+      margin: 0; font-size: 1.375rem; font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .section-banner__sub {
+      margin: .2rem 0 0; font-size: .875rem;
+      color: rgba(255,255,255,.7);
+    }
+    .section-banner__icon {
+      position: absolute; right: 2rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: 4.5rem;
+      color: rgba(255,255,255,.06);
+    }
+
+    /* ── MODULE CARDS ───────────────────────────────────────── */
+    .module-card {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 1.75rem;
+      align-items: start;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem 1.75rem;
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      page-break-inside: avoid;
+      transition: box-shadow .2s;
+    }
+    .module-card:hover { box-shadow: var(--shadow-lift); }
+
+    .module-card--flip {
+      grid-template-columns: 1.15fr 1fr;
+    }
+    .module-card--flip .module-copy { order: 2; }
+    .module-card--flip .module-shot { order: 1; }
+
+    .module-copy__eyebrow {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .6875rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--pink); margin-bottom: .5rem;
+    }
+    .module-copy h3 {
+      display: flex; align-items: center; gap: .5rem;
+      font-family: var(--font-display);
+      margin: 0 0 .6rem;
+      font-size: 1.125rem; font-weight: 700;
+      letter-spacing: -.025em; color: var(--ink);
+    }
+    .module-copy h3 i {
+      font-size: 1.2rem; color: var(--pink); flex-shrink: 0;
+    }
+    .module-copy p {
+      margin: 0 0 .9rem;
+      color: var(--muted);
+      font-size: .9375rem; line-height: 1.6;
+    }
+
+    .feature-list {
+      margin: 0; padding: 0; list-style: none;
+      display: flex; flex-direction: column; gap: .4rem;
+    }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: .5rem;
+      font-size: .8125rem; line-height: 1.5; color: var(--ink-soft);
+    }
+    .feature-list li::before {
+      content: "";
+      flex-shrink: 0;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--pink);
+      margin-top: .5em;
+    }
+
+    /* screenshot placeholder */
+    .module-shot {
+      margin: 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--rule);
+      background: linear-gradient(135deg, rgba(29,78,216,.05) 0%, rgba(29,78,216,.02) 100%);
+      aspect-ratio: 16 / 10;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .module-shot img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top center;
+      display: block;
+    }
+    .module-shot__placeholder {
+      display: flex; flex-direction: column; align-items: center;
+      gap: .5rem; color: var(--rule);
+    }
+    .module-shot__placeholder i {
+      font-size: 2.5rem;
+      color: rgba(29,78,216,.2);
+    }
+    .module-shot__placeholder span {
+      font-size: .7rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(29,78,216,.3);
+    }
+
+    /* ── FOOTER CTA ─────────────────────────────────────────── */
+    .cta {
+      text-align: center;
+      margin: 2rem 1.75rem 3rem;
+      padding: 4rem 2rem;
+      max-width: 900px;
+      margin-left: auto; margin-right: auto;
+      background: linear-gradient(148deg, #0d1117 0%, #1c0a14 55%, #2a0823 100%);
+      border-radius: var(--radius-lg);
+      color: #fff;
+      position: relative; overflow: hidden;
+      page-break-inside: avoid;
+    }
+    .cta::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(29,78,216,.3) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .cta__body { position: relative; z-index: 1; }
+    .cta h2 {
+      font-family: var(--font-display);
+      margin: 0 0 .75rem;
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 800; letter-spacing: -.03em;
+    }
+    .cta p {
+      margin: 0 auto 1.75rem;
+      color: rgba(255,255,255,.7);
+      max-width: 44ch; font-size: 1rem; line-height: 1.6;
+    }
+    .cta__pill {
+      display: inline-block;
+      padding: .6rem 1.5rem;
+      background: var(--pink-gradient);
+      border-radius: 999px;
+      font-weight: 700; font-size: .9375rem;
+      letter-spacing: -.01em;
+    }
+
+    /* ── PRINT ──────────────────────────────────────────────── */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 16mm;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        font-size: 10pt;
+      }
+
+      .nav { display: none !important; }
+
+      .cover {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
+        height: 100vh;
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .cover::before, .cover::after {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .toc-page {
+        padding: 2rem 0 1.5rem;
+        max-width: none;
+        page-break-after: always;
+        break-after: page;
+      }
+      .toc-grid { gap: .75rem; }
+      .toc-section { page-break-inside: avoid; break-inside: avoid; }
+
+      .section-wrap {
+        max-width: none;
+        padding: 0 0 1rem;
+        margin: 0;
+      }
+
+      .section-banner {
+        margin: 1.25rem 0 .75rem;
+        padding: 1rem 1.25rem;
+        break-after: avoid;
+        page-break-after: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .section-wrap:first-of-type .section-banner {
+        margin-top: .5rem;
+      }
+
+      .module-card {
+        page-break-inside: auto;
+        break-inside: auto;
+        box-shadow: none;
+        margin-bottom: .65rem;
+        padding: .75rem 1rem;
+        gap: 1rem;
+      }
+      .module-card:hover { box-shadow: none; }
+      .module-card--flip .module-copy { order: 2; }
+      .module-card--flip .module-shot { order: 1; }
+
+      .module-copy p {
+        font-size: 9pt;
+        margin-bottom: .5rem;
+      }
+      .feature-list li { font-size: 9pt; }
+
+      .module-shot {
+        max-height: 48mm;
+        aspect-ratio: auto;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .module-shot img {
+        width: 100%;
+        max-height: 48mm;
+        object-fit: contain;
+      }
+
+      .cta {
+        margin: 1rem 0 0;
+        padding: 2.5rem 1.5rem;
+        border-radius: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      a { color: inherit; text-decoration: none; }
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .toc-grid { grid-template-columns: 1fr; }
+      .module-card, .module-card--flip {
+        grid-template-columns: 1fr;
+      }
+      .module-card--flip .module-copy,
+      .module-card--flip .module-shot { order: unset; }
+      .cover__headline { font-size: 2rem; }
+      .section-wrap { padding: 0 1rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" aria-label="Brochure tools">
+    <a class="nav__brand" href="#">LimoCRM</a>
+    <button type="button" class="nav__cta" onclick="window.print()">
+      <i class="ri-download-2-line"></i> Save as PDF
+    </button>
+  </nav>
+
+  <!-- ── COVER PAGE ────────────────────────────────────────── -->
+  <section class="cover">
+    <span class="cover__eyebrow">
+      <i class="ri-car-line"></i> Complete Product Guide
+    </span>
+    <h1 class="cover__headline">
+      Building blocks for your <em>limo business</em>
+    </h1>
+    <p class="cover__sub">
+      One workspace built for limousine operators — from the first website visit to the last report. 7 modules, every stage covered.
+    </p>
+
+    <div class="cover__journey" aria-label="Customer journey">
+      <span class="step">Website</span>
+      <span class="arrow">→</span>
+      <span class="step">Lead</span>
+      <span class="arrow">→</span>
+      <span class="step">Quote</span>
+      <span class="arrow">→</span>
+      <span class="step">Agreement</span>
+      <span class="arrow">→</span>
+      <span class="step">Payment</span>
+      <span class="arrow">→</span>
+      <span class="step">Report</span>
+    </div>
+
+    <div class="cover__chips">
+      <div class="chip"><i class="ri-dashboard-3-line"></i> Command Center</div>
+      <div class="chip"><i class="ri-user-search-line"></i> Sales Pipeline</div>
+      <div class="chip"><i class="ri-car-line"></i> Fleet & Pricing</div>
+      <div class="chip"><i class="ri-file-text-line"></i> Agreements</div>
+      <div class="chip"><i class="ri-mail-send-line"></i> Email Comms</div>
+      <div class="chip"><i class="ri-flow-chart"></i> Growth & Automation</div>
+      <div class="chip"><i class="ri-team-line"></i> Administration</div>
+    </div>
+  </section>
+
+  <!-- ── TABLE OF CONTENTS ─────────────────────────────────── -->
+  <div class="toc-page">
+    <div class="toc-page__header">
+      <h2 class="toc-page__title">Contents</h2>
+      <span class="toc-page__brand">LimoCRM</span>
+    </div>
+
+    <div class="toc-grid">
+      <!-- 01 -->
+      <div class="toc-section">
+        <div class="toc-section__header">
+          <span class="toc-section__num">01</span>
+          <div>
+            <h3 class="toc-section__title">Command center</h3>
+            <p class="toc-section__sub">Start every day knowing pipeline health</p>
+          </div>
+        </div>
+        <div class="toc-modules">
+          <a class="toc-module" href="#sec-01"><i class="ri-dashboard-3-line"></i> Dashboard</a>
+          <a class="toc-module" href="#sec-01"><i class="ri-bar-chart-grouped-line"></i> Reports &amp; Analytics</a>
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="toc-section">
+        <div class="toc-section__header">
+          <span class="toc-section__num">02</span>
+          <div>
+            <h3 class="toc-section__title">Sales pipeline</h3>
+            <p class="toc-section__sub">Work every inquiry to a closed deal</p>
+          </div>
+        </div>
+        <div class="toc-modules">
+          <a class="toc-module" href="#sec-02"><i class="ri-user-search-line"></i> Leads</a>
+          <a class="toc-module" href="#sec-02"><i class="ri-file-list-3-line"></i> Lead detail</a>
+          <a class="toc-module" href="#sec-02"><i class="ri-contacts-book-line"></i> Contacts</a>
+          <a class="toc-module" href="#sec-02"><i class="ri-checkbox-circle-line"></i> Tasks</a>
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="toc-section">
+        <div class="toc-section__header">
+          <span class="toc-section__num">03</span>
+          <div>
+            <h3 class="toc-section__title">Fleet &amp; pricing</h3>
+            <p class="toc-section__sub">Keep the catalog current and profitable</p>
+          </div>
+        </div>
+        <div class="toc-modules">
+          <a class="toc-module" href="#sec-03"><i class="ri-car-line"></i> Vehicles</a>
+          <a class="toc-module" href="#sec-03"><i class="ri-price-tag-3-line"></i> Pricing</a>
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="toc-section">
+        <div class="toc-section__header">
+          <span class="toc-section__num">04</span>
+          <div>
+            <h3 class="toc-section__title">Agreements &amp; payments</h3>
+            <p class="toc-section__sub">Close and collect in one link</p>
+          </div>
+        </div>
+        <div class="toc-modules">
+          <a class="toc-module" href="#sec-04"><i class="ri-file-text-line"></i> Agreements</a>
+          <a class="toc-module" href="#sec-04"><i class="ri-exchange-funds-line"></i> Transactions</a>
+        </div>
+      </div>
+
+      <!-- 05 -->
+      <div class="toc-section">
+        <div class="toc-section__header">
+          <span class="toc-section__num">05</span>
+          <div>
+            <h3 class="toc-section__title">Email communications</h3>
+            <p class="toc-section__sub">On-brand outreach with real metrics</p>
+          </div>
+        </div>
+        <div class="toc-modules">
+          <a class="toc-module" href="#sec-05"><i class="ri-layout-4-line"></i> Email templates</a>
+          <a class="toc-module" href="#sec-05"><i class="ri-line-chart-line"></i> Email analytics</a>
+          <a class="toc-module" href="#sec-05"><i class="ri-mail-open-line"></i> Email detail</a>
+        </div>
+      </div>
+
+      <!-- 06 -->
+      <div class="toc-section">
+        <div class="toc-section__header">
+          <span class="toc-section__num">06</span>
+          <div>
+            <h3 class="toc-section__title">Growth &amp; automation</h3>
+            <p class="toc-section__sub">Capture demand and automate repetitive work</p>
+          </div>
+        </div>
+        <div class="toc-modules">
+          <a class="toc-module" href="#sec-06"><i class="ri-plug-line"></i> Integrations (Widget)</a>
+          <a class="toc-module" href="#sec-06"><i class="ri-calculator-line"></i> Instant quote widget</a>
+          <a class="toc-module" href="#sec-06"><i class="ri-flow-chart"></i> Workflows</a>
+          <a class="toc-module" href="#sec-06"><i class="ri-shield-keyhole-line"></i> Welcome / OTP funnel</a>
+          <a class="toc-module" href="#sec-06"><i class="ri-login-box-line"></i> Explore demo login</a>
+        </div>
+      </div>
+
+      <!-- 07 -->
+      <div class="toc-section" style="grid-column: 1 / -1;">
+        <div class="toc-section__header">
+          <span class="toc-section__num">07</span>
+          <div>
+            <h3 class="toc-section__title">Administration &amp; account</h3>
+            <p class="toc-section__sub">Scale the team without losing control</p>
+          </div>
+        </div>
+        <div class="toc-modules" style="display:grid; grid-template-columns: repeat(3,1fr); gap:.4rem;">
+          <a class="toc-module" href="#sec-07"><i class="ri-team-line"></i> Users</a>
+          <a class="toc-module" href="#sec-07"><i class="ri-shield-user-line"></i> Role management</a>
+          <a class="toc-module" href="#sec-07"><i class="ri-settings-3-line"></i> Settings</a>
+          <a class="toc-module" href="#sec-07"><i class="ri-user-line"></i> Profile</a>
+          <!-- <a class="toc-module" href="#sec-07"><i class="ri-guide-line"></i> Intro wizard</a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       01 COMMAND CENTER
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-01">
+    <div class="section-banner">
+      <span class="section-banner__num">01</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Command center</h2>
+        <p class="section-banner__sub">Start every day knowing pipeline health and performance</p>
+      </div>
+      <i class="ri-dashboard-3-line section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-dashboard-3-line"></i> Module 01.1</span>
+        <h3><i class="ri-dashboard-3-line"></i> Dashboard</h3>
+        <p>See year-to-date lead volume, open pipeline, and wins in charts and KPI cards at a glance. Owners get a team-wide view; staff see only the pipeline they own, so everyone starts the day knowing what needs attention.</p>
+        <ul class="feature-list">
+          <li>YTD lead charts and monthly win tracking</li>
+          <li>Open pipeline KPI cards at a glance</li>
+          <li>Admin vs. staff pipeline visibility by role</li>
+          <li>Quick health check before the daily standup</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/dashboard.png" alt="Dashboard" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-layout-masonry-line\'></i><span>Dashboard</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-bar-chart-grouped-line"></i> Module 01.2</span>
+        <h3><i class="ri-bar-chart-grouped-line"></i> Reports &amp; Analytics</h3>
+        <p>Drill into performance by month, quarter, or year with funnel stages, geographic breakdowns, and revenue-style metrics drawn from real lead data. Use it to spot which routes, channels, and periods drive growth—and where deals stall.</p>
+        <ul class="feature-list">
+          <li>Funnel and stage analysis by month, quarter, or year</li>
+          <li>Geographic breakdown from pickup and dropoff data</li>
+          <li>Revenue-style metrics from trip pricing fields</li>
+          <li>Trend lines to spot seasonal peaks and slow periods</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/reports.png" alt="Reports" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-bar-chart-grouped-line\'></i><span>Reports</span></div>';" />
+      </figure>
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       02 SALES PIPELINE
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-02">
+    <div class="section-banner">
+      <span class="section-banner__num">02</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Sales pipeline</h2>
+        <p class="section-banner__sub">Work every inquiry to a closed deal</p>
+      </div>
+      <i class="ri-user-search-line section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-user-search-line"></i> Module 02.1</span>
+        <h3><i class="ri-user-search-line"></i> Leads</h3>
+        <p>A filterable, sortable table of every inquiry with status, source, trip date, and assigned rep. Bulk-assign, search by name or company, and jump straight into the detail view—all from one screen that keeps the whole team aligned.</p>
+        <ul class="feature-list">
+          <li>Filterable and sortable table across all reps</li>
+          <li>Status, source, trip date, and assignee at a glance</li>
+          <li>Bulk-assign leads without opening each record</li>
+          <li>One-click into full lead detail</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/leads.png" alt="Leads" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-user-search-line\'></i><span>Leads</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-file-list-3-line"></i> Module 02.2</span>
+        <h3><i class="ri-file-list-3-line"></i> Lead detail</h3>
+        <p>Every field, note, email, task, and agreement for a single lead on one scrollable page. No switching tabs—reps get full context from first contact to closed deal, with a timeline that shows exactly what happened and when.</p>
+        <ul class="feature-list">
+          <li>Full trip details, pricing, and status on one page</li>
+          <li>Activity timeline — notes, emails, status changes</li>
+          <li>Linked tasks and agreements in the same view</li>
+          <li>Send email and update status without leaving the record</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/lead-detail.png" alt="Lead detail" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-file-list-3-line\'></i><span>Lead Detail</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-contacts-book-line"></i> Module 02.3</span>
+        <h3><i class="ri-contacts-book-line"></i> Contacts</h3>
+        <p>A deduplicated directory of everyone your team has ever interacted with. Search by name or company, review all linked leads for a person, and keep notes on corporate and repeat clients — separate from individual trip records.</p>
+        <ul class="feature-list">
+          <li>Deduplicated directory across all reps</li>
+          <li>View every lead linked to a contact</li>
+          <li>Notes for corporate and repeat client context</li>
+          <li>Fast search by name or company</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/contacts.png" alt="Contacts" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-contacts-book-line\'></i><span>Contacts</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-checkbox-circle-line"></i> Module 02.4</span>
+        <h3><i class="ri-checkbox-circle-line"></i> Tasks</h3>
+        <p>Create, assign, and track follow-up tasks tied to leads or contacts. Filter by due date and assignee, and close tasks from the task list or directly from the lead record so nothing falls through the cracks.</p>
+        <ul class="feature-list">
+          <li>Tasks tied to leads or contacts</li>
+          <li>Assign to any team member with due dates</li>
+          <li>Filter and sort by due date or assignee</li>
+          <li>Close tasks from the list or the lead record</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/tasks.png" alt="Tasks" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-checkbox-circle-line\'></i><span>Tasks</span></div>';" />
+      </figure>
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       03 FLEET & PRICING
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-03">
+    <div class="section-banner">
+      <span class="section-banner__num">03</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Fleet &amp; pricing</h2>
+        <p class="section-banner__sub">Keep the catalog current and profitable</p>
+      </div>
+      <i class="ri-car-line section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-car-line"></i> Module 03.1</span>
+        <h3><i class="ri-car-line"></i> Vehicles</h3>
+        <p>Manage the full fleet with photos, capacity, and status so the instant quote widget always shows what's actually available. Add or retire vehicles in seconds — the catalog stays live across the CRM and the customer-facing widget simultaneously.</p>
+        <ul class="feature-list">
+          <li>Full fleet catalog with photos and capacity</li>
+          <li>Active / inactive status synced to the widget</li>
+          <li>Add or retire vehicles in seconds</li>
+          <li>Live across CRM and quote widget simultaneously</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/vehicles.png" alt="Vehicles" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-car-line\'></i><span>Vehicles</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-price-tag-3-line"></i> Module 03.2</span>
+        <h3><i class="ri-price-tag-3-line"></i> Pricing</h3>
+        <p>Set base rates, per-mile and per-hour rules, and flat-rate overrides per vehicle so every quote is calculated consistently. Reps always quote the same number for the same trip — no spreadsheets, no guesswork, no margin erosion.</p>
+        <ul class="feature-list">
+          <li>Base, per-mile, and per-hour rate rules per vehicle</li>
+          <li>Flat-rate overrides for recurring routes</li>
+          <li>Consistent quotes across the whole team</li>
+          <li>No spreadsheets or manual calculations</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/pricing.png" alt="Pricing" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-price-tag-3-line\'></i><span>Pricing</span></div>';" />
+      </figure>
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       04 AGREEMENTS & PAYMENTS
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-04">
+    <div class="section-banner">
+      <span class="section-banner__num">04</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Agreements &amp; payments</h2>
+        <p class="section-banner__sub">Close and collect in one link</p>
+      </div>
+      <i class="ri-file-text-line section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-file-text-line"></i> Module 04.1</span>
+        <h3><i class="ri-file-text-line"></i> Agreements</h3>
+        <p>Generate a booking agreement pre-filled from the lead record, send a secure link, and get a signed copy back — all without leaving CRM. Signed agreements attach to the lead timeline automatically so the audit trail is always complete.</p>
+        <ul class="feature-list">
+          <li>Pre-filled from the lead record in one click</li>
+          <li>Secure signing link sent to the client</li>
+          <li>Signed copy auto-attached to the lead timeline</li>
+          <li>Full audit trail from send to signature</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/agreements.png" alt="Agreements" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-file-text-line\'></i><span>Agreements</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-exchange-funds-line"></i> Module 04.2</span>
+        <h3><i class="ri-exchange-funds-line"></i> Transactions</h3>
+        <p>Stripe-powered payment collection tied directly to the agreement and lead. Clients pay from the same secure link they signed — no separate invoicing tool required. Payment status updates the lead automatically the moment funds clear.</p>
+        <ul class="feature-list">
+          <li>Stripe-powered collection linked to the agreement</li>
+          <li>Client pays from the same link they signed</li>
+          <li>No separate invoicing tool required</li>
+          <li>Lead status updates automatically on payment</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/transactions.png" alt="Transactions" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-exchange-funds-line\'></i><span>Transactions</span></div>';" />
+      </figure>
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       05 EMAIL COMMUNICATIONS
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-05">
+    <div class="section-banner">
+      <span class="section-banner__num">05</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Email communications</h2>
+        <p class="section-banner__sub">On-brand outreach with real metrics</p>
+      </div>
+      <i class="ri-mail-send-line section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-layout-4-line"></i> Module 05.1</span>
+        <h3><i class="ri-layout-4-line"></i> Email templates</h3>
+        <p>Build and reuse branded email templates with LimoCRM placeholders that auto-fill from the lead record. Quotes, agreements, and follow-ups all go out consistently—every time, from every rep—without anyone writing from scratch.</p>
+        <ul class="feature-list">
+          <li>Visual editor with LimoCRM placeholders</li>
+          <li>Tracking and unsubscribe links built in</li>
+          <li>Consistent quotes, agreements, and follow-ups</li>
+          <li>Reusable templates across the team</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/email-templates.png" alt="Email templates" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-layout-4-line\'></i><span>Email Templates</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-line-chart-line"></i> Module 05.2</span>
+        <h3><i class="ri-line-chart-line"></i> Email analytics</h3>
+        <p>See how outbound mail performs with open and engagement metrics per user. Refine templates and timing based on data — not guesswork — and identify which messages drive replies versus which go cold.</p>
+        <ul class="feature-list">
+          <li>Open and engagement metrics per user</li>
+          <li>Performance data for all outbound mail</li>
+          <li>Refine templates based on real results</li>
+          <li>Optimize send timing with data</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/email-analytics.png" alt="Email analytics" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-line-chart-line\'></i><span>Email Analytics</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-mail-open-line"></i> Module 05.3</span>
+        <h3><i class="ri-mail-open-line"></i> Email detail</h3>
+        <p>Open a single sent message from a lead's timeline for support, disputes, or audit. Full context on what went out and when, tied to the job record so the whole story is there when a client calls in.</p>
+        <ul class="feature-list">
+          <li>Single sent message from the lead timeline</li>
+          <li>Full context for support and disputes</li>
+          <li>Audit trail of what went out and when</li>
+          <li>Tied directly to the job record</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/email-detail.png" alt="Email detail" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-mail-open-line\'></i><span>Email Detail</span></div>';" />
+      </figure>
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       06 GROWTH & AUTOMATION
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-06">
+    <div class="section-banner">
+      <span class="section-banner__num">06</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Growth &amp; automation</h2>
+        <p class="section-banner__sub">Capture demand and automate repetitive work</p>
+      </div>
+      <i class="ri-flow-chart section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-plug-line"></i> Module 06.1</span>
+        <h3><i class="ri-plug-line"></i> Integrations (Widget)</h3>
+        <p>Get embed code, live preview, and controls for accent color and font to match your brand on any website. See which domains drive leads so marketing spend ties back to CRM data.</p>
+        <ul class="feature-list">
+          <li>Embed code with live preview</li>
+          <li>Accent color and font match your brand</li>
+          <li>Track which domains drive leads</li>
+          <li>Marketing spend tied back to CRM data</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/integrations.png" alt="Integrations" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-plug-line\'></i><span>Integrations</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-calculator-line"></i> Module 06.2</span>
+        <h3><i class="ri-calculator-line"></i> Instant quote widget</h3>
+        <p>Visitors enter pickup, destination, date, and passengers, pick a vehicle, and submit — creating a new lead in CRM automatically. Turns passive site traffic into qualified pipeline without phone tag.</p>
+        <ul class="feature-list">
+          <li>Pickup, destination, date, and passenger fields</li>
+          <li>Vehicle selection before submit</li>
+          <li>Auto-creates a new lead in CRM</li>
+          <li>Turns site traffic into qualified pipeline</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/widget.png" alt="Instant quote widget" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-calculator-line\'></i><span>Quote Widget</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-flow-chart"></i> Module 06.3</span>
+        <h3><i class="ri-flow-chart"></i> Workflows</h3>
+        <p>Define rule-based automation with conditions and actions on leads and contacts — status changes, follow-ups, and repetitive updates. Frees staff from manual clicks as volume grows.</p>
+        <ul class="feature-list">
+          <li>Rule-based conditions and actions</li>
+          <li>Automate status changes and follow-ups</li>
+          <li>Works on leads and contacts</li>
+          <li>Frees staff from manual clicks at scale</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/workflows.png" alt="Workflows" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-flow-chart\'></i><span>Workflows</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-shield-keyhole-line"></i> Module 06.4</span>
+        <h3><i class="ri-shield-keyhole-line"></i> Welcome / OTP funnel</h3>
+        <p>Prospects arrive via a marketing link, verify their email with a one-time code, and enter CRM securely. Campaign-driven growth stays verified and traceable from first click.</p>
+        <ul class="feature-list">
+          <li>Marketing links with verified email entry</li>
+          <li>One-time code (OTP) for secure access</li>
+          <li>Campaign-driven growth stays traceable</li>
+          <li>Verified prospects from first click</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/welcome-otp.png" alt="Welcome OTP" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-shield-keyhole-line\'></i><span>OTP Funnel</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-login-box-line"></i> Module 06.5</span>
+        <h3><i class="ri-login-box-line"></i> Explore demo login</h3>
+        <p>Campaign links with tracking IDs can auto-open a demo workspace so prospects evaluate the product immediately. Sales and marketing see which sends convert to product exploration.</p>
+        <ul class="feature-list">
+          <li>Campaign links with tracking IDs</li>
+          <li>Auto-open demo workspace for prospects</li>
+          <li>Immediate product evaluation</li>
+          <li>Track which sends convert to exploration</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/login-explore.png" alt="Explore demo login" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-login-box-line\'></i><span>Demo Login</span></div>';" />
+      </figure>
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       07 ADMINISTRATION
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-07">
+    <div class="section-banner">
+      <span class="section-banner__num">07</span>
+      <div class="section-banner__body">
+        <h2 class="section-banner__title">Administration &amp; account</h2>
+        <p class="section-banner__sub">Scale the team without losing control</p>
+      </div>
+      <i class="ri-team-line section-banner__icon"></i>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-team-line"></i> Module 07.1</span>
+        <h3><i class="ri-team-line"></i> Users</h3>
+        <p>Add team members, assign roles, and manage active accounts as the company scales. Onboarding new hires takes minutes, not an IT project.</p>
+        <ul class="feature-list">
+          <li>Add team members and assign roles</li>
+          <li>Manage active and inactive accounts</li>
+          <li>Onboarding in minutes, not an IT project</li>
+          <li>Scale the team as the company grows</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/users.png" alt="Users" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-team-line\'></i><span>Users</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-shield-user-line"></i> Module 07.2</span>
+        <h3><i class="ri-shield-user-line"></i> Role management</h3>
+        <p>Build roles with module-level create, read, update, and delete permissions — sales sees leads, not payment keys. Owners keep control; staff see only what their job requires.</p>
+        <ul class="feature-list">
+          <li>Module-level CRUD permissions</li>
+          <li>Sales sees leads, not payment keys</li>
+          <li>Custom roles for each job function</li>
+          <li>Owners keep control as the team scales</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/roles.png" alt="Role management" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-shield-user-line\'></i><span>Roles</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-settings-3-line"></i> Module 07.3</span>
+        <h3><i class="ri-settings-3-line"></i> Settings</h3>
+        <p>Update profile details, username, phone, and password in one account screen. Self-service changes reduce support load on admins.</p>
+        <ul class="feature-list">
+          <li>Profile, username, phone, and password in one screen</li>
+          <li>Self-service account updates</li>
+          <li>Reduces admin support load</li>
+          <li>Quick changes without IT help</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/settings.png" alt="Settings" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-settings-3-line\'></i><span>Settings</span></div>';" />
+      </figure>
+    </article>
+
+    <article class="module-card module-card--flip">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-user-line"></i> Module 07.4</span>
+        <h3><i class="ri-user-line"></i> Profile</h3>
+        <p>Quick view of the signed-in user's identity and shortcuts to account actions. Keeps personal info accessible from anywhere in the app.</p>
+        <ul class="feature-list">
+          <li>Signed-in user identity at a glance</li>
+          <li>Shortcuts to account actions</li>
+          <li>Accessible from anywhere in the app</li>
+          <li>Quick personal info without digging</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/profile.png" alt="Profile" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-user-line\'></i><span>Profile</span></div>';" />
+      </figure>
+    </article>
+
+    <!-- <article class="module-card">
+      <div class="module-copy">
+        <span class="module-copy__eyebrow"><i class="ri-guide-line"></i> Module 07.5</span>
+        <h3><i class="ri-guide-line"></i> Intro wizard</h3>
+        <p>A first-run guided tour walks new operators through fleet, templates, widget embed, and leads. Faster adoption means ROI sooner after go-live.</p>
+        <ul class="feature-list">
+          <li>First-run guided tour for new operators</li>
+          <li>Covers fleet, templates, widget, and leads</li>
+          <li>Faster adoption after go-live</li>
+          <li>ROI sooner with guided setup</li>
+        </ul>
+      </div>
+      <figure class="module-shot">
+        <img src="screenshots/dashboard.png" alt="Intro wizard" decoding="sync"
+             onerror="this.parentElement.innerHTML='<div class=\'module-shot__placeholder\'><i class=\'ri-guide-line\'></i><span>Intro Wizard</span></div>';" />
+      </figure>
+    </article> -->
+  </div>
+
+  <!-- ── FOOTER CTA ─────────────────────────────────────────── -->
+  <footer class="cta">
+    <div class="cta__body">
+      <h2>One workspace. The full journey.</h2>
+      <p>Website → lead → quote → agreement → payment → report. LimoCRM connects every step for limousine operators.</p>
+      <span class="cta__pill">limocrm.com · Demo available</span>
+    </div>
+  </footer>
+
+</body>
+</html>

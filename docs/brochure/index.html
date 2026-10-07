@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LimoCRM — Module Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- <link rel="stylesheet" href="brochure.css" /> -->
+   <style>
+    :root {
+  --crm-primary: #1d4ed8;
+  --crm-primary-dark: #1e40af;
+  --crm-primary-light: #38bdf8;
+  --crm-primary-rgb: 29, 78, 216;
+  --crm-primary-gradient: linear-gradient(90deg, #1d4ed8 0%, #38bdf8 100%);
+  --crm-ink: #0f172a;
+  --crm-muted: #64748b;
+  --crm-bg: #f8fafc;
+  --crm-card: #ffffff;
+  --crm-border: rgba(15, 23, 42, 0.08);
+  --crm-radius: 16px;
+  --crm-font: "DM Sans", system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--crm-font);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--crm-ink);
+  background: var(--crm-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+.brochure-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--crm-border);
+}
+
+.brochure-nav__brand {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--crm-primary);
+  text-decoration: none;
+}
+
+.brochure-nav__print {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--crm-primary);
+  cursor: pointer;
+}
+
+.brochure-nav__print:hover {
+  background: var(--crm-primary-dark);
+}
+
+/* Opening spread (diamond mosaic page + module catalog page) */
+.opening-spread {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.opening-spread::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, transparent 48%, rgba(var(--crm-primary-rgb), 0.04) 48%, rgba(var(--crm-primary-rgb), 0.04) 52%, transparent 52%),
+    radial-gradient(circle at 50% 20%, rgba(var(--crm-primary-rgb), 0.06), transparent 45%);
+  pointer-events: none;
+}
+
+.opening-spread__mosaic {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, rgba(var(--crm-primary-rgb), 0.08) 0%, #f1f5f9 100%);
+  border-bottom: 1px solid var(--crm-border);
+  page-break-after: always;
+  break-after: page;
+}
+
+.diamond-mosaic {
+  --diamond-large: 158px;
+  --diamond-small: 82px;
+  --diamond-gutter: 4px;
+  --diamond-label-h: 2.75rem;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--diamond-large) * 2 + var(--diamond-small) * 2 + 8rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.diamond-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding-top: 3.25rem;
+  padding-bottom: 2.5rem;
+}
+
+.diamond-quad {
+  display: grid;
+  grid-template-columns: repeat(2, var(--diamond-large));
+  grid-template-rows: repeat(2, var(--diamond-large));
+  gap: var(--diamond-gutter);
+  background: #fff;
+  padding: var(--diamond-gutter);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.diamond-block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.diamond-block--large {
+  width: var(--diamond-large);
+  height: var(--diamond-large);
+}
+
+.diamond-block--small {
+  width: var(--diamond-small);
+}
+
+.diamond-block--top {
+  margin-bottom: calc(var(--diamond-small) * -0.38);
+  z-index: 2;
+}
+
+.diamond-block--bottom {
+  margin-top: calc(var(--diamond-small) * -0.38);
+  z-index: 2;
+}
+
+.diamond-block__text {
+  position: absolute;
+  bottom: calc(100% + 0.3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 11rem;
+  text-align: center;
+  line-height: 1.25;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.diamond-quad .diamond-block__text {
+  max-width: 9rem;
+}
+
+.diamond-block__title {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--crm-ink);
+  letter-spacing: -0.02em;
+}
+
+.diamond-block__line {
+  display: block;
+  font-size: 0.6875rem;
+  font-style: italic;
+  color: var(--crm-primary-dark);
+  margin-top: 0.1rem;
+}
+
+.diamond-block--small .diamond {
+  width: var(--diamond-small);
+  height: var(--diamond-small);
+}
+
+.diamond-block--large .diamond {
+  width: 100%;
+  height: 100%;
+}
+
+.diamond {
+  position: relative;
+  flex-shrink: 0;
+  transform: rotate(45deg);
+  overflow: hidden;
+  border: var(--diamond-gutter) solid #fff;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
+  background: var(--crm-bg);
+}
+
+.diamond__inner {
+  position: absolute;
+  width: 141%;
+  height: 141%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.diamond__inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.diamond--brand {
+  width: var(--diamond-small);
+  height: var(--diamond-small);
+  background: var(--crm-primary-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.diamond--brand .diamond__inner {
+  position: static;
+  transform: rotate(-45deg);
+  width: 88%;
+  height: auto;
+  padding: 0.25rem;
+  color: #fff;
+  font-size: 0.55rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.diamond--brand ul {
+  margin: 0;
+  padding: 0 0 0 1rem;
+  list-style: disc;
+}
+
+.diamond--brand li {
+  margin-bottom: 0.35rem;
+}
+
+.opening-spread__content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 2rem 2rem 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  page-break-after: always;
+  break-after: page;
+}
+
+.opening-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.opening-brand__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.opening-brand__name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--crm-primary);
+  letter-spacing: -0.03em;
+}
+
+.opening-brand__tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--crm-muted);
+}
+
+.opening-headline {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--crm-ink);
+}
+
+.opening-headline i {
+  font-size: 2.25rem;
+  color: var(--crm-primary);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.opening-headline > span {
+  display: block;
+}
+
+.opening-headline > span > span {
+  display: block;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  color: var(--crm-primary);
+  margin-top: 0.15rem;
+}
+
+.opening-tagline {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: var(--crm-muted);
+  max-width: 38ch;
+}
+
+.opening-services-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+.opening-services-label i {
+  color: var(--crm-primary);
+  font-size: 1.25rem;
+}
+
+.module-catalog {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+  flex: 1;
+}
+
+.catalog-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  background: var(--crm-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  page-break-inside: avoid;
+}
+
+.catalog-item:hover {
+  border-color: rgba(var(--crm-primary-rgb), 0.45);
+  box-shadow: 0 4px 16px rgba(var(--crm-primary-rgb), 0.1);
+}
+
+.catalog-item__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(var(--crm-primary-rgb), 0.08);
+  color: var(--crm-primary);
+  font-size: 1.25rem;
+}
+
+.catalog-item__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.catalog-item__sec {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--crm-primary);
+}
+
+.catalog-item__name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--crm-ink);
+}
+
+.journey-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--crm-border);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--crm-muted);
+}
+
+.journey-strip span:not(.journey-strip__arrow) {
+  padding: 0.25rem 0.5rem;
+  background: rgba(var(--crm-primary-rgb), 0.08);
+  border-radius: 999px;
+  color: var(--crm-primary-dark);
+}
+
+.journey-strip__arrow {
+  color: var(--crm-primary);
+}
+
+/* Legacy cover journey (CTA reuse) */
+.cover__journey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cover__journey span {
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.cover__journey .arrow {
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--crm-primary);
+  font-size: 1rem;
+}
+
+/* Sections */
+.section {
+  padding: 0 1.5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 2.5rem 0 1.75rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--crm-primary-gradient);
+  border-radius: var(--crm-radius);
+  color: #fff;
+  page-break-after: avoid;
+}
+
+.section-header__num {
+  font-size: 2rem;
+  font-weight: 800;
+  opacity: 0.35;
+  line-height: 1;
+}
+
+.section-header__text h2 {
+  margin: 0;
+  font-size: 1.375rem;
+  letter-spacing: -0.02em;
+}
+
+.section-header__text p {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+/* Module cards */
+.module-card {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  background: var(--crm-card);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04);
+  page-break-inside: avoid;
+}
+
+.module-card:nth-child(even) {
+  grid-template-columns: 1.15fr 1fr;
+}
+
+.module-card:nth-child(even) .module-copy {
+  order: 2;
+}
+
+.module-card:nth-child(even) .module-shot {
+  order: 1;
+}
+
+.module-copy h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--crm-ink);
+}
+
+.module-copy h3 i {
+  font-size: 1.25rem;
+  color: var(--crm-primary);
+  flex-shrink: 0;
+}
+
+.module-copy p {
+  margin: 0 0 0.75rem;
+  color: var(--crm-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.module-bullets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.module-bullets li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--crm-ink);
+}
+
+.module-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--crm-primary);
+}
+
+.module-bullets li:last-child {
+  margin-bottom: 0;
+}
+
+.module-shot {
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--crm-border);
+  background: var(--crm-bg);
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.module-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.module-shot--pending {
+  background:
+    linear-gradient(135deg, rgba(var(--crm-primary-rgb), 0.06) 0%, rgba(var(--crm-primary-rgb), 0.02) 100%);
+}
+
+.module-shot--pending::after {
+  content: "Screenshot";
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--crm-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.module-shot img[src=""],
+.module-shot img:not([src]) {
+  display: none;
+}
+
+/* CTA */
+.cta {
+  text-align: center;
+  padding: 4rem 1.5rem;
+  margin: 2rem 1.5rem 3rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(155deg, #0b1220 0%, #1a0a14 100%);
+  border-radius: var(--crm-radius);
+  color: #fff;
+  page-break-inside: avoid;
+}
+
+.cta h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.75rem;
+}
+
+.cta p {
+  margin: 0 0 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 40ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta__pill {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: var(--crm-primary);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .diamond-mosaic {
+    min-height: 480px;
+  }
+
+  .opening-spread__content {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .module-catalog {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .module-card,
+  .module-card:nth-child(even) {
+    grid-template-columns: 1fr;
+  }
+
+  .module-card:nth-child(even) .module-copy,
+  .module-card:nth-child(even) .module-shot {
+    order: unset;
+  }
+}
+
+/* Print */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 14mm;
+  }
+
+  body {
+    background: #fff;
+    font-size: 10pt;
+  }
+
+  .brochure-nav {
+    display: none !important;
+  }
+
+  .opening-spread__mosaic {
+    min-height: auto;
+    page-break-after: always;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .opening-spread__content {
+    min-height: auto;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .diamond-mosaic {
+    min-height: 220mm;
+  }
+
+  .diamond-block__text {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .diamond {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .module-catalog {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+
+  .catalog-item__icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  .module-bullets li {
+    font-size: 8.5pt;
+    margin-bottom: 0.2rem;
+  }
+
+  .section {
+    padding: 0;
+    max-width: none;
+  }
+
+  .section-header {
+    margin-top: 1.5rem;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .module-card {
+    box-shadow: none;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    grid-template-columns: 1fr 1.1fr !important;
+  }
+
+  .module-card:nth-child(even) .module-copy {
+    order: 2 !important;
+  }
+
+  .module-card:nth-child(even) .module-shot {
+    order: 1 !important;
+  }
+
+  .module-shot {
+    aspect-ratio: auto;
+    max-height: 55mm;
+  }
+
+  .module-shot img {
+    width: 100%;
+    max-height: 55mm;
+    object-fit: contain;
+  }
+
+
+  .cta {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 1rem 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+   </style>
+</head>
+<body>
+  <nav class="brochure-nav" aria-label="Brochure tools">
+    <a class="brochure-nav__brand" href="#">LimoCRM</a>
+    <button type="button" class="brochure-nav__print" onclick="window.print()">Save as PDF</button>
+  </nav>
+
+  <section class="opening-spread">
+    <!-- <div class="opening-spread__mosaic">
+      <div class="diamond-mosaic">
+        <div class="diamond-cluster">
+          <div class="diamond-block diamond-block--small diamond-block--top">
+            <div class="diamond-block__text">
+              <strong class="diamond-block__title">Integrations</strong>
+              <span class="diamond-block__line">Your brand on any site</span>
+            </div>
+            <div class="diamond">
+              <div class="diamond__inner"><img src="screenshots/integrations.png" alt="" decoding="sync" /></div>
+            </div>
+          </div>
+
+          <div class="diamond-quad" aria-label="Core modules">
+            <div class="diamond-block diamond-block--large">
+              <div class="diamond-block__text">
+                <strong class="diamond-block__title">Dashboard</strong>
+                <span class="diamond-block__line">Pipeline health at a glance</span>
+              </div>
+              <div class="diamond">
+                <div class="diamond__inner"><img src="screenshots/dashboard.png" alt="" decoding="sync" /></div>
+              </div>
+            </div>
+            <div class="diamond-block diamond-block--large">
+              <div class="diamond-block__text">
+                <strong class="diamond-block__title">Leads</strong>
+                <span class="diamond-block__line">Every inquiry, one workspace</span>
+              </div>
+              <div class="diamond">
+                <div class="diamond__inner"><img src="screenshots/leads.png" alt="" decoding="sync" /></div>
+              </div>
+            </div>
+            <div class="diamond-block diamond-block--large">
+              <div class="diamond-block__text">
+                <strong class="diamond-block__title">Instant quote</strong>
+                <span class="diamond-block__line">Turn site traffic into leads</span>
+              </div>
+              <div class="diamond">
+                <div class="diamond__inner"><img src="screenshots/widget.png" alt="" decoding="sync" /></div>
+              </div>
+            </div>
+            <div class="diamond-block diamond-block--large">
+              <div class="diamond-block__text">
+                <strong class="diamond-block__title">Agreements</strong>
+                <span class="diamond-block__line">Sign and pay in one link</span>
+              </div>
+              <div class="diamond">
+                <div class="diamond__inner"><img src="screenshots/agreements.png" alt="" decoding="sync" /></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="diamond-block diamond-block--small diamond-block--bottom">
+            <div class="diamond-block__text">
+              <strong class="diamond-block__title">LimoCRM</strong>
+              <span class="diamond-block__line">Quote · Automate · Grow</span>
+            </div>
+            <div class="diamond diamond--brand">
+              <div class="diamond__inner">
+                <ul>
+                  <li>Instant quote on your site</li>
+                  <li>Workflow automation</li>
+                  <li>Low cost vs. legacy tools</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="opening-spread__content">
+      <div class="opening-brand">
+        <img class="opening-brand__logo" src="../../assets/images/brand-logos/abcs.svg" alt="" width="40" height="40" onerror="this.style.display='none'" />
+        <div>
+          <div class="opening-brand__name">LimoCRM</div>
+          <div class="opening-brand__tag">Product guide</div>
+        </div>
+      </div>
+
+      <h1 class="opening-headline">
+        <i class="ri-lightbulb-flash-line" aria-hidden="true"></i>
+        <span>Building blocks for <span>your limo business</span></span>
+      </h1>
+
+      <p class="opening-tagline">
+        Website → lead → quote → agreement → payment → report—one workspace built for limousine operators.
+      </p>
+
+      <p class="opening-services-label">
+        <i class="ri-apps-2-line" aria-hidden="true"></i>
+        Modules at a glance
+      </p>
+
+      <nav class="module-catalog" aria-label="Module catalog">
+        <a class="catalog-item" href="#sec-01">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-dashboard-3-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">01</span>
+            <span class="catalog-item__name">Dashboard</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-01">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-bar-chart-grouped-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">01</span>
+            <span class="catalog-item__name">Reports</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-02">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-user-search-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">02</span>
+            <span class="catalog-item__name">Leads</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-02">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-file-list-3-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">02</span>
+            <span class="catalog-item__name">Lead detail</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-02">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-contacts-book-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">02</span>
+            <span class="catalog-item__name">Contacts</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-02">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-checkbox-circle-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">02</span>
+            <span class="catalog-item__name">Tasks</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-03">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-car-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">03</span>
+            <span class="catalog-item__name">Vehicles</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-03">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-price-tag-3-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">03</span>
+            <span class="catalog-item__name">Pricing</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-04">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-file-text-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">04</span>
+            <span class="catalog-item__name">Agreements</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-04">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-exchange-funds-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">04</span>
+            <span class="catalog-item__name">Transactions</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-05">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-layout-4-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">05</span>
+            <span class="catalog-item__name">Email templates</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-05">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-line-chart-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">05</span>
+            <span class="catalog-item__name">Email analytics</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-06">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-calculator-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">06</span>
+            <span class="catalog-item__name">Widget</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-06">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-flow-chart"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">06</span>
+            <span class="catalog-item__name">Workflows</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-06">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-login-box-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">06</span>
+            <span class="catalog-item__name">Explore demo</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-07">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-team-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">07</span>
+            <span class="catalog-item__name">Users</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-07">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-shield-user-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">07</span>
+            <span class="catalog-item__name">Roles</span>
+          </div>
+        </a>
+        <a class="catalog-item" href="#sec-07">
+          <div class="catalog-item__icon" aria-hidden="true"><i class="ri-settings-3-line"></i></div>
+          <div class="catalog-item__text">
+            <span class="catalog-item__sec">07</span>
+            <span class="catalog-item__name">Settings</span>
+          </div>
+        </a>
+      </nav>
+
+      <!-- <div class="journey-strip" aria-label="Customer journey">
+        <span>Website</span><span class="journey-strip__arrow">→</span>
+        <span>Lead</span><span class="journey-strip__arrow">→</span>
+        <span>Quote</span><span class="journey-strip__arrow">→</span>
+        <span>Agreement</span><span class="journey-strip__arrow">→</span>
+        <span>Payment</span><span class="journey-strip__arrow">→</span>
+        <span>Report</span>
+      </div>
+    </div> -->
+  </section>
+
+  <!-- 01 Command center -->
+  <div class="section" id="sec-01">
+    <div class="section-header">
+      <span class="section-header__num">01</span>
+      <div class="section-header__text">
+        <h2>Command center</h2>
+        <p>Start every day knowing pipeline health and performance</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-dashboard-3-line"></i> Dashboard</h3>
+        <p>See year-to-date lead volume, open pipeline, and wins in charts and KPI cards at a glance. Owners get a team-wide view; staff see only the pipeline they own, so everyone starts the day knowing what needs attention.</p>
+        <ul class="module-bullets">
+          <li>YTD lead charts and monthly win tracking</li>
+          <li>Open pipeline KPI cards at a glance</li>
+          <li>Admin vs staff pipeline visibility by role</li>
+          <li>Quick health check before the daily standup</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/dashboard.png" alt="Dashboard" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-bar-chart-grouped-line"></i> Reports &amp; Analytics</h3>
+        <p>Drill into performance by month, quarter, or year with funnel stages, geographic breakdowns, and revenue-style metrics drawn from real lead data. Use it to spot which routes, channels, and periods drive growth—and where deals stall.</p>
+        <ul class="module-bullets">
+          <li>Funnel and stage analysis by month, quarter, or year</li>
+          <li>Geographic breakdown from pickup and dropoff data</li>
+          <li>Revenue-style metrics from trip pricing fields</li>
+          <li>Trend lines to spot seasonal peaks and slow periods</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/reports.png" alt="Reports and Analytics" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <!-- 02 Sales pipeline -->
+  <div class="section" id="sec-02">
+    <div class="section-header">
+      <span class="section-header__num">02</span>
+      <div class="section-header__text">
+        <h2>Sales pipeline</h2>
+        <p>From first inquiry to won booking in one workspace</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-user-search-line"></i> Leads</h3>
+        <p>Every inquiry lives in one searchable list with status, assignment, trip details, and pricing. It is the central hub for moving a job from first contact to a won booking.</p>
+        <ul class="module-bullets">
+          <li>Searchable list with status, assignee, and trip details</li>
+          <li>Pickup, dropoff, date, and price on every row</li>
+          <li>Role-based create, edit, and delete permissions</li>
+          <li>Central hub from new inquiry to won booking</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/leads.png" alt="Leads" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-file-list-3-line"></i> Lead detail</h3>
+        <p>Open a single lead to see full history, related emails, and actions to send a formal quote or agreement link. Your team stays in one workspace instead of jumping between inbox, docs, and payment tools.</p>
+        <ul class="module-bullets">
+          <li>Full trip history and pricing on one screen</li>
+          <li>Related emails tied to the lead timeline</li>
+          <li>Send quote or agreement links from the record</li>
+          <li>Status updates without leaving the workspace</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/lead-detail.png" alt="Lead detail" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-add-circle-line"></i> Add / Edit lead</h3>
+        <p>Capture new bookings or update existing ones with forms built for limo trips—pickup, dropoff, date, passengers, vehicle, and assignee. Keeps data clean from the first touch so quotes and agreements are accurate.</p>
+        <ul class="module-bullets">
+          <li>Limo-specific fields: pickup, dropoff, date, passengers</li>
+          <li>Vehicle and assignee selection on every job</li>
+          <li>Clean data from first touch for accurate quotes</li>
+          <li>Edit existing records without re-entering everything</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/add-lead.png" alt="Add lead" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-contacts-book-line"></i> Contacts</h3>
+        <p>Store long-term customer records separate from one-off leads, with detail and edit views for repeat clients and corporate accounts. Builds a relationship layer that supports upsell and loyalty over time.</p>
+        <ul class="module-bullets">
+          <li>Long-term customer records separate from one-off leads</li>
+          <li>Detail and edit views for repeat clients</li>
+          <li>Corporate account tracking for B2B sales</li>
+          <li>Relationship layer for upsell and loyalty</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/contacts.png" alt="Contacts" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-sticky-note-line"></i> Notes</h3>
+        <p>Attach internal notes to CRM records so dispatch, sales, and owners share context in one place. Replaces scattered email threads and sticky notes when handoffs happen.</p>
+        <ul class="module-bullets">
+          <li>Internal notes attached to CRM records</li>
+          <li>Shared context for dispatch, sales, and owners</li>
+          <li>Replaces scattered email threads on handoffs</li>
+          <li>Timestamped history on each record</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/notes.png" alt="Notes" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-checkbox-circle-line"></i> Tasks</h3>
+        <p>Track follow-up to-dos tied to CRM work—calls, quotes, and check-ins—so nothing slips after a conversation. Keeps the team accountable without a separate task app.</p>
+        <ul class="module-bullets">
+          <li>Follow-up to-dos tied to CRM records</li>
+          <li>Calls, quotes, and check-ins tracked in one list</li>
+          <li>Nothing slips after a customer conversation</li>
+          <li>No separate task app required</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/tasks.png" alt="Tasks" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <!-- 03 Fleet -->
+  <div class="section" id="sec-03">
+    <div class="section-header">
+      <span class="section-header__num">03</span>
+      <div class="section-header__text">
+        <h2>Fleet &amp; pricing</h2>
+        <p>Quote from the vehicles and rates you actually run</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-car-line"></i> Vehicles (Fleet)</h3>
+        <p>Maintain a catalog of limos with capacity, features, photos, and status in a fleet grid. Sales always quotes from what you actually run, not outdated spreadsheets.</p>
+        <ul class="module-bullets">
+          <li>Fleet grid with capacity, features, and photos</li>
+          <li>Active/inactive status per vehicle</li>
+          <li>Sales quotes from live fleet data</li>
+          <li>Replaces outdated spreadsheet catalogs</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/vehicles.png" alt="Fleet" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-car-washing-line"></i> Vehicle detail</h3>
+        <p>View deep specs, image gallery, and pricing for one vehicle when configuring quotes or reviewing fleet ops. Gives dispatch and sales the same source of truth on each unit.</p>
+        <ul class="module-bullets">
+          <li>Deep specs and image gallery per vehicle</li>
+          <li>Per-vehicle pricing overrides</li>
+          <li>Same source of truth for dispatch and sales</li>
+          <li>Quick review before quoting a specific unit</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/vehicle-detail.png" alt="Vehicle detail" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-price-tag-3-line"></i> Pricing (Admin)</h3>
+        <p>Set global hourly rates, fuel surcharge, and driver commission defaults, then override per vehicle when needed. Protects margin while keeping quotes consistent across the team.</p>
+        <ul class="module-bullets">
+          <li>Global hourly rates and fuel surcharge defaults</li>
+          <li>Driver commission settings at account level</li>
+          <li>Per-vehicle pricing overrides when needed</li>
+          <li>Consistent quotes that protect margin</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/pricing.png" alt="Pricing" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <!-- 04 Revenue -->
+  <div class="section" id="sec-04">
+    <div class="section-header">
+      <span class="section-header__num">04</span>
+      <div class="section-header__text">
+        <h2>Revenue: agreements &amp; payments</h2>
+        <p>Sign, collect, and reconcile without leaving CRM</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-file-text-line"></i> Agreements (staff)</h3>
+        <p>Manage agreement records and generate signing links from inside CRM for jobs ready to close. Track which bookings are still awaiting signature so sales can follow up quickly.</p>
+        <ul class="module-bullets">
+          <li>Agreement records linked to leads</li>
+          <li>Generate signing links from inside CRM</li>
+          <li>Track bookings awaiting signature</li>
+          <li>Fast follow-up when deals are ready to close</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/agreements.png" alt="Agreements" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-shield-check-line"></i> Public agreement page</h3>
+        <p>Customers open a branded page to review the trip, sign electronically, and pay via Stripe, PayPal, or offline—without staff in the loop. Shortens the gap between “yes” and money in the bank.</p>
+        <ul class="module-bullets">
+          <li>Branded page with full trip details</li>
+          <li>Electronic signature without staff involvement</li>
+          <li>Stripe, PayPal, or offline payment options</li>
+          <li>Shorter gap between “yes” and payment</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/agreement-public.png" alt="Public agreement page" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-bank-card-line"></i> Payment methods (Admin)</h3>
+        <p>Connect Stripe and PayPal and choose the default payment mode for each operator account. Each owner controls how their customers pay while staying inside one platform.</p>
+        <ul class="module-bullets">
+          <li>Connect Stripe and PayPal per account</li>
+          <li>Choose default payment mode for customers</li>
+          <li>Owner-controlled payment configuration</li>
+          <li>All payment setup inside one platform</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/payment-methods.png" alt="Payment methods" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-exchange-funds-line"></i> Transactions</h3>
+        <p>View a ledger of payments linked to jobs for reconciliation and cash-flow visibility. Owners see what cleared, when, and against which booking.</p>
+        <ul class="module-bullets">
+          <li>Payment ledger linked to each job</li>
+          <li>Reconciliation and cash-flow visibility</li>
+          <li>See what cleared and when</li>
+          <li>Match payments to specific bookings</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/transactions.png" alt="Transactions" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <!-- 05 Communications -->
+  <div class="section" id="sec-05">
+    <div class="section-header">
+      <span class="section-header__num">05</span>
+      <div class="section-header__text">
+        <h2>Communications</h2>
+        <p>Professional email from your brand, with measurable results</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-mail-settings-line"></i> Email settings</h3>
+        <p>Configure outbound SMTP accounts so quotes and agreements send from your domain and brand. Professional delivery builds trust and keeps messages out of spam folders.</p>
+        <ul class="module-bullets">
+          <li>Outbound SMTP from your domain</li>
+          <li>Branded sender for quotes and agreements</li>
+          <li>Professional delivery builds customer trust</li>
+          <li>Better deliverability vs generic senders</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/email-settings.png" alt="Email settings" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-layout-4-line"></i> Email templates</h3>
+        <p>Build and edit templates with a visual editor and LimoCRM placeholders for tracking and unsubscribe links. Every outreach looks consistent—formal quotes, agreements, and follow-ups included.</p>
+        <ul class="module-bullets">
+          <li>Visual editor with LimoCRM placeholders</li>
+          <li>Tracking and unsubscribe links built in</li>
+          <li>Consistent quotes, agreements, and follow-ups</li>
+          <li>Reusable templates across the team</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/email-templates.png" alt="Email templates" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-line-chart-line"></i> Email analytics</h3>
+        <p>See how outbound mail performs with open and engagement metrics per user. Refine templates and timing based on data, not guesswork.</p>
+        <ul class="module-bullets">
+          <li>Open and engagement metrics per user</li>
+          <li>Performance data for outbound mail</li>
+          <li>Refine templates based on real results</li>
+          <li>Optimize send timing with data</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/email-analytics.png" alt="Email analytics" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-mail-open-line"></i> Email detail</h3>
+        <p>Open a single sent message from a lead’s timeline for support, disputes, or audit. Full context on what went out and when, tied to the job.</p>
+        <ul class="module-bullets">
+          <li>Single sent message from the lead timeline</li>
+          <li>Full context for support and disputes</li>
+          <li>Audit trail of what went out and when</li>
+          <li>Tied directly to the job record</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/email-detail.png" alt="Email detail" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <!-- 06 Growth -->
+  <div class="section" id="sec-06">
+    <div class="section-header">
+      <span class="section-header__num">06</span>
+      <div class="section-header__text">
+        <h2>Growth &amp; automation</h2>
+        <p>Capture demand and automate repetitive work</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-plug-line"></i> Integrations (Widget)</h3>
+        <p>Get embed code, live preview, and controls for accent color and font to match your brand on any website. See which domains drive leads so marketing spend ties back to CRM data.</p>
+        <ul class="module-bullets">
+          <li>Embed code with live preview</li>
+          <li>Accent color and font match your brand</li>
+          <li>Track which domains drive leads</li>
+          <li>Marketing spend tied back to CRM data</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/integrations.png" alt="Integrations" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-calculator-line"></i> Instant quote widget</h3>
+        <p>Visitors enter pickup, destination, date, and passengers, pick a vehicle, and submit—creating a new lead in CRM automatically. Turns passive site traffic into qualified pipeline without phone tag.</p>
+        <ul class="module-bullets">
+          <li>Pickup, destination, date, and passenger fields</li>
+          <li>Vehicle selection before submit</li>
+          <li>Auto-creates a new lead in CRM</li>
+          <li>Turns site traffic into qualified pipeline</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/widget.png" alt="Instant quote widget" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-flow-chart"></i> Workflows</h3>
+        <p>Define rule-based automation with conditions and actions on leads and contacts—status changes, follow-ups, and repetitive updates. Frees staff from manual clicks as volume grows.</p>
+        <ul class="module-bullets">
+          <li>Rule-based conditions and actions</li>
+          <li>Automate status changes and follow-ups</li>
+          <li>Works on leads and contacts</li>
+          <li>Frees staff from manual clicks at scale</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/workflows.png" alt="Workflows" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-shield-keyhole-line"></i> Welcome / OTP funnel</h3>
+        <p>Prospects arrive via a marketing link, verify their email with a one-time code, and enter CRM securely. Campaign-driven growth stays verified and traceable from first click.</p>
+        <ul class="module-bullets">
+          <li>Marketing links with verified email entry</li>
+          <li>One-time code (OTP) for secure access</li>
+          <li>Campaign-driven growth stays traceable</li>
+          <li>Verified prospects from first click</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/welcome-otp.png" alt="Welcome OTP funnel" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-login-box-line"></i> Explore demo login</h3>
+        <p>Campaign links with tracking IDs can auto-open a demo workspace so prospects evaluate the product immediately. Sales and marketing see which sends convert to product exploration.</p>
+        <ul class="module-bullets">
+          <li>Campaign links with tracking IDs</li>
+          <li>Auto-open demo workspace for prospects</li>
+          <li>Immediate product evaluation</li>
+          <li>Track which sends convert to exploration</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/login-explore.png" alt="Explore demo login" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <!-- 07 Admin -->
+  <div class="section" id="sec-07">
+    <div class="section-header">
+      <span class="section-header__num">07</span>
+      <div class="section-header__text">
+        <h2>Administration &amp; account</h2>
+        <p>Scale the team without losing control</p>
+      </div>
+    </div>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-team-line"></i> Users</h3>
+        <p>Add team members, assign roles, and manage active accounts as the company scales. Onboarding new hires takes minutes, not an IT project.</p>
+        <ul class="module-bullets">
+          <li>Add team members and assign roles</li>
+          <li>Manage active and inactive accounts</li>
+          <li>Onboarding in minutes, not an IT project</li>
+          <li>Scale the team as the company grows</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/users.png" alt="Users" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-shield-user-line"></i> Role management</h3>
+        <p>Build roles with module-level create, read, update, and delete permissions—sales sees leads, not payment keys. Owners keep control; staff see only what their job requires.</p>
+        <ul class="module-bullets">
+          <li>Module-level create, read, update, delete permissions</li>
+          <li>Sales sees leads, not payment keys</li>
+          <li>Custom roles for each job function</li>
+          <li>Owners keep control as the team scales</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/roles.png" alt="Role management" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-settings-3-line"></i> Settings</h3>
+        <p>Update profile details, username, phone, and password in one account screen. Self-service changes reduce support load on admins.</p>
+        <ul class="module-bullets">
+          <li>Profile, username, phone, and password in one screen</li>
+          <li>Self-service account updates</li>
+          <li>Reduces admin support load</li>
+          <li>Quick changes without IT help</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/settings.png" alt="Settings" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-user-line"></i> Profile</h3>
+        <p>Quick view of the signed-in user’s identity and shortcuts to account actions. Keeps personal info accessible from anywhere in the app.</p>
+        <ul class="module-bullets">
+          <li>Signed-in user identity at a glance</li>
+          <li>Shortcuts to account actions</li>
+          <li>Accessible from anywhere in the app</li>
+          <li>Quick personal info without digging</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/profile.png" alt="Profile" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+
+    <article class="module-card">
+      <div class="module-copy">
+        <h3><i class="ri-guide-line"></i> Intro wizard</h3>
+        <p>A first-run guided tour walks new operators through fleet, templates, widget embed, and leads. Faster adoption means ROI sooner after go-live.</p>
+        <ul class="module-bullets">
+          <li>First-run guided tour for new operators</li>
+          <li>Covers fleet, templates, widget, and leads</li>
+          <li>Faster adoption after go-live</li>
+          <li>ROI sooner with guided setup</li>
+        </ul>
+      </div>
+      <figure class="module-shot"><img src="screenshots/dashboard.png" alt="Intro wizard on dashboard" decoding="sync" onerror="this.parentElement.classList.add('module-shot--pending');this.remove();" /></figure>
+    </article>
+  </div>
+
+  <footer class="cta">
+    <h2>One workspace. The full journey.</h2>
+    <p>Website → lead → quote → agreement → payment → report. LimoCRM connects every step for limousine operators.</p>
+    <span class="cta__pill">limocrm.com · Demo available</span>
+  </footer>
+</body>
+</html>

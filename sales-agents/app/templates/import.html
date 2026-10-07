@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Import operators</h1>
+<p class="sub">CSV is enough for v1. Google Places is optional. Sample file: <a href="/static/sample_prospects.csv">sample_prospects.csv</a></p>
+<div id="status"></div>
+<div class="two">
+  <div class="card">
+    <h3>CSV</h3>
+    <p class="sub">Headers: company, city, region, country, website, contact, role, email, phone, linkedin, instagram, facebook, x</p>
+    <form id="csv">
+      <input type="file" name="file" accept=".csv,text/csv" required>
+      <button class="btn" type="submit">Import CSV</button>
+    </form>
+    <button class="btn secondary" data-action="enrich-all" style="margin-top:12px">Enrich up to 10 new sites</button>
+  </div>
+  <div class="card">
+    <h3>Google Places</h3>
+    <form id="places">
+      <label>Query</label>
+      <input name="query" value="limousine service in Miami" required>
+      <button class="btn" type="submit">Search Places</button>
+    </form>
+  </div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h3>Add one company</h3>
+  <form id="manual" class="two">
+    <div>
+      <label>Company</label><input name="company" required>
+      <label>City</label><input name="city">
+      <label>Region</label><input name="region">
+      <label>Website</label><input name="website">
+      <label>Phone</label><input name="phone">
+    </div>
+    <div>
+      <label>Contact</label><input name="contact_name">
+      <label>Role</label><input name="role">
+      <label>Email</label><input name="email">
+      <label>LinkedIn URL</label><input name="linkedin_url">
+      <label>Instagram / Facebook / X</label>
+      <input name="instagram_url" placeholder="Instagram">
+      <input name="facebook_url" placeholder="Facebook" style="margin-top:8px">
+      <input name="x_url" placeholder="X" style="margin-top:8px">
+    </div>
+    <button class="btn" type="submit">Save prospect</button>
+  </form>
+</div>
+<script>
+document.getElementById("csv").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const fd = new FormData();
+  fd.append("file", e.target.file.files[0]);
+  const res = await fetch("/api/import/csv", { method: "POST", body: fd });
+  const json = await res.json();
+  flash(document.getElementById("status"), json, !res.ok);
+  if (res.ok) location.href = "/prospects";
+});
+document.getElementById("places").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    const json = await postForm("/api/hunter/places", { query: e.target.query.value });
+    flash(document.getElementById("status"), json, !!json.error);
+    if (!json.error) location.href = "/prospects";
+  } catch (err) { flash(document.getElementById("status"), err.message, true); }
+});
+document.getElementById("manual").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target).entries());
+  const json = await postForm("/api/prospects", data);
+  location.href = "/prospects/" + json.id;
+});
+</script>
+{% endblock %}

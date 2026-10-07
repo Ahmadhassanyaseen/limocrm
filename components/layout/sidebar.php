@@ -83,7 +83,7 @@
                           margin-right: 0px;
                         "
                       >
-                      <li class="slide__category"><span class="category-name">Main</span></li>
+                      <li class="slide__category"><span class="category-name" style="color: rgb(92 103 247);">Main</span></li>
                       <!-- Start::slide -->
 
                         <!-- Dashboard -->
@@ -224,7 +224,7 @@
 
                       <!-- ADMIN Section -->
                       <?php if (limo_nav_session_admin_full_access()): ?>
-                      <li class="slide__category"><span class="category-name" style="color: #e74c3c;">ADMIN</span></li>
+                      <li class="slide__category"><span class="category-name" style="color: rgb(92 103 247);">ADMIN</span></li>
 
                         <!-- User Management (Expandable) -->
                         <?php $userMgmtActive = in_array($url, ['users.php','role_management.php','employee_analytics.php']); ?>

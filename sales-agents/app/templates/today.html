@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Today’s social sends</h1>
+<p class="sub">Agents do not log into LinkedIn, Instagram, Facebook, or X. Copy, send from the real account, then mark sent. Cap yourself at a human daily volume.</p>
+<div id="status"></div>
+{% for channel, items in grouped.items() %}
+  <h2>{{ channel }} <span class="pill">{{ items|length }}</span></h2>
+  {% for item in items %}
+    {% set m = item.message %}
+    <div class="card" style="margin-bottom:12px">
+      <div class="channel">{{ m.sequence_step }}</div>
+      <h3>{{ item.prospect.company if item.prospect else '' }} — {{ item.contact.name if item.contact else '' }}</h3>
+      {% if item.contact %}
+        {% set url = item.contact.linkedin_url if channel == 'linkedin' else item.contact.instagram_url if channel == 'instagram' else item.contact.facebook_url if channel == 'facebook' else item.contact.x_url %}
+        {% if url %}<p><a href="{{ url }}" target="_blank" rel="noopener">Open profile</a></p>{% endif %}
+      {% endif %}
+      <textarea id="copy-{{ m.id }}" readonly>{{ m.body }}</textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn secondary" data-action="copy" data-id="{{ m.id }}">Copy</button>
+        <button class="btn" data-action="mark-sent" data-id="{{ m.id }}">Mark sent</button>
+      </div>
+    </div>
+  {% else %}
+    <div class="card">Nothing queued for {{ channel }}.</div>
+  {% endfor %}
+{% endfor %}
+{% endblock %}

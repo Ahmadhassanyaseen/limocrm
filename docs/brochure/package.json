@@ -1,0 +1,16 @@
+{
+  "name": "brochure",
+  "version": "1.0.0",
+  "description": "Print-ready HTML brochure built from [CLIENT_PITCH_MODULES.md](../CLIENT_PITCH_MODULES.md).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.61.1"
+  }
+}

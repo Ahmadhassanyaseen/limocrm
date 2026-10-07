@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Unsubscribe</h1>
+{% if done %}
+  <div class="card">{{ email }} is on the suppression list. We will not email this address again.</div>
+{% elif ok %}
+  <div class="card">
+    <p>Confirm unsubscribe for {{ email }}.</p>
+    <form method="post" action="/unsubscribe">
+      <input type="hidden" name="email" value="{{ email }}">
+      <input type="hidden" name="token" value="{{ token }}">
+      <button class="btn" type="submit">Unsubscribe</button>
+    </form>
+  </div>
+{% else %}
+  <div class="card">This unsubscribe link is invalid.</div>
+{% endif %}
+{% endblock %}

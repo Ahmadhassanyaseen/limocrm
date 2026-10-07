@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Prospects</h1>
+<p class="sub">Sorted by ICP score. Filter by stage from the dashboard cards.</p>
+<div class="card">
+  <table>
+    <thead>
+      <tr><th>Company</th><th>Location</th><th>Score</th><th>Stage</th><th>Next</th></tr>
+    </thead>
+    <tbody>
+    {% for p in prospects %}
+      <tr>
+        <td><a href="/prospects/{{ p.id }}">{{ p.company }}</a></td>
+        <td>{{ p.city }} {{ p.region }}</td>
+        <td><span class="pill {{ 'high' if p.icp_score >= 70 else 'mid' if p.icp_score >= 40 else '' }}">{{ p.icp_score|int }}</span></td>
+        <td>{{ p.stage }}</td>
+        <td>{{ p.next_action }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No prospects yet. Import a CSV or run a Places search.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

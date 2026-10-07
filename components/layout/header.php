@@ -1612,7 +1612,7 @@ $__limo_intro_add_lead = rtrim($APP_BASE, '/') . '/add_lead.php';
                       class="pcr-button"
                       role="button"
                       aria-label="toggle color picker dialog"
-                      style="--pcr-color: rgba(92, 103, 247, 1)"
+                      style="--pcr-color: rgba(29, 78, 216, 1)"
                     ></button>
                   </div>
                 </div>
@@ -1675,7 +1675,7 @@ $__limo_intro_add_lead = rtrim($APP_BASE, '/') . '/add_lead.php';
                       class="pcr-button"
                       role="button"
                       aria-label="toggle color picker dialog"
-                      style="--pcr-color: rgba(92, 103, 247, 1)"
+                      style="--pcr-color: rgba(29, 78, 216, 1)"
                     ></button>
                   </div>
                 </div>

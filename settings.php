@@ -34,9 +34,9 @@ $accountBadge = (!empty($u['role_id'])) ? 'Team' : 'Admin';
     --stg-inner: rgba(15,23,42,0.45);
     --stg-muted: rgba(226,232,240,0.55);
     --stg-heading: rgba(248,250,252,0.96);
-    --stg-accent: #CF1C82;
-    --stg-accent-dim: rgba(207, 28, 130 , 0.12);
-    --stg-gold: #CF1C82;
+    --stg-accent: #1d4ed8;
+    --stg-accent-dim: rgba(29, 78, 216, 0.12);
+    --stg-gold: #1d4ed8;
     --stg-input-bg: rgba(15,23,42,0.55);
     --stg-input-border: rgba(148,163,184,0.18);
     /* max-width: 1120px; */
@@ -191,9 +191,9 @@ $accountBadge = (!empty($u['role_id'])) ? 'Team' : 'Admin';
     font-weight: 700;
     font-size: 13px;
     cursor: pointer;
-    background: #CF1C82;
+    background: linear-gradient(90deg, #1d4ed8 0%, #38bdf8 100%);
     color: #fff;
-    box-shadow: 0 4px 14px rgba(212,175,55,0.28);
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.28);
     transition: filter 0.15s;
   }
   .stg-btn-gold:hover { filter: brightness(1.06); }

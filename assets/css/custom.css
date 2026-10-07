@@ -1,3 +1,28 @@
+:root {
+  --primary: 29 78 216;
+  --primary-rgb: 29, 78, 216;
+  --secondary: 56 189 248;
+  --primary-gradient: linear-gradient(90deg, #1d4ed8 0%, #38bdf8 100%);
+  --primary-gradient-hover: linear-gradient(90deg, #1e40af 0%, #0ea5e9 100%);
+  --primary-color: #1d4ed8;
+}
+
+.ti-btn-primary,
+.\!ti-btn-primary,
+.ti-btn-primary-gradient,
+.bg-primary-gradient {
+  background-image: var(--primary-gradient) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+.ti-btn-primary:hover,
+.\!ti-btn-primary:hover,
+.ti-btn-primary-gradient:hover,
+.bg-primary-gradient:hover {
+  background-image: var(--primary-gradient-hover) !important;
+}
+
 .text-center{
     text-align: center;
 }

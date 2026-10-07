@@ -7,10 +7,10 @@
     --lt-text: #0f172a;
     --lt-muted: rgba(15, 23, 42, 0.6);
     --lt-muted-2: rgba(15, 23, 42, 0.42);
-    --lt-accent: #cf1c82;
-    --lt-accent-2: rgba(207, 28, 130, 0.12);
+    --lt-accent: #1d4ed8;
+    --lt-accent-2: rgba(29, 78, 216, 0.12);
     --lt-row-hover: rgba(15, 23, 42, 0.04);
-    --lt-focus: rgba(207, 28, 130, 0.35);
+    --lt-focus: rgba(29, 78, 216, 0.35);
 
     background: var(--lt-surface);
     border: 1px solid var(--lt-border);
@@ -25,10 +25,10 @@
     --lt-text: rgba(255, 255, 255, 0.92);
     --lt-muted: rgba(255, 255, 255, 0.62);
     --lt-muted-2: rgba(255, 255, 255, 0.45);
-    --lt-accent: #cf1c82;
-    --lt-accent-2: rgba(207, 28, 130, 0.14);
+    --lt-accent: #1d4ed8;
+    --lt-accent-2: rgba(29, 78, 216, 0.14);
     --lt-row-hover: rgba(255, 255, 255, 0.04);
-    --lt-focus: rgba(207, 28, 130, 0.42);
+    --lt-focus: rgba(29, 78, 216, 0.42);
   }
 
   /* DataTables controls (search/paging/info) */

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Inbox</h1>
+<p class="sub">IMAP polls automatically when configured. You can also paste a LinkedIn/IG/X reply.</p>
+<div class="two">
+  <div class="card">
+    <h3>Threads</h3>
+    <table>
+      <thead><tr><th>Contact</th><th>Channel</th><th></th></tr></thead>
+      <tbody>
+      {% for t in threads %}
+        <tr>
+          <td><a href="/inbox/{{ t.id }}">{{ t.contact.name or t.contact.email or t.contact.id }}</a></td>
+          <td>{{ t.channel }} {% if t.unread %}<span class="badge">new</span>{% endif %}</td>
+          <td>{{ t.last_message_at }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="3">No threads yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Paste inbound</h3>
+    <form id="paste">
+      <label>Contact</label>
+      <select name="contact_id">
+        {% for c in contacts %}
+        <option value="{{ c.id }}">{{ c.name or c.email or c.id }} — #{{ c.prospect_id }}</option>
+        {% endfor %}
+      </select>
+      <label>Channel</label>
+      <select name="channel">
+        <option value="email">email</option>
+        <option value="linkedin">linkedin</option>
+        <option value="instagram">instagram</option>
+        <option value="facebook">facebook</option>
+        <option value="x">x</option>
+        <option value="sms">sms</option>
+        <option value="whatsapp">whatsapp</option>
+      </select>
+      <label>Message they sent</label>
+      <textarea name="body"></textarea>
+      <button class="btn" type="submit">Classify + draft closer</button>
+    </form>
+    <div id="status"></div>
+  </div>
+</div>
+<script>
+document.getElementById("paste").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  try {
+    const result = await postForm("/api/inbox/paste", {
+      contact_id: f.contact_id.value,
+      channel: f.channel.value,
+      body: f.body.value,
+    });
+    flash(document.getElementById("status"), "Classified as " + result.label);
+    location.href = "/approvals";
+  } catch (err) {
+    flash(document.getElementById("status"), err.message, true);
+  }
+});
+</script>
+{% endblock %}
